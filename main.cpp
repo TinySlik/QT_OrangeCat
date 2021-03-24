@@ -51,6 +51,7 @@
 #include "browser.h"
 #include "browserwindow.h"
 #include "tabwidget.h"
+#include "parameterserver.h"
 #include <QApplication>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
@@ -62,11 +63,16 @@ QUrl commandLineUrlArgument()
         if (!arg.startsWith(QLatin1Char('-')))
             return QUrl::fromUserInput(arg);
     }
-    return QUrl(QStringLiteral("https://tinyslik.github.io"));
+    return QUrl(QStringLiteral("http://localhost:8099"));
 }
 
 int main(int argc, char **argv)
 {
+    ParameterServer::instance()->CreateNewRoot("base");
+    ParameterServer::instance()->SetCurrentRoot("base");
+    auto ctrl = ParameterServer::instance()->GetCfgCtrlRoot();
+    ctrl["test_obj"] = "obj";
+
     QCoreApplication::setOrganizationName("QtExamples");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

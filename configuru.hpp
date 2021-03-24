@@ -1997,7 +1997,7 @@ namespace configuru
 		auto&& a_array = a.as_array();
 		auto&& b_array = b.as_array();
 		for (size_t i=0; i<a_array.size(); ++i) {
-		  result *= deep_async(a_array[i], a_array[i]);
+          result *= deep_async(a_array[i], b_array[i]);
 		}
 	      }
 	    }

@@ -52,6 +52,7 @@
 #include "browserwindow.h"
 #include "tabwidget.h"
 #include "parameterserver.h"
+#include "mainwindow.h"
 #include <QApplication>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
@@ -68,7 +69,18 @@ QUrl commandLineUrlArgument()
 
 int main(int argc, char **argv)
 {
-    ParameterServer::instance()->CreateNewRoot("base");
+
+    ParameterServer::instance()->CreateNewRoot("base", {
+                                                   {"dev_ctrl", {
+                                                     {"array",  configuru::Config::array({ 1, 2, 3 })},
+                                                     { "key1", "value1" },
+                                                     { "key2", "value2" },
+                                                   }},
+                                                   {"dev_status", {
+                                                     { "key1", "value1" },
+                                                     { "key2", "value2" },
+                                                   }}
+                                                 });
     ParameterServer::instance()->SetCurrentRoot("base");
     auto ctrl = ParameterServer::instance()->GetCfgCtrlRoot();
     ctrl["test_obj"] = "obj";
@@ -88,7 +100,11 @@ int main(int argc, char **argv)
 
     Browser browser;
     BrowserWindow *window = browser.createWindow();
+    window->show();
     window->tabWidget()->setUrl(url);
+
+//    MainWindow w;
+//    w.show();
 
     return app.exec();
 }

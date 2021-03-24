@@ -26,8 +26,10 @@ include(cmake/Option.cmake)
 # flags
 
 if(OS_WIN)
+  set(QT_PATH "D:/Qt/Qt5.13.2/5.13.2")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+  set(Qt5WebEngineWidgets_DIR ${QT_PATH}/msvc2017/lib/cmake/Qt5WebEngineWidgets)
 elseif(OS_MAC)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wno-error=deprecated-declarations -Wno-deprecated-declarations -Wno-error=expansion-to-defined -Wno-expansion-to-defined")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wno-error=deprecated-declarations -Wno-deprecated-declarations -Wno-error=expansion-to-defined -Wno-expansion-to-defined")
@@ -60,7 +62,6 @@ macro(target_link_threads NAME)
 endmacro()
 
 include(CMakePackageConfigHelpers)
-
 
 find_package(Qt5 COMPONENTS Widgets WebEngineWidgets REQUIRED)
 
@@ -118,6 +119,9 @@ add_executable(OIL
     passworddialog.ui
     downloadmanagerwidget.ui
     downloadwidget.ui
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
 )
 
 target_link_libraries(OIL PRIVATE Qt5::Widgets Qt5::WebEngineWidgets )

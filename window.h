@@ -48,21 +48,41 @@
 **
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef WINDOW_H
+#define WINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
 
-class MainWindow : public QMainWindow
+QT_BEGIN_NAMESPACE
+class QSlider;
+class QPushButton;
+QT_END_NAMESPACE
+
+class GLWidget;
+class MainWindow;
+
+class Window : public QWidget
 {
     Q_OBJECT
 
 public:
-    MainWindow();
-    ~MainWindow();
+    Window(MainWindow *mw);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
-    void onAddNew();
+    void dockUndock();
+
+private:
+    QSlider *createSlider();
+
+    GLWidget *glWidget;
+    QSlider *xSlider;
+    QSlider *ySlider;
+    QSlider *zSlider;
+    QPushButton *dockBtn;
+    MainWindow *mainWindow;
 };
 
 #endif

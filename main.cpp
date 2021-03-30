@@ -52,10 +52,19 @@
 #include "browserwindow.h"
 #include "tabwidget.h"
 #include "parameterserver.h"
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QSurfaceFormat>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
+
+#include "glwidget.h"
 #include "mainwindow.h"
 #include <QApplication>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
+
+#include <QGuiApplication>
 
 QUrl commandLineUrlArgument()
 {
@@ -67,14 +76,21 @@ QUrl commandLineUrlArgument()
     return QUrl(QStringLiteral("http://localhost:8099"));
 }
 
+std::shared_ptr<std::vector<char>> func() {
+    auto ss = std::vector<char>(256);
+    memcpy(ss.data(), "hello", 6);
+    return std::make_shared<std::vector<char>>(ss);
+}
+
 int main(int argc, char **argv)
 {
+    std::cout << (char *)(func()->data()) << std::endl;
 
     ParameterServer::instance()->CreateNewRoot("base", {
                                                    {"dev_ctrl", {
-                                                     {"array",  configuru::Config::array({ 1, 2, 3 })},
-                                                     { "key1", "value1" },
-                                                     { "key2", "value2" },
+                                                     { "X", 0 },
+                                                     { "Y", 0 },
+                                                     { "Z", 0 }
                                                    }},
                                                    {"dev_status", {
                                                      { "key1", "value1" },
@@ -90,7 +106,7 @@ int main(int argc, char **argv)
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     QApplication app(argc, argv);
-//    app.setWindowIcon(QIcon(QStringLiteral(":AppLogoColor.png")));
+////    app.setWindowIcon(QIcon(QStringLiteral(":AppLogoColor.png")));
 
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
@@ -103,8 +119,46 @@ int main(int argc, char **argv)
     window->show();
     window->tabWidget()->setUrl(url);
 
-//    MainWindow w;
-//    w.show();
+    QCoreApplication::setApplicationName("Oil paint demo.");
+    QCoreApplication::setOrganizationName("Citek");
+    QCoreApplication::setApplicationVersion(QT_VERSION_STR);
+    QCommandLineParser parser;
+    parser.setApplicationDescription(QCoreApplication::applicationName());
+    parser.addHelpOption();
+    parser.addVersionOption();
+    QCommandLineOption multipleSampleOption("multisample", "Multisampling");
+    parser.addOption(multipleSampleOption);
+    QCommandLineOption coreProfileOption("coreprofile", "Use core profile");
+    parser.addOption(coreProfileOption);
+    QCommandLineOption transparentOption("transparent", "Transparent window");
+    parser.addOption(transparentOption);
 
+    parser.process(app);
+
+    QSurfaceFormat fmt;
+    fmt.setDepthBufferSize(24);
+    if (parser.isSet(multipleSampleOption))
+        fmt.setSamples(4);
+    if (parser.isSet(coreProfileOption)) {
+        fmt.setVersion(3, 2);
+        fmt.setProfile(QSurfaceFormat::CoreProfile);
+    }
+    QSurfaceFormat::setDefaultFormat(fmt);
+
+    MainWindow mainWindow;
+
+    GLWidget::setTransparent(parser.isSet(transparentOption));
+    if (GLWidget::isTransparent()) {
+        mainWindow.setAttribute(Qt::WA_TranslucentBackground);
+        mainWindow.setAttribute(Qt::WA_NoSystemBackground, false);
+    }
+    mainWindow.resize(mainWindow.sizeHint());
+    int desktopArea = QApplication::desktop()->width() *
+                     QApplication::desktop()->height();
+    int widgetArea = mainWindow.width() * mainWindow.height();
+    if (((float)widgetArea / (float)desktopArea) < 0.75f)
+        mainWindow.show();
+    else
+        mainWindow.showMaximized();
     return app.exec();
 }

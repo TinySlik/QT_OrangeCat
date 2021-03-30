@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the examples of the Qt Toolkit.
@@ -48,21 +48,12 @@
 **
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+import QtQuick 2.0
 
-#include <QMainWindow>
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    MainWindow();
-    ~MainWindow();
-
-private slots:
-    void onAddNew();
-};
-
-#endif
+Text {
+    width: 400
+    height: 100
+    text: 'Platform does not support threaded OpenGL needed by this example.'
+    verticalAlignment: Text.AlignVCenter
+    horizontalAlignment: Text.AlignHCenter
+}

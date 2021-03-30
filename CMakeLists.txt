@@ -63,7 +63,7 @@ endmacro()
 
 include(CMakePackageConfigHelpers)
 
-find_package(Qt5 COMPONENTS Widgets WebEngineWidgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets WebEngineWidgets Quick REQUIRED)
 
 set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
 set_outdir(
@@ -88,7 +88,12 @@ add_custom_command(TARGET res
   COMMAND echo "executing a res command"
  )
 
+file(GLOB_RECURSE QRC_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
+#set(QRC_SOURCE_FILES res.qrc)
+qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
+
 add_executable(OIL
+    ${QRC_FILES}
     browser.h
     browserwindow.h
     downloadmanagerwidget.h
@@ -121,7 +126,14 @@ add_executable(OIL
     downloadwidget.ui
     mainwindow.cpp
     mainwindow.h
-    mainwindow.ui
+    glwidget.h
+    window.h
+    mainwindow.h
+    logo.h
+    glwidget.cpp
+    main.cpp
+    window.cpp
+    logo.cpp
 )
 
-target_link_libraries(OIL PRIVATE Qt5::Widgets Qt5::WebEngineWidgets )
+target_link_libraries(OIL PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick)

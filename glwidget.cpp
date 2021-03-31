@@ -84,19 +84,19 @@ GLWidget::GLWidget(QWidget *parent)
     cfg["X"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_int()) return false;
         auto tg = int(b);
-        setXRotation(m_xRot + 8 * tg);
+        setXRotation(8 * tg);
         return true;
       });
     cfg["Y"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_int()) return false;
         auto tg = int(b);
-        setYRotation(m_yRot + 8 * tg);
+        setYRotation(8 * tg);
         return true;
       });
     cfg["Z"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_int()) return false;
         auto tg = int(b);
-        setZRotation(m_zRot + 8 * tg);
+        setZRotation(8 * tg);
         return true;
       });
 }
@@ -288,8 +288,11 @@ void GLWidget::initializeGL()
     m_program->setUniformValue(m_lightPosLoc, QVector3D(0, 0, 70));
 
     m_program->release();
+    setXRotation(0);
+    setYRotation(0);
+    setZRotation(0);
 
-    timer.start(12, this);
+    timer.start(16, this);
 }
 
 void GLWidget::setupVertexAttribs()
@@ -343,7 +346,8 @@ void GLWidget::resizeGL(int w, int h)
     m_proj.setToIdentity();
 
     // Set perspective projection
-    m_proj.perspective(fov, aspect, zNear, zFar);
+    m_proj.ortho(+0.5f, -0.5f, +0.5f, -0.5f, zNear, zFar);
+//    m_proj.perspective(fov, aspect, zNear, zFar);
 
 //    m_proj.setToIdentity();
 //    m_proj.perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);

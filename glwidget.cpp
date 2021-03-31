@@ -333,8 +333,21 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
+    // Calculate aspect ratio
+    qreal aspect = qreal(w) / qreal(h ? h : 1);
+
+    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
+    const qreal zNear = 0.01f, zFar = 100.0f, fov = 45.0;
+
+    // Reset projection
     m_proj.setToIdentity();
-    m_proj.perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
+
+    // Set perspective projection
+    m_proj.perspective(fov, aspect, zNear, zFar);
+
+//    m_proj.setToIdentity();
+//    m_proj.perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
+
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)

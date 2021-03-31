@@ -10,74 +10,44 @@ uniform float time;
 //  gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0);
 //}
 
+// 随泥浆脉冲信号去噪算法验证demo (论文同步页数)
 
-float hash( float n ) { return fract(sin(n)*753.5453123); }
-
-// Slight modification of iq's noise function.
-float noise( in vec2 x )
-{
-    vec2 p = floor(x);
-    vec2 f = fract(x);
-    f = f*f*(3.0-2.0*f);
-
-    float n = p.x + p.y*157.0;
-    return mix(
-                    mix( hash(n+  0.0), hash(n+  1.0),f.x),
-                    mix( hash(n+157.0), hash(n+158.0),f.x),
-            f.y);
-}
-
-
-float fbm(vec2 p, vec3 a)
-{
-     float v = 0.0;
-     v += noise(p*a.x)*.50;
-     v += noise(p*a.y)*.50;
-     v += noise(p*a.z)*.125;
-     return v;
-}
-
-vec3 drawLines( vec2 uv, vec3 fbmOffset,  vec3 color2 )
-{
-    float timeVal = time * 0.1;
-    vec3 finalColor = vec3( 0.0 );
-
-    for( int i=0; i < 1; ++i )
-    {
-        float indexAsFloat = float(i);
-        float amp = 8.0 + (indexAsFloat*7.0);
-        float period = 2.0 + (indexAsFloat+8.0);
-        float thickness = mix( 0.7, 1.0, noise(uv*10.0) );
-        float t = abs( 1.0 / (sin(uv.x + fbm( uv + timeVal * period, fbmOffset )) * amp) * thickness );
-
-        finalColor +=  t * color2 * 0.6;
-    }
-
-    return finalColor;
-}
-
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
+const vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
+const vec4 black = vec4(0.0, 0.0, 0.0, 1.0);
+const vec4 color1 = vec4(1.0, 0.7, 0.7, 1.0);
+const vec4 color2 = vec4(0.2, 0.2, 0.9, 1.0);
+const vec4 color3 = vec4(0.9, 0.0, 0.2, 1.0);
+const vec4 color4 = vec4(0.2, 1.0, 0.2, 1.0);
+const vec4 color5 = vec4(0.6, 0.5, 0.2, 1.0);
 
 void main( void )
 {
+        vec2 position = vert.xy * 30.0;
 
-    vec2 pos = vert.xy / 1.0; // resolution-independent position relative to lower-left screen corner
-      //vec2 pos = (gl_FragCoord.xy - 0.5*R) / R.y; // resolution-independent position relative to screen center
-      //vec2 pos = (gl_FragCoord.xy - M*R) / R.y; // resolution-independent position relative to mouse position
-      //vec2 pos = gl_FragCoord.xy / R.y - 0.2*vec2(T, sin(T)); // resolution-independent position relative to moving center
+        float x = position.x;
+        float y = position.y;
 
-      float freq = 16.0; vec2 tile = floor(pos * freq); // convert position into tile coordinates
+        float d1 = 0.04, d2 = 0.03;
+        gl_FragColor = white;
+        if ((y > -d1)&&((y < d1)))   gl_FragColor = black;
+        if ((x > -d1)&&((x < d1)))   gl_FragColor = black;
 
-      vec3 rgb = vec3(mod(tile.x + tile.y, 2.0)); // black-and-white chessboard
-      //float steps = 5.0; vec3 rgb = vec3(mod(tile.x + tile.y, steps) / (steps - 1.0)); // multi-gray chessboard
-      //vec3 rgb = vec3(mod(tile.x, 2.0), mod(tile.y, 3.0), mod(tile.x + tile.y, 2.0)); // multi-color chessboard
-      //vec3 rgb = vec3(min(min(tile.x, tile.y), min(freq-tile.x, freq-tile.y)) * 2.0 / freq); // concentric squares
+        if (((fract(x) < d2 || (fract(x) > 1.0 - d2)) && abs(y) < 0.25))   gl_FragColor = black;
+        if (((fract(y) < d2 || (fract(y) > 1.0 - d2)) && abs(x) < 0.25))   gl_FragColor = black;
 
-   gl_FragColor = vec4(rgb.r,rgb.g,rgb.b, 1.0); // set fragment color
+        // 基础波形使用三角函数曲线.
 
+        // functions
+        float fx1 = sin(x+time);
+        float fx2 = cos(x+time * 2.0);
+//        float fx2 = 2.0*smoothstep(-2.,2.,x)-1.;
+//        float fx3 = x/sqrt(1.0+pow(x,2.0));
+//        float fx4 = x/sqrt(1.0+pow(x,4.0));
+//        float fx5 = 2.0*sin(4.*x)/x;
+
+        if ((y < fx1+d1)&&((y > fx1-d2))) gl_FragColor = color1;
+        if ((y < fx2+d1)&&((y > fx2-d2))) gl_FragColor = color2;
+//        if ((y < fx3+d1)&&((y > fx3-d2))) gl_FragColor = color3;
+//        if ((y < fx4+d1)&&((y > fx4-d2))) gl_FragColor = color4;
+//        if ((y < fx5+d1)&&((y > fx5-d2))) gl_FragColor = color5;
 }

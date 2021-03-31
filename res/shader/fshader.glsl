@@ -20,6 +20,14 @@ const vec4 color3 = vec4(0.9, 0.0, 0.2, 1.0);
 const vec4 color4 = vec4(0.2, 1.0, 0.2, 1.0);
 const vec4 color5 = vec4(0.6, 0.5, 0.2, 1.0);
 
+float rand(float n){return fract(sin(n) * 43758.5453123);}
+
+float noise(float p){
+        float fl = floor(p);
+  float fc = fract(p);
+        return mix(rand(fl), rand(fl + 1.0), fc);
+}
+#if 0
 void main( void )
 {
         vec2 position = vert.xy * 20.0;
@@ -54,4 +62,19 @@ void main( void )
 //        if ((y < fx3+d1)&&((y > fx3-d2))) gl_FragColor = color3;
 //        if ((y < fx4+d1)&&((y > fx4-d2))) gl_FragColor = color4;
 //        if ((y < fx5+d1)&&((y > fx5-d2))) gl_FragColor = color5;
+}
+#endif
+
+void main( void )
+{
+    vec2 me = vec2(vert.x + (mod(time, 500.f))/ 5.0, vert.y) * 20.0;
+    float y = 0.0;
+    y += mix(noise(me.x*4.0 * 5.0)*0.25,noise(me.x*4.0+1.0)*5.5,.15);
+    y += mix(noise(me.x*2.0 * 5.0)*0.25,noise(me.x*2.0+1.0)*4.4,.15);
+    y += mix(noise(me.x*4.0 * 5.0)*0.25,noise(me.x*1.0+1.0)*3.3,.15);
+    y += mix(noise(me.x*4.0 * 5.0)*0.25,noise(me.x*5.0+1.0)*0.25,.15);
+    if ( me.y < y + .05 && me.y  > y - .04)
+            gl_FragColor = vec4(1.0);
+    else
+            gl_FragColor = vec4(0.0);
 }

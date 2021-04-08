@@ -88,52 +88,37 @@ add_custom_command(TARGET res
   COMMAND echo "executing a res command"
  )
 
-file(GLOB_RECURSE QRC_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.qrc)
+file(GLOB_RECURSE QRC_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/res/*.qrc)
 #set(QRC_SOURCE_FILES res.qrc)
 qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
-add_executable(OIL
+add_executable(${PROJECT_NAME}
     ${QRC_FILES}
-    browser.h
-    browserwindow.h
-    downloadmanagerwidget.h
-    downloadwidget.h
-    tabwidget.h
-    webpage.h
-    webpopupwindow.h
-    webview.h
-    mongoose.h
-    parameterserver.h
-    simplethread.h
-    urldecode.h
-    easylogging++.h
-    configuru.hpp
-    browser.cpp
-    browserwindow.cpp
-    downloadmanagerwidget.cpp
-    downloadwidget.cpp
-    main.cpp
-    tabwidget.cpp
-    webpage.cpp
-    webpopupwindow.cpp
-    webview.cpp
-    mongoose.c
-    parameterserver.cpp
-    urldecode.cpp
-    certificateerrordialog.ui
-    passworddialog.ui
-    downloadmanagerwidget.ui
-    downloadwidget.ui
-    mainwindow.cpp
-    mainwindow.h
-    glwidget.h
-    window.h
-    mainwindow.h
-    logo.h
-    glwidget.cpp
-    main.cpp
-    window.cpp
-    logo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/certificateerrordialog.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/passworddialog.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadmanagerwidget.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadwidget.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/browser.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/browserwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadmanagerwidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadwidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/tabwidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/webpage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/webpopupwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/webview.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mongoose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/parameterserver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/urldecode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/glwidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/window.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/logo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/glwidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/logo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
-target_link_libraries(OIL PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick)

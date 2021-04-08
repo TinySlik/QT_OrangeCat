@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/error.qml</file>
+        <file>qml/main.qml</file>
+        <file>shader/fft-test.glsl</file>
+        <file>shader/fft.glsl</file>
+        <file>shader/frag.glsl</file>
+        <file>shader/fshader.glsl</file>
+        <file>shader/vert.glsl</file>
+        <file>shader/vshader.glsl</file>
+        <file>web_root/cat.svg</file>
+        <file>web_root/favicon.ico</file>
+        <file>web_root/index.html</file>
+        <file>web_root/jquery.min.js</file>
+        <file>web_root/json_editor.css</file>
+        <file>web_root/jsoneditor-icons.svg</file>
+        <file>web_root/jsoneditor.min.css</file>
+        <file>web_root/jsoneditor.min.js</file>
+        <file>web_root/style.css</file>
+        <file>web_root/test.txt</file>
+        <file>res.qrc</file>
+    </qresource>
+</RCC>

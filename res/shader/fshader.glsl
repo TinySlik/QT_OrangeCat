@@ -22,10 +22,18 @@ const vec4 color5 = vec4(0.6, 0.5, 0.2, 1.0);
 
 float rand(float n){return fract(sin(n) * 43758.5453123);}
 
-float noise(float p){
+// 随机噪声
+float noise0(float p){
         float fl = floor(p);
   float fc = fract(p);
         return mix(rand(fl), rand(fl + 1.0), fc);
+}
+
+// 活塞运动噪声(5hz)
+float noise1(float p){
+  float fl = floor(p);
+  float fc = fract(p);
+  return mix(rand(fl), rand(fl + 1.0), fc);
 }
 #if 0
 void main( void )
@@ -50,7 +58,6 @@ void main( void )
         // 相邻三钢绑干扰噪声(0.5hz)
         fx1 = fx1 + 3.0 * cos((x+time) * 0.5);
 
-
 //        float fx2 = cos(x+time * 2.0);
 //        float fx2 = 2.0*smoothstep(-2.,2.,x)-1.;
 //        float fx3 = x/sqrt(1.0+pow(x,2.0));
@@ -69,10 +76,10 @@ void main( void )
 {
     vec2 me = vec2(vert.x + (mod(time, 500.f))/ 5.0, vert.y) * 20.0;
     float y = 0.0;
-    y += mix(noise(me.x*4.0 * 5.0)*0.25,noise(me.x*4.0+1.0)*5.5,.15);
-    y += mix(noise(me.x*2.0 * 5.0)*0.25,noise(me.x*2.0+1.0)*4.4,.15);
-    y += mix(noise(me.x*4.0 * 5.0)*0.25,noise(me.x*1.0+1.0)*3.3,.15);
-    y += mix(noise(me.x*4.0 * 5.0)*0.25,noise(me.x*5.0+1.0)*0.25,.15);
+    y += mix(noise0(me.x*4.0 * 5.0)*0.25,noise0(me.x*4.0+1.0)*5.f,.15);
+    y += mix(noise0(me.x*2.0 * 5.0)*0.25,noise0(me.x*2.0+1.0)*1.f,.15);
+    y += mix(noise0(me.x*4.0 * 5.0)*0.25,noise0(me.x*1.0+1.0)*1.f,.15);
+    y += mix(noise0(me.x*4.0 * 5.0)*0.25,noise0(me.x*5.0+1.0)*1.f,.15);
     if ( me.y < y + .05 && me.y  > y - .04)
             gl_FragColor = vec4(1.0);
     else

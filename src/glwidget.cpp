@@ -59,17 +59,12 @@
 
 bool GLWidget::m_transparent = false;
 
-void GLWidget::timerEvent(QTimerEvent *)
-{
-    update();
-}
-
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent),
       m_xRot(0),
       m_yRot(0),
       m_zRot(0),
-      m_program(0)
+      m_program(nullptr)
 {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -160,8 +155,8 @@ void GLWidget::cleanup()
         return;
     makeCurrent();
     m_logoVbo.destroy();
-    delete m_program;
-    m_program = 0;
+//    delete m_program;
+//    m_program = 0;
     doneCurrent();
 }
 
@@ -247,10 +242,12 @@ void GLWidget::initializeGL()
     initializeOpenGLFunctions();
     glClearColor(0, 0, 0, m_transparent ? 0 : 1);
 
-    m_program = new QOpenGLShaderProgram;
-    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/res/shader/vshader.glsl"))
+    m_program = std::make_shared<QOpenGLShaderProgram>();
+
+//    m_program = new QOpenGLShaderProgram;
+    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shader/vshader.glsl"))
         close();
-    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/res/shader/fshader.glsl"))
+    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shader/fshader.glsl"))
         close();
 //    m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, m_core ? vertexShaderSourceCore : vertexShaderSource);
 //    m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, m_core ? fragmentShaderSourceCore : fragmentShaderSource);
@@ -292,7 +289,8 @@ void GLWidget::initializeGL()
     setYRotation(0);
     setZRotation(0);
 
-    timer.start(16, this);
+    connect(&timer,SIGNAL(timeout()),this,SLOT(update()));
+    timer.start(16);
 }
 
 void GLWidget::setupVertexAttribs()

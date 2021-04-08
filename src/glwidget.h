@@ -48,33 +48,74 @@
 **
 ****************************************************************************/
 
-#include "mainwindow.h"
-#include "window.h"
-#include <QMenuBar>
-#include <QMenu>
-#include <QMessageBox>
+#ifndef GLWIDGET_H
+#define GLWIDGET_H
 
-MainWindow::MainWindow()
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
+#include <QMatrix4x4>
+#include <QTimer>
+#include "logo.h"
+
+QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
+
+class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
-    QMenuBar *menuBar = new QMenuBar;
-    QMenu *menuWindow = menuBar->addMenu(tr("&Window"));
-    QAction *addNew = new QAction(menuWindow);
-    addNew->setText(tr("Add new"));
-    menuWindow->addAction(addNew);
-    connect(addNew, &QAction::triggered, this, &MainWindow::onAddNew);
-    setMenuBar(menuBar);
+    Q_OBJECT
 
-    onAddNew();
-}
+public:
+    GLWidget(QWidget *parent = 0);
+    ~GLWidget();
 
-MainWindow::~MainWindow() {
-    //
-}
+    static bool isTransparent() { return m_transparent; }
+    static void setTransparent(bool t) { m_transparent = t; }
 
-void MainWindow::onAddNew()
-{
-    if (!centralWidget())
-        setCentralWidget(new Window(this));
-    else
-        QMessageBox::information(0, tr("Cannot add new window"), tr("Already occupied. Undock first."));
-}
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
+
+public slots:
+    void setXRotation(int angle);
+    void setYRotation(int angle);
+    void setZRotation(int angle);
+    void cleanup();
+
+signals:
+    void xRotationChanged(int angle);
+    void yRotationChanged(int angle);
+    void zRotationChanged(int angle);
+
+protected:
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int width, int height) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+
+private:
+    QTimer timer;
+    void setupVertexAttribs();
+
+    bool m_core;
+    int m_xRot;
+    int m_yRot;
+    int m_zRot;
+    QPoint m_lastPos;
+    Logo m_logo;
+    QOpenGLVertexArrayObject m_vao;
+    QOpenGLBuffer m_logoVbo;
+    std::shared_ptr<QOpenGLShaderProgram> m_program;
+//    QOpenGLShaderProgram *m_program;
+    int m_projMatrixLoc;
+    int m_mvMatrixLoc;
+    int m_time_;
+    int m_normalMatrixLoc;
+    int m_lightPosLoc;
+    QMatrix4x4 m_proj;
+    QMatrix4x4 m_camera;
+    QMatrix4x4 m_world;
+    static bool m_transparent;
+};
+
+#endif

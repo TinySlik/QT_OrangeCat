@@ -52,16 +52,18 @@
 #define GLWIDGET_H
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+//#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_4_3_Core>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
 #include <QTimer>
 #include "logo.h"
+#define MAX_PAINT_BUF_SIZE (1080)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core
 {
     Q_OBJECT
 
@@ -74,6 +76,9 @@ public:
 
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
+
+    void reset();
+    void getData();
 
 public slots:
     void setXRotation(int angle);
@@ -115,6 +120,8 @@ private:
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;
     QMatrix4x4 m_world;
+    std::vector<float> m_tex_buf;
+    float * m_tex_buf_render_head;
     static bool m_transparent;
 };
 

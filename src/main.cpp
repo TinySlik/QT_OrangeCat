@@ -112,12 +112,12 @@ int main(int argc, char **argv)
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
     QWebEngineProfile::defaultProfile()->setUseForGlobalCertificateVerification();
 
-//    QUrl url = commandLineUrlArgument();
+    QUrl url = commandLineUrlArgument();
 
-//    Browser browser;
-//    BrowserWindow *window = browser.createWindow();
-//    window->show();
-//    window->tabWidget()->setUrl(url);
+    Browser browser;
+    BrowserWindow *window = browser.createWindow();
+    window->show();
+    window->tabWidget()->setUrl(url);
 
     QCoreApplication::setApplicationName("Oil paint demo.");
     QCoreApplication::setOrganizationName("Citek");

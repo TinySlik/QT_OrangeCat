@@ -64,7 +64,8 @@ GLWidget::GLWidget(QWidget *parent)
       m_xRot(0),
       m_yRot(0),
       m_zRot(0),
-      m_program(nullptr)
+      m_program(nullptr),
+      m_tex_buf_render_head(nullptr)
 {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -94,33 +95,35 @@ GLWidget::GLWidget(QWidget *parent)
         setZRotation(8 * tg);
         return true;
       });
+    reset();
 }
 
-GLWidget::~GLWidget()
-{
+void GLWidget::reset() {
+    m_tex_buf.clear();
+    m_tex_buf.resize(MAX_PAINT_BUF_SIZE * 2);
+    m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
+}
+
+GLWidget::~GLWidget() {
     cleanup();
 }
 
-QSize GLWidget::minimumSizeHint() const
-{
+QSize GLWidget::minimumSizeHint() const {
     return QSize(50, 50);
 }
 
-QSize GLWidget::sizeHint() const
-{
+QSize GLWidget::sizeHint() const {
     return QSize(768, 512);
 }
 
-static void qNormalizeAngle(int &angle)
-{
+static void qNormalizeAngle(int &angle) {
     while (angle < 0)
         angle += 360 * 16;
     while (angle > 360 * 16)
         angle -= 360 * 16;
 }
 
-void GLWidget::setXRotation(int angle)
-{
+void GLWidget::setXRotation(int angle) {
     qNormalizeAngle(angle);
     if (angle != m_xRot) {
         m_xRot = angle;
@@ -129,8 +132,7 @@ void GLWidget::setXRotation(int angle)
     }
 }
 
-void GLWidget::setYRotation(int angle)
-{
+void GLWidget::setYRotation(int angle) {
     qNormalizeAngle(angle);
     if (angle != m_yRot) {
         m_yRot = angle;
@@ -139,8 +141,7 @@ void GLWidget::setYRotation(int angle)
     }
 }
 
-void GLWidget::setZRotation(int angle)
-{
+void GLWidget::setZRotation(int angle) {
     qNormalizeAngle(angle);
     if (angle != m_zRot) {
         m_zRot = angle;
@@ -149,8 +150,7 @@ void GLWidget::setZRotation(int angle)
     }
 }
 
-void GLWidget::cleanup()
-{
+void GLWidget::cleanup() {
     if (m_program == nullptr)
         return;
     makeCurrent();
@@ -158,6 +158,31 @@ void GLWidget::cleanup()
 //    delete m_program;
 //    m_program = 0;
     doneCurrent();
+}
+
+void GLWidget::getData() {
+    //模擬
+//    std::vector<float> cache;
+//    size_t sz = rand()%50 + 50;
+//    for (size_t i = 0; i < sz; i++) {
+//        cache.push_back(float(rand() % 100));
+//    }
+
+    //==================
+//    if (sz > MAX_PAINT_BUF_SIZE) {
+//        qDebug() << "error";
+//        return;
+//    }
+    float value = float(rand() % 100);
+
+    if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
+        m_tex_buf_render_head --;
+    } else {
+        m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
+    }
+
+    *m_tex_buf_render_head = value;
+    *(m_tex_buf_render_head + MAX_PAINT_BUF_SIZE) = value;
 }
 
 static const char *vertexShaderSourceCore =
@@ -296,11 +321,10 @@ void GLWidget::initializeGL()
 void GLWidget::setupVertexAttribs()
 {
     m_logoVbo.bind();
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-    f->glEnableVertexAttribArray(0);
-    f->glEnableVertexAttribArray(1);
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
     m_logoVbo.release();
 }
 
@@ -324,10 +348,13 @@ void GLWidget::paintGL()
     float time = (float)(GetTickCount()) / 1000.f ;
     m_program->setUniformValue(m_time_, time);
 
-//    std::cout << time - floor(time) << std::endl;
-//    std::cout .flush();
-
     glDrawArrays(GL_TRIANGLES, 0, m_logo.vertexCount());
+
+    getData();
+    qDebug() << "======================" << m_tex_buf_render_head - m_tex_buf.data();
+    for (size_t i = 0; i < 20; ++i) {
+        qDebug() << m_tex_buf_render_head[i] << "|||";
+    }
 
     m_program->release();
 }

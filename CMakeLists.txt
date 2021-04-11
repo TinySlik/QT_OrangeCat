@@ -72,7 +72,6 @@ set_outdir(
   "${OUT_DIR}/bin"
 )
 
-
 set(RES_DIR_OUTPUT ${OUT_DIR}/res)
 set(RES_DIR ${PROJECT_SOURCE_DIR}/res)
 

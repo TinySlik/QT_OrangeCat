@@ -52,10 +52,12 @@
 #define GLWIDGET_H
 
 #include <QOpenGLWidget>
-//#include <QOpenGLFunctions>
 #include <QOpenGLFunctions_4_3_Core>
-#include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
+#include <QOpenGLShader>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+#include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
 #include <QTimer>
 #include "logo.h"
@@ -123,6 +125,17 @@ private:
     std::vector<float> m_tex_buf;
     float * m_tex_buf_render_head;
     static bool m_transparent;
+
+    QOpenGLVertexArrayObject m_Cvao;
+    QOpenGLBuffer *m_CvertexBuffer;
+    QOpenGLBuffer *m_CindexBuffer;
+    QOpenGLShaderProgram *m_CcomputeProgram;
+    QOpenGLShaderProgram *m_CrenderProgram;
+    QOpenGLShader *m_CcomputeShader;
+    QOpenGLShader *m_CfragmentShader;
+    QOpenGLShader *m_CvertexShader;
+    QOpenGLTexture *m_Ctexture;
+    float roll;
 };
 
 #endif

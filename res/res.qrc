@@ -19,5 +19,8 @@
         <file>web_root/style.css</file>
         <file>web_root/test.txt</file>
         <file>res.qrc</file>
+        <file>shader/example_c.glsl</file>
+        <file>shader/example_f.glsl</file>
+        <file>shader/example_v.glsl</file>
     </qresource>
 </RCC>

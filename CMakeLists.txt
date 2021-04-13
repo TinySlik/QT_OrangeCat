@@ -106,6 +106,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/webpopupwindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/webview.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/mongoose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/configuru.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/parameterserver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/urldecode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.cpp

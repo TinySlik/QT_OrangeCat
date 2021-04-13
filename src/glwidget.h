@@ -132,6 +132,8 @@ private:
     std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
     std::shared_ptr<QOpenGLTexture> m_Ctexture;
     float roll;
+    float m_speed;
+    float m_lineThickness;
 };
 
 #endif

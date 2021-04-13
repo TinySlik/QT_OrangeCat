@@ -88,13 +88,8 @@ int main(int argc, char **argv)
 
     ParameterServer::instance()->CreateNewRoot("base", {
                                                    {"dev_ctrl", {
-                                                     { "X", 0 },
-                                                     { "Y", 0 },
-                                                     { "Z", 0 }
                                                    }},
                                                    {"dev_status", {
-                                                     { "key1", "value1" },
-                                                     { "key2", "value2" },
                                                    }}
                                                  });
     ParameterServer::instance()->SetCurrentRoot("base");

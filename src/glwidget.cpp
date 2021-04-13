@@ -70,7 +70,10 @@ GLWidget::GLWidget(QWidget *parent)
       m_CindexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::IndexBuffer)),
       m_CcomputeProgram(std::make_shared<QOpenGLShaderProgram>()),
       m_CrenderProgram(std::make_shared<QOpenGLShaderProgram>()),
-      m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)) {
+      m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
+      roll(0.0),
+      m_speed(0.15f),
+      m_lineThickness(0.02f) {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
@@ -81,27 +84,27 @@ GLWidget::GLWidget(QWidget *parent)
     }
 
     auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
-    cfg["X"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
-        if (!b.is_int()) return false;
-        auto tg = int(b);
-        setXRotation(8 * tg);
+
+    cfg += {
+        {"Speed", m_speed},
+        {"lineThickness", m_lineThickness}
+    };
+
+    cfg["Speed"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+        if (!b.is_float()) return false;
+        auto tg = float(b);
+        m_speed = tg;
         return true;
       });
-    cfg["Y"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
-        if (!b.is_int()) return false;
-        auto tg = int(b);
-        setYRotation(8 * tg);
-        return true;
-      });
-    cfg["Z"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
-        if (!b.is_int()) return false;
-        auto tg = int(b);
-        setZRotation(8 * tg);
+
+    cfg["lineThickness"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+        if (!b.is_float()) return false;
+        auto tg = float(b);
+        m_lineThickness = tg;
         return true;
       });
     reset();
 
-    roll=0.0;
     QSurfaceFormat format;
     format.setVersion(4, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
@@ -250,65 +253,6 @@ void GLWidget::initializeGL() {
 
     m_vao.release();
 
-//    // In this example the widget's corresponding top-level window can change
-//    // several times during the widget's lifetime. Whenever this happens, the
-//    // QOpenGLWidget's associated context is destroyed and a new one is created.
-//    // Therefore we have to be prepared to clean up the resources on the
-//    // aboutToBeDestroyed() signal, instead of the destructor. The emission of
-//    // the signal will be followed by an invocation of initializeGL() where we
-//    // can recreate all resources.
-//    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
-
-//    initializeOpenGLFunctions();
-//    glClearColor(0, 0, 0, m_transparent ? 0 : 1);
-
-//    m_program = std::make_shared<QOpenGLShaderProgram>();
-
-////    m_program = new QOpenGLShaderProgram;
-//    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shader/vshader.glsl"))
-//        close();
-//    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shader/fshader.glsl"))
-//        close();
-////    m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, m_core ? vertexShaderSourceCore : vertexShaderSource);
-////    m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, m_core ? fragmentShaderSourceCore : fragmentShaderSource);
-//    m_program->bindAttributeLocation("vertex", 0);
-//    m_program->bindAttributeLocation("normal", 1);
-//    m_program->link();
-
-//    m_program->bind();
-//    m_projMatrixLoc = m_program->uniformLocation("projMatrix");
-//    m_mvMatrixLoc = m_program->uniformLocation("mvMatrix");
-//    m_normalMatrixLoc = m_program->uniformLocation("normalMatrix");
-//    m_lightPosLoc = m_program->uniformLocation("lightPos");
-//    m_time_ = m_program->uniformLocation("time");
-
-//    // Create a vertex array object. In OpenGL ES 2.0 and OpenGL 2.x
-//    // implementations this is optional and support may not be present
-//    // at all. Nonetheless the below code works in all cases and makes
-//    // sure there is a VAO when one is needed.
-//    m_vao.create();
-//    QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
-
-//    // Setup our vertex buffer object.
-//    m_logoVbo.create();
-//    m_logoVbo.bind();
-//    m_logoVbo.allocate(m_logo.constData(), m_logo.count() * sizeof(GLfloat));
-
-//    // Store the vertex attribute bindings for the program.
-//    setupVertexAttribs();
-
-//    // Our camera never changes in this example.
-//    m_camera.setToIdentity();
-//    m_camera.translate(0, 0, -1);
-
-//    // Light position is fixed.
-//    m_program->setUniformValue(m_lightPosLoc, QVector3D(0, 0, 70));
-
-//    m_program->release();
-//    setXRotation(0);
-//    setYRotation(0);
-//    setZRotation(0);
-
     connect(&timer,SIGNAL(timeout()),this,SLOT(update()));
     timer.start(16);
 }
@@ -323,37 +267,16 @@ void GLWidget::setupVertexAttribs() {
 }
 
 void GLWidget::paintGL() {
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_CULL_FACE);
-
-//    m_world.setToIdentity();
-//    m_world.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
-//    m_world.rotate(m_yRot / 16.0f, 0, 1, 0);
-//    m_world.rotate(m_zRot / 16.0f, 0, 0, 1);
-
-//    QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
-//    m_program->bind();
-//    m_program->setUniformValue(m_projMatrixLoc, m_proj);
-//    m_program->setUniformValue(m_mvMatrixLoc, m_camera * m_world);
-//    QMatrix3x3 normalMatrix = m_world.normalMatrix();
-//    m_program->setUniformValue(m_normalMatrixLoc, normalMatrix);
-//    float time = (float)(GetTickCount()) / 1000.f ;
-//    m_program->setUniformValue(m_time_, time);
-
-//    glDrawArrays(GL_TRIANGLES, 0, m_logo.vertexCount());
-
 ////    getData();
 ////    qDebug() << "======================" << m_tex_buf_render_head - m_tex_buf.data();
 ////    for (size_t i = 0; i < 20; ++i) {
 ////        qDebug() << m_tex_buf_render_head[i] << "|||";
 ////    }
-
-//    m_program->release();
-
     static GLint srcLoc= glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
     static GLint destLoc=glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
     static GLint rollLoc=glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
+    static GLint lineThicknessLoc=glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
+
 
 //    qDebug() << srcLoc;
 //    qDebug() << destLoc;
@@ -367,7 +290,7 @@ void GLWidget::paintGL() {
     m_Ctexture->bind();
     glUniform1i(destLoc, 0);
     glUniform1f(rollLoc, roll);
-    roll += 0.15;
+    roll += m_speed;
     glDispatchCompute(m_Ctexture->width() / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
@@ -378,6 +301,7 @@ void GLWidget::paintGL() {
     //glClear(GL_COLOR_BUFFER_BIT);
     m_Ctexture->bind();
     glUniform1i(srcLoc, 0);
+    glUniform1f(lineThicknessLoc, m_lineThickness);
     glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 
     m_Cvao.release();
@@ -395,10 +319,6 @@ void GLWidget::resizeGL(int w, int h) {
 
     // Set perspective projection
     m_proj.ortho(+0.5f, -0.5f, +0.5f, -0.5f, zNear, zFar);
-//    m_proj.perspective(fov, aspect, zNear, zFar);
-
-//    m_proj.setToIdentity();
-//    m_proj.perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {

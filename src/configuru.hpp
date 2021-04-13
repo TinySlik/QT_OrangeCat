@@ -362,6 +362,7 @@ namespace configuru
 		Config(Config&& o) noexcept;
 		Config& operator=(const Config& o);
 		Config& operator<<(const Config& o);
+        Config& operator+=(const Config& o);
 
 		void add_callback(std::function<bool(Config& dst, const Config& in)> func) {
 		  func_array.push_back(func);
@@ -1647,6 +1648,19 @@ namespace configuru
 	  deep_async(*this, o);
 	  return *this;
 	}
+    Config& Config::operator+=(const Config& o)
+    {
+        if (&o == this) { return *this; }
+        if (_type != o._type) { return *this; }
+        if (_type == Object) {
+            auto&& b_object = o.as_object()._impl;
+            for (auto&& p: b_object) {
+              (*this)[p.first] = p.second._value;
+            }
+        } else {
+            return *this;
+        }
+    }
 
 	Config& Config::operator=(const Config& o)
 	{

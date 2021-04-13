@@ -65,8 +65,12 @@ GLWidget::GLWidget(QWidget *parent)
       m_yRot(0),
       m_zRot(0),
       m_program(nullptr),
-      m_tex_buf_render_head(nullptr)
-{
+      m_tex_buf_render_head(nullptr),
+      m_CvertexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer)),
+      m_CindexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::IndexBuffer)),
+      m_CcomputeProgram(std::make_shared<QOpenGLShaderProgram>()),
+      m_CrenderProgram(std::make_shared<QOpenGLShaderProgram>()),
+      m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)) {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
@@ -191,13 +195,12 @@ void GLWidget::getData() {
     *(m_tex_buf_render_head + MAX_PAINT_BUF_SIZE) = value;
 }
 
-void GLWidget::initializeGL()
-{
+void GLWidget::initializeGL() {
     initializeOpenGLFunctions();
     glClearColor(0,0,1,1);
 
     m_Cvao.create();
-    if (m_Cvao.isCreated()){
+    if (m_Cvao.isCreated()) {
         m_Cvao.bind();
         qDebug() << "VAO created!";
     }
@@ -210,23 +213,20 @@ void GLWidget::initializeGL()
     };
     static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 
-    m_CvertexBuffer = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     m_CvertexBuffer->create();
     m_CvertexBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
     m_CvertexBuffer->bind();
     m_CvertexBuffer->allocate(g_vertex_buffer_data,sizeof(g_vertex_buffer_data));
 
-    m_CindexBuffer = new QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
     m_CindexBuffer->create();
     m_CindexBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
     m_CindexBuffer->bind();
     m_CindexBuffer->allocate(g_element_buffer_data,sizeof(g_element_buffer_data));
 
     glActiveTexture(GL_TEXTURE0);
-    m_Ctexture = new QOpenGLTexture(QOpenGLTexture::Target2D);
     m_Ctexture->create();
     m_Ctexture->setFormat(QOpenGLTexture::RGBA8_UNorm);
-    m_Ctexture->setSize(512,512);
+    m_Ctexture->setSize(512, 1);
     m_Ctexture->setMinificationFilter(QOpenGLTexture::Linear);
     m_Ctexture->setMagnificationFilter(QOpenGLTexture::Linear);
     m_Ctexture->allocateStorage();
@@ -235,23 +235,12 @@ void GLWidget::initializeGL()
     glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
     qDebug() << m_Ctexture->width() << m_Ctexture->height();
 
-    m_CcomputeShader = new QOpenGLShader(QOpenGLShader::Compute);
-    m_CcomputeShader->compileSourceFile(":/shader/example_c.glsl");
-
-    m_CvertexShader = new QOpenGLShader(QOpenGLShader::Vertex);
-    m_CvertexShader->compileSourceFile(":/shader/example_v.glsl");
-
-    m_CfragmentShader = new QOpenGLShader(QOpenGLShader::Fragment);
-    m_CfragmentShader->compileSourceFile(":/shader/example_f.glsl");
-
-    m_CcomputeProgram = new QOpenGLShaderProgram();
-    m_CcomputeProgram->addShader(m_CcomputeShader);
+    m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, ":/shader/example_c.glsl");
     m_CcomputeProgram->link();
     m_CcomputeProgram->bind();
 
-    m_CrenderProgram = new QOpenGLShaderProgram();
-    m_CrenderProgram->addShader(m_CvertexShader);
-    m_CrenderProgram->addShader(m_CfragmentShader);
+    m_CrenderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shader/example_v.glsl");
+    m_CrenderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shader/example_f.glsl");
     m_CrenderProgram->link();
     m_CrenderProgram->bind();
 
@@ -260,7 +249,6 @@ void GLWidget::initializeGL()
     glEnableVertexAttribArray(posPtr);
 
     m_vao.release();
-
 
 //    // In this example the widget's corresponding top-level window can change
 //    // several times during the widget's lifetime. Whenever this happens, the
@@ -325,8 +313,7 @@ void GLWidget::initializeGL()
     timer.start(16);
 }
 
-void GLWidget::setupVertexAttribs()
-{
+void GLWidget::setupVertexAttribs() {
     m_logoVbo.bind();
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
@@ -335,8 +322,7 @@ void GLWidget::setupVertexAttribs()
     m_logoVbo.release();
 }
 
-void GLWidget::paintGL()
-{
+void GLWidget::paintGL() {
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //    glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
@@ -365,9 +351,9 @@ void GLWidget::paintGL()
 
 //    m_program->release();
 
-    static GLint srcLoc= glGetUniformLocation(m_CrenderProgram->programId(),"srcTex");
-    static GLint destLoc=glGetUniformLocation(m_CcomputeProgram->programId(),"destTex");
-    static GLint rollLoc=glGetUniformLocation(m_CcomputeProgram->programId(),"roll");
+    static GLint srcLoc= glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
+    static GLint destLoc=glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
+    static GLint rollLoc=glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
 
 //    qDebug() << srcLoc;
 //    qDebug() << destLoc;
@@ -379,10 +365,10 @@ void GLWidget::paintGL()
 
     m_CcomputeProgram->bind();
     m_Ctexture->bind();
-    glUniform1i(destLoc,0);
-    glUniform1f(rollLoc,roll);
-    roll+=0.15;
-    glDispatchCompute(m_Ctexture->width()/16,m_Ctexture->height()/16,1);
+    glUniform1i(destLoc, 0);
+    glUniform1f(rollLoc, roll);
+    roll += 0.15;
+    glDispatchCompute(m_Ctexture->width() / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 //    m_texture
@@ -391,14 +377,13 @@ void GLWidget::paintGL()
     m_CrenderProgram->bind();
     //glClear(GL_COLOR_BUFFER_BIT);
     m_Ctexture->bind();
-    glUniform1i(srcLoc,0);
-    glDrawElements(GL_TRIANGLE_STRIP,4,GL_UNSIGNED_SHORT,0);
+    glUniform1i(srcLoc, 0);
+    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 
     m_Cvao.release();
 }
 
-void GLWidget::resizeGL(int w, int h)
-{
+void GLWidget::resizeGL(int w, int h) {
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
@@ -414,16 +399,13 @@ void GLWidget::resizeGL(int w, int h)
 
 //    m_proj.setToIdentity();
 //    m_proj.perspective(45.0f, GLfloat(w) / h, 0.01f, 100.0f);
-
 }
 
-void GLWidget::mousePressEvent(QMouseEvent *event)
-{
+void GLWidget::mousePressEvent(QMouseEvent *event) {
     m_lastPos = event->pos();
 }
 
-void GLWidget::mouseMoveEvent(QMouseEvent *event)
-{
+void GLWidget::mouseMoveEvent(QMouseEvent *event){
     int dx = event->x() - m_lastPos.x();
     int dy = event->y() - m_lastPos.y();
 

@@ -113,7 +113,6 @@ private:
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_logoVbo;
     std::shared_ptr<QOpenGLShaderProgram> m_program;
-//    QOpenGLShaderProgram *m_program;
     int m_projMatrixLoc;
     int m_mvMatrixLoc;
     int m_time_;
@@ -127,14 +126,11 @@ private:
     static bool m_transparent;
 
     QOpenGLVertexArrayObject m_Cvao;
-    QOpenGLBuffer *m_CvertexBuffer;
-    QOpenGLBuffer *m_CindexBuffer;
-    QOpenGLShaderProgram *m_CcomputeProgram;
-    QOpenGLShaderProgram *m_CrenderProgram;
-    QOpenGLShader *m_CcomputeShader;
-    QOpenGLShader *m_CfragmentShader;
-    QOpenGLShader *m_CvertexShader;
-    QOpenGLTexture *m_Ctexture;
+    std::shared_ptr<QOpenGLBuffer> m_CvertexBuffer;
+    std::shared_ptr<QOpenGLBuffer> m_CindexBuffer;
+    std::shared_ptr<QOpenGLShaderProgram> m_CcomputeProgram;
+    std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
+    std::shared_ptr<QOpenGLTexture> m_Ctexture;
     float roll;
 };
 

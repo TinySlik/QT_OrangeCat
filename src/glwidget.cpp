@@ -56,6 +56,7 @@
 #include "parameterserver.h"
 #include <windows.h>
 #include <QBasicTimer>
+#include "easylogging++.h"
 
 bool GLWidget::m_transparent = false;
 
@@ -73,7 +74,8 @@ GLWidget::GLWidget(QWidget *parent)
       m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
       roll(0.0),
       m_speed(0.15f),
-      m_lineThickness(0.02f) {
+      m_lineThickness(0.02f),
+      m_ComputeShaderSwitch(false) {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
@@ -87,7 +89,8 @@ GLWidget::GLWidget(QWidget *parent)
 
     cfg += {
         {"Speed", m_speed},
-        {"lineThickness", m_lineThickness}
+        {"lineThickness", m_lineThickness},
+        {"compute1_switch", m_ComputeShaderSwitch}
     };
 
     cfg["Speed"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
@@ -101,6 +104,13 @@ GLWidget::GLWidget(QWidget *parent)
         if (!b.is_float()) return false;
         auto tg = float(b);
         m_lineThickness = tg;
+        return true;
+      });
+
+    cfg["compute1_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+        if (!b.is_bool()) return false;
+        auto tg = bool(b);
+        m_ComputeShaderSwitch = tg;
         return true;
       });
     reset();
@@ -186,7 +196,7 @@ void GLWidget::getData() {
 //        qDebug() << "error";
 //        return;
 //    }
-    float value = float(rand() % 100);
+    float value = float((rand() % 1000) / 1000.f);
 
     if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
         m_tex_buf_render_head --;
@@ -205,7 +215,7 @@ void GLWidget::initializeGL() {
     m_Cvao.create();
     if (m_Cvao.isCreated()) {
         m_Cvao.bind();
-        qDebug() << "VAO created!";
+        LOG(INFO) << "VAO created!";
     }
 
     static const GLfloat g_vertex_buffer_data[] = {
@@ -236,7 +246,6 @@ void GLWidget::initializeGL() {
     m_Ctexture->bind();
 
     glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    qDebug() << m_Ctexture->width() << m_Ctexture->height();
 
     m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, ":/shader/example_c.glsl");
     m_CcomputeProgram->link();
@@ -267,16 +276,15 @@ void GLWidget::setupVertexAttribs() {
 }
 
 void GLWidget::paintGL() {
-////    getData();
-////    qDebug() << "======================" << m_tex_buf_render_head - m_tex_buf.data();
-////    for (size_t i = 0; i < 20; ++i) {
-////        qDebug() << m_tex_buf_render_head[i] << "|||";
-////    }
-    static GLint srcLoc= glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
-    static GLint destLoc=glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
-    static GLint rollLoc=glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
-    static GLint lineThicknessLoc=glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
-
+    getData();
+//    qDebug() << "======================" << m_tex_buf_render_head - m_tex_buf.data();
+//    for (size_t i = 0; i < 10; ++i) {
+//        qDebug() << m_tex_buf_render_head[i] << "|||";
+//    }
+    static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
+    static GLint destLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
+    static GLint rollLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
+    static GLint lineThicknessLoc = glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
 
 //    qDebug() << srcLoc;
 //    qDebug() << destLoc;
@@ -284,17 +292,34 @@ void GLWidget::paintGL() {
 //    qDebug() << roll;
 
     // compute
+
+//    glTexImage2D(GL_TEXTURE_2D,
+//          0,                        // GLint  	   level
+//          GL_R8UI,                  // internal    format
+//          nWidth,                   // GLsizei  	width,
+//          nHeight,                  // GLsizei  	height,
+//          0,                        // GLint  	   border,
+//          GL_RED_INTEGER,           // GLenum  	   format,
+//          GL_UNSIGNED_BYTE,        // data type
+//          (const GLvoid*)_data.data());       // texels
+    /**
+     * @brief getData
+     * (int mipLevel,
+                 PixelFormat sourceFormat, PixelType sourceType,
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
+     */
+    m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);
+
     m_Cvao.bind();
-
-    m_CcomputeProgram->bind();
-    m_Ctexture->bind();
-    glUniform1i(destLoc, 0);
-    glUniform1f(rollLoc, roll);
-    roll += m_speed;
-    glDispatchCompute(m_Ctexture->width() / 256, 1, 1);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
-//    m_texture
+    if (m_ComputeShaderSwitch) {
+        m_CcomputeProgram->bind();
+        m_Ctexture->bind();
+        glUniform1i(destLoc, 0);
+        glUniform1f(rollLoc, roll);
+        roll += m_speed;
+        glDispatchCompute(m_Ctexture->width() / 256, 1, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    }
 
     // draw
     m_CrenderProgram->bind();

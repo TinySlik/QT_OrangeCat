@@ -76,16 +76,8 @@ QUrl commandLineUrlArgument()
     return QUrl(QStringLiteral("http://localhost:8099"));
 }
 
-std::shared_ptr<std::vector<char>> func() {
-    auto ss = std::vector<char>(256);
-    memcpy(ss.data(), "hello", 6);
-    return std::make_shared<std::vector<char>>(ss);
-}
 
-int main(int argc, char **argv)
-{
-    std::cout << (char *)(func()->data()) << std::endl;
-
+int main(int argc, char **argv) {
     ParameterServer::instance()->CreateNewRoot("base", {
                                                    {"dev_ctrl", {
                                                    }},
@@ -93,8 +85,6 @@ int main(int argc, char **argv)
                                                    }}
                                                  });
     ParameterServer::instance()->SetCurrentRoot("base");
-    auto ctrl = ParameterServer::instance()->GetCfgCtrlRoot();
-    ctrl["test_obj"] = "obj";
 
     QCoreApplication::setOrganizationName("QtExamples");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

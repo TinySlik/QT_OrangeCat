@@ -134,6 +134,7 @@ private:
     float roll;
     float m_speed;
     float m_lineThickness;
+    bool m_ComputeShaderSwitch;
 };
 
 #endif

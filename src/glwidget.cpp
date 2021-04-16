@@ -75,7 +75,7 @@ GLWidget::GLWidget(QWidget *parent)
       roll(0.0),
       m_speed(0.15f),
       m_lineThickness(0.02f),
-      m_ComputeShaderSwitch(false) {
+      m_ComputeShaderSwitch(true) {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
@@ -245,7 +245,7 @@ void GLWidget::initializeGL() {
     m_Ctexture->allocateStorage();
     m_Ctexture->bind();
 
-    glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
 
     m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, ":/shader/example_c.glsl");
     m_CcomputeProgram->link();
@@ -308,7 +308,7 @@ void GLWidget::paintGL() {
                  PixelFormat sourceFormat, PixelType sourceType,
                  const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
      */
-    m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);
+    m_Ctexture->setData(0, QOpenGLTexture::RGBA, QOpenGLTexture::Float32, m_tex_buf_render_head);
 
     m_Cvao.bind();
     if (m_ComputeShaderSwitch) {
@@ -317,7 +317,7 @@ void GLWidget::paintGL() {
         glUniform1i(destLoc, 0);
         glUniform1f(rollLoc, roll);
         roll += m_speed;
-        glDispatchCompute(m_Ctexture->width() / 256, 1, 1);
+        glDispatchCompute(m_Ctexture->width(), 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
 

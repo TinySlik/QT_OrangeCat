@@ -73,7 +73,7 @@ GLWidget::GLWidget(QWidget *parent)
       m_CrenderProgram(std::make_shared<QOpenGLShaderProgram>()),
       m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
       roll(0.0),
-      m_speed(0.15f),
+      m_speed(0.0333f),
       m_lineThickness(0.01f),
       m_ComputeShaderSwitch(true) {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;

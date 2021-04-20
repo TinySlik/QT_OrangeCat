@@ -41,8 +41,23 @@ void fft_pass(int ns, int source)
 void main() {
     ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
     vec4 v_ = imageLoad(destTex, pos.x);
-    if(v_.r > 0.5f) {
-    float val=0.25 + 0.2*sin((pos.x+pos.y)/30.0 - roll);
-    imageStore(destTex, pos.x, vec4(val, 0.5f, 0.5f, 1.0f));
+    uint i = gl_LocalInvocationID.x;
+    values[i][0] = vec2(v_.r, 0.);
+    synchronize();
+
+    int source = 0;
+
+    for (int n = 2; n <= SIZE; n *= 2) {
+        fft_pass(n, source);
+        source ^= 1;
+        synchronize();
     }
+
+    float v = length(values[i][source]);
+
+
+//    if(v_.r < 0.8f) {
+//        float val=0.25 + 0.2*sin((pos.x+pos.y)/30.0 - roll);
+        imageStore(destTex, pos.x, vec4(v / 100.f, 0.0f, 0.0f, 1.0f));
+//    }
 }

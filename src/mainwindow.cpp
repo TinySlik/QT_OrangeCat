@@ -54,8 +54,7 @@
 #include <QMessageBox>
 #include "window.h"
 
-MainWindow::MainWindow()
-{
+MainWindow::MainWindow() {
     QMenuBar *menuBar = new QMenuBar;
     QMenu *menuWindow = menuBar->addMenu(tr("&Window"));
     QAction *addNew = new QAction(menuWindow);
@@ -71,8 +70,7 @@ MainWindow::~MainWindow() {
     //
 }
 
-void MainWindow::onAddNew()
-{
+void MainWindow::onAddNew() {
     if (!centralWidget())
         setCentralWidget(new Window(this));
     else

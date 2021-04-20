@@ -48,8 +48,8 @@
 **
 ****************************************************************************/
 
-#ifndef WINDOW_H
-#define WINDOW_H
+#ifndef OIL_SRC_WINDOW_H_
+#define OIL_SRC_WINDOW_H_
 
 #include <QWidget>
 
@@ -61,28 +61,27 @@ QT_END_NAMESPACE
 class GLWidget;
 class MainWindow;
 
-class Window : public QWidget
-{
-    Q_OBJECT
+class Window : public QWidget {
+  Q_OBJECT
 
-public:
-    Window(MainWindow *mw);
+ public:
+  explicit Window(MainWindow *mw);
 
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
+ protected:
+  void keyPressEvent(QKeyEvent *event) override;
 
-private slots:
-    void dockUndock();
+ private slots:
+  void dockUndock();
 
-private:
-    QSlider *createSlider();
+ private:
+  QSlider *createSlider();
 
-    GLWidget *glWidget;
-    QSlider *xSlider;
-    QSlider *ySlider;
-    QSlider *zSlider;
-    QPushButton *dockBtn;
-    MainWindow *mainWindow;
+  GLWidget *glWidget;
+  QSlider *xSlider;
+  QSlider *ySlider;
+  QSlider *zSlider;
+  QPushButton *dockBtn;
+  MainWindow *mainWindow;
 };
 
-#endif
+#endif  // OIL_SRC_WINDOW_H_

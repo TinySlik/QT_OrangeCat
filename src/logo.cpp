@@ -52,8 +52,7 @@
 #include <qmath.h>
 
 Logo::Logo()
-    : m_count(0)
-{
+    : m_count(0) {
     m_data.resize(6 * 6);
 
     add(QVector3D(0.5, -0.5, 0), QVector3D(0, 0, -1));
@@ -109,8 +108,7 @@ Logo::Logo()
 //    }
 }
 
-void Logo::add(const QVector3D &v, const QVector3D &n)
-{
+void Logo::add(const QVector3D &v, const QVector3D &n) {
     GLfloat *p = m_data.data() + m_count;
     *p++ = v.x();
     *p++ = v.y();
@@ -121,8 +119,8 @@ void Logo::add(const QVector3D &v, const QVector3D &n)
     m_count += 6;
 }
 
-//void Logo::quad(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat x3, GLfloat y3, GLfloat x4, GLfloat y4)
-//{
+// void Logo::quad(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat x3, GLfloat y3, GLfloat x4, GLfloat y4)
+// {
 //    QVector3D n = QVector3D::normal(QVector3D(x4 - x1, y4 - y1, 0.0f), QVector3D(x2 - x1, y2 - y1, 0.0f));
 
 //    add(QVector3D(x1, y1, -0.05f), n);
@@ -144,8 +142,8 @@ void Logo::add(const QVector3D &v, const QVector3D &n)
 //    add(QVector3D(x4, y4, 0.05f), n);
 //}
 
-//void Logo::extrude(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2)
-//{
+// void Logo::extrude(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2)
+// {
 //    QVector3D n = QVector3D::normal(QVector3D(0.0f, 0.0f, -0.1f), QVector3D(x2 - x1, y2 - y1, 0.0f));
 
 //    add(QVector3D(x1, y1, +0.05f), n);

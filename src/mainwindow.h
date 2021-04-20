@@ -48,21 +48,20 @@
 **
 ****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef OIL_SRC_MAINWINDOW_H_
+#define OIL_SRC_MAINWINDOW_H_
 
 #include <QMainWindow>
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 
-public:
-    MainWindow();
-    ~MainWindow();
+ public:
+  MainWindow();
+  ~MainWindow();
 
-private slots:
-    void onAddNew();
+ private slots:
+  void onAddNew();
 };
 
-#endif
+#endif  // OIL_SRC_MAINWINDOW_H_

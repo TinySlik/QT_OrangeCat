@@ -1,15 +1,19 @@
-#ifndef PARAMETERSERVER_H
-#define PARAMETERSERVER_H
+#ifndef OIL_SRC_PARAMETERSERVER_H_
+#define OIL_SRC_PARAMETERSERVER_H_
 
-#include "configuru.hpp"
-#include "simplethread.h"
-#include <mutex>
 #include <utility>
-#include <thread>
-#include <chrono>
 #include <functional>
 #include <atomic>
 #include <iostream>
+#include <memory>
+#include <vector>
+#include <string>
+#include <thread>
+#include <chrono>
+#include <mutex>
+#include "configuru.hpp"
+#include "simplethread.h"
+
 #define MAX_ROOT_NODE_COUNT (256)
 
 typedef  struct config_root {
@@ -19,7 +23,7 @@ typedef  struct config_root {
 
 class ParameterServer {
  private:
-  explicit ParameterServer();
+  ParameterServer();
   ~ParameterServer() {
     stop_server();
   }
@@ -34,10 +38,10 @@ class ParameterServer {
  public:
   bool CreateNewRoot(const std::string &name,
       configuru::Config &&config = configuru::Config::object());
-  configuru::Config &GetRoot(const std::string &name) ;
+  configuru::Config &GetRoot(const std::string &name);
   configuru::Config &GetRootOrCreate(const std::string &name,
       configuru::Config &&config);
-  bool RemoveRoot(const std::string &name) ;
+  bool RemoveRoot(const std::string &name);
   bool SetCurrentRoot(const std::string &name);
   bool SetCurrentRoot(size_t index = 0);
   inline configuru::Config &GetCfgStatusRoot() {
@@ -79,4 +83,4 @@ class ParameterServer {
   bool debug_;
 };
 
-#endif // PARAMETERSERVER_H
+#endif  // OIL_SRC_PARAMETERSERVER_H_

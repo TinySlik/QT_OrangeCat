@@ -1,20 +1,21 @@
 #include "parameterserver.h"
+#include <thread>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
 #include "mongoose.h"
 #include "urldecode.h"
 #define ELPP_THREAD_SAFE
 #define ELPP_FORCE_USE_STD_THREAD
-#include <thread>
-#include <chrono>
 #include "easylogging++.h"
-#include <iostream>
-#include <string>
 
 #define CONFIGURU_IMPLEMENTATION 1
 #define TARGET_WEB_DIR_NAME "../res/web_root"
 #define CONFIGURU_JSON_PARSE_ERROR_LOG ""
 #define CACHE_MAX_SIZE (128*1024)
 #define STATUS_DISPLAY_TIME_INTERVAL 1000
-//#define DEBUG_PARAM_SERV
+// #define DEBUG_PARAM_SERV
 #define CONFIG_HIDEN_PARAM
 #define WITH_HTTP_PAGE
 INITIALIZE_EASYLOGGINGPP
@@ -203,7 +204,7 @@ static void handle_get_device_usage(struct mg_connection *nc) {
   mg_send_http_chunk(nc, "", 0);
 }
 
-static void handle_set_dev_ctrl(struct mg_connection *nc,struct http_message *hm) {
+static void handle_set_dev_ctrl(struct mg_connection *nc, struct http_message *hm) {
   // Use chunked encoding in order to avoid calculating Content-Length
   char * res = urlDecode(hm->message.p);
   char *custom_head = strstr(res, "code_res=");
@@ -217,7 +218,7 @@ static void handle_set_dev_ctrl(struct mg_connection *nc,struct http_message *hm
   }
 
   memset(cache, 0, CACHE_MAX_SIZE);
-  memcpy(cache, custom_head + 9,end - custom_head - 9);
+  memcpy(cache, custom_head + 9, end - custom_head - 9);
   free(res);
 
   auto config_in = parse_string(cache, JSON, CONFIGURU_JSON_PARSE_ERROR_LOG);
@@ -239,7 +240,7 @@ static void handle_set_dev_ctrl(struct mg_connection *nc,struct http_message *hm
   mg_send_http_chunk(nc, "", 0);
 }
 
-static void handle_set_target_root(struct mg_connection *nc,struct http_message *hm) {
+static void handle_set_target_root(struct mg_connection *nc, struct http_message *hm) {
   // Use chunked encoding in order to avoid calculating Content-Length
   char * res = urlDecode(hm->message.p);
   char *custom_head = strstr(res, "code_res=");
@@ -253,7 +254,7 @@ static void handle_set_target_root(struct mg_connection *nc,struct http_message 
   }
 
   memset(cache, 0, CACHE_MAX_SIZE);
-  memcpy(cache, custom_head + 9,end - custom_head - 10);
+  memcpy(cache, custom_head + 9, end - custom_head - 10);
   free(res);
 
   auto res_root = ParameterServer::instance()->SetCurrentRoot(cache);
@@ -316,17 +317,17 @@ typedef enum {
 } ThreadState;
 
 class ServerThread : public Runnable {
-private:
+ private:
   std::mutex mmutex;
   Condition *condition;
-  ThreadState requestedState=INIT;
-  ThreadState currentState=INIT;
+  ThreadState requestedState = INIT;
+  ThreadState currentState = INIT;
   int id;
 
-public:
-  ServerThread(int id) {
-    this->id=id;
-    condition=new Condition(mmutex);
+ public:
+  explicit ServerThread(int id) {
+    this->id = id;
+    condition = new Condition(mmutex);
   }
   ~ServerThread() {
     delete condition;
@@ -336,20 +337,19 @@ public:
   }
   void setState(ThreadState nState) {
     {
-    Synchronized x(mmutex);
-    requestedState=nState;
-    condition->notifyAll(x);
+      Synchronized x(mmutex);
+      requestedState = nState;
+      condition->notifyAll(x);
     }
-  };
+  }
   ThreadState getState() {
     Synchronized x(mmutex);
     return currentState;
-  };
-
+  }
   virtual void run() {
     {
       Synchronized x(mmutex);
-      currentState=RUNNING;
+      currentState = RUNNING;
     }
 #ifdef WITH_HTTP_PAGE
     struct mg_mgr mgr;
@@ -358,15 +358,15 @@ public:
     static int count_;
     mg_mgr_init(&mgr, NULL);
     nc = mg_bind(&mgr, s_http_port, ev_handler);
-	while (nc == NULL && s_http_port[3] != '0') {
-	  LOG(WARNING) << "Cannot bind to " << s_http_port << std::endl;
-	  s_http_port[3]--;
-	  LOG(WARNING) << "Try " << s_http_port << std::endl;
-	  nc = mg_bind(&mgr, s_http_port, ev_handler);
-	}
-	if (s_http_port[3] == '0') {
+  while (nc == NULL && s_http_port[3] != '0') {
+    LOG(WARNING) << "Cannot bind to " << s_http_port << std::endl;
+    s_http_port[3]--;
+    LOG(WARNING) << "Try " << s_http_port << std::endl;
+    nc = mg_bind(&mgr, s_http_port, ev_handler);
+  }
+  if (s_http_port[3] == '0') {
 #ifdef DEBUG_PARAM_SERV
-	  LOG(ERROR) << "failed";
+    LOG(ERROR) << "failed";
 #endif
       exit(1);
     }
@@ -378,7 +378,7 @@ public:
 #ifdef DEBUG_PARAM_SERV
       LOG(ERROR) << "Cannot find web_root directory, continue without params server.\n" << std::endl;
 #endif
-      while (requestedState!=STOP) {
+      while (requestedState != STOP) {
         // waiting for close;
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
@@ -387,18 +387,18 @@ public:
 #ifdef DEBUG_PARAM_SERV
     LOG(INFO) << "Starting web server on port " << s_http_port << std::endl;
 #endif
-    while (requestedState!=STOP) {
+    while (requestedState != STOP) {
       mg_mgr_poll(&mgr, STATUS_DISPLAY_TIME_INTERVAL);
     }
-    currentState=STOP;
+    currentState = STOP;
     mg_mgr_free(&mgr);
     return;
 #endif
   }
 
   virtual void stop() {
-    requestedState=STOP;
-    currentState=STOP;
+    requestedState = STOP;
+    currentState = STOP;
   }
 };
 

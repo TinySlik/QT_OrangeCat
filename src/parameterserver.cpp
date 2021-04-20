@@ -213,7 +213,7 @@ static void handle_set_dev_ctrl(struct mg_connection *nc, struct http_message *h
   if (!(custom_head && end)) {
     LOG(ERROR) << __FUNCTION__ << "error";
     free(res);
-    mg_http_send_error(nc, 403, NULL);
+    mg_http_send_error(nc, 403, nullptr);
     return;
   }
 
@@ -355,10 +355,9 @@ class ServerThread : public Runnable {
     struct mg_mgr mgr;
     struct mg_connection *nc;
     cs_stat_t st;
-    static int count_;
-    mg_mgr_init(&mgr, NULL);
+    mg_mgr_init(&mgr, nullptr);
     nc = mg_bind(&mgr, s_http_port, ev_handler);
-  while (nc == NULL && s_http_port[3] != '0') {
+  while (nc == nullptr && s_http_port[3] != '0') {
     LOG(WARNING) << "Cannot bind to " << s_http_port << std::endl;
     s_http_port[3]--;
     LOG(WARNING) << "Try " << s_http_port << std::endl;

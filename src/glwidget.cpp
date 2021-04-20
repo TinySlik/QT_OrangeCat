@@ -161,12 +161,7 @@ QSize GLWidget::sizeHint() const {
   return QSize(768, 512);
 }
 
-static void qNormalizeAngle(const int &angle) {
-//    while (angle < 0)
-//        angle += 360 * 16;
-//    while (angle > 360 * 16)
-//        angle -= 360 * 16;
-}
+static void qNormalizeAngle(const int &) {}
 
 void GLWidget::setXRotation(int angle) {
   qNormalizeAngle(angle);

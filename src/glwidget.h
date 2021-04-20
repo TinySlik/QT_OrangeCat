@@ -61,7 +61,7 @@
 #include <QMatrix4x4>
 #include <QTimer>
 #include "logo.h"
-#define MAX_PAINT_BUF_SIZE (1080)
+#define MAX_PAINT_BUF_SIZE (4096)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 

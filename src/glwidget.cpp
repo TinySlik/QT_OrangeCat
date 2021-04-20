@@ -74,7 +74,7 @@ GLWidget::GLWidget(QWidget *parent)
       m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
       roll(0.0),
       m_speed(0.15f),
-      m_lineThickness(0.02f),
+      m_lineThickness(0.01f),
       m_ComputeShaderSwitch(true) {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -86,28 +86,31 @@ GLWidget::GLWidget(QWidget *parent)
     }
 
     auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
-
-    cfg += {
-        {"Speed", m_speed},
-        {"lineThickness", m_lineThickness},
-        {"compute1_switch", m_ComputeShaderSwitch}
+    std::string class_obj_id = typeid(*this).name();
+    class_obj_id += std::to_string((int)this);
+    cfg += {{class_obj_id.c_str(), {
+                {"Speed", m_speed},
+                {"lineThickness", m_lineThickness},
+                {"compute1_switch", m_ComputeShaderSwitch}
+        }}
     };
+    auto cfg_local = cfg[class_obj_id.c_str()];
 
-    cfg["Speed"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+    cfg_local["Speed"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_float()) return false;
         auto tg = float(b);
         m_speed = tg;
         return true;
       });
 
-    cfg["lineThickness"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+    cfg_local["lineThickness"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_float()) return false;
         auto tg = float(b);
         m_lineThickness = tg;
         return true;
       });
 
-    cfg["compute1_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+    cfg_local["compute1_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_bool()) return false;
         auto tg = bool(b);
         m_ComputeShaderSwitch = tg;
@@ -238,14 +241,16 @@ void GLWidget::initializeGL() {
 
     glActiveTexture(GL_TEXTURE0);
     m_Ctexture->create();
-    m_Ctexture->setFormat(QOpenGLTexture::RGBA8_UNorm);
+//    m_Ctexture->setFormat(QOpenGLTexture::RGBA8_SNorm);
+    m_Ctexture->setFormat(QOpenGLTexture::R32F);
     m_Ctexture->setSize(512, 1);
     m_Ctexture->setMinificationFilter(QOpenGLTexture::Linear);
     m_Ctexture->setMagnificationFilter(QOpenGLTexture::Linear);
     m_Ctexture->allocateStorage();
     m_Ctexture->bind();
 
-    glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+//    glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+    glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 
     m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, ":/shader/example_c.glsl");
     m_CcomputeProgram->link();
@@ -308,7 +313,7 @@ void GLWidget::paintGL() {
                  PixelFormat sourceFormat, PixelType sourceType,
                  const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
      */
-    m_Ctexture->setData(0, QOpenGLTexture::RGBA, QOpenGLTexture::Float32, m_tex_buf_render_head);
+    m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);
 
     m_Cvao.bind();
     if (m_ComputeShaderSwitch) {

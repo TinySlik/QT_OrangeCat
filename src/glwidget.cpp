@@ -48,14 +48,15 @@
 **
 ****************************************************************************/
 
+#include <string>
 #include "glwidget.h"
+#include <math.h>
+#include <windows.h>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
-#include <math.h>
-#include "parameterserver.h"
-#include <windows.h>
 #include <QBasicTimer>
+#include "parameterserver.h"
 #include "easylogging++.h"
 
 bool GLWidget::m_transparent = false;
@@ -89,7 +90,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
     std::string class_obj_id = typeid(*this).name();
-    class_obj_id += std::to_string((int)this);
+    class_obj_id += std::to_string(int(this));
     cfg += {{class_obj_id.c_str(), {
                 {"Speed", m_speed},
                 {"lineThickness", m_lineThickness},
@@ -102,35 +103,35 @@ GLWidget::GLWidget(QWidget *parent)
 
     cfg_local["Speed"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_float()) return false;
-        auto tg = float(b);
+        auto tg = static_cast<float>(b);
         m_speed = tg;
         return true;
       });
 
     cfg_local["lineThickness"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_float()) return false;
-        auto tg = float(b);
+        auto tg = static_cast<float>(b);
         m_lineThickness = tg;
         return true;
       });
 
     cfg_local["compute1_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_bool()) return false;
-        auto tg = bool(b);
+        auto tg = static_cast<bool>(b);
         m_ComputeShaderSwitch = tg;
         return true;
       });
 
     cfg_local["test_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_int()) return false;
-        auto tg = int(b);
+        auto tg = static_cast<int>(b);
         m_TestSwitch = tg;
         return true;
       });
 
     cfg_local["test_frequency"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
         if (!b.is_float()) return false;
-        auto tg = float(b);
+        auto tg = static_cast<float>(b);
         m_TestFrequency = tg;
         return true;
       });
@@ -160,11 +161,11 @@ QSize GLWidget::sizeHint() const {
     return QSize(768, 512);
 }
 
-static void qNormalizeAngle(int &angle) {
-    while (angle < 0)
-        angle += 360 * 16;
-    while (angle > 360 * 16)
-        angle -= 360 * 16;
+static void qNormalizeAngle(const int &angle) {
+//    while (angle < 0)
+//        angle += 360 * 16;
+//    while (angle > 360 * 16)
+//        angle -= 360 * 16;
 }
 
 void GLWidget::setXRotation(int angle) {
@@ -205,7 +206,7 @@ void GLWidget::cleanup() {
 }
 
 void GLWidget::getData() {
-    //模擬
+    // 模擬
 //    std::vector<float> cache;
 //    size_t sz = rand()%50 + 50;
 //    for (size_t i = 0; i < sz; i++) {
@@ -217,10 +218,10 @@ void GLWidget::getData() {
 //        qDebug() << "error";
 //        return;
 //    }
-    float value = float((rand() % 1000) / 1000.f);
+    float value = static_cast<float>((rand() % 1000) / 1000.f);
 
     if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
-        m_tex_buf_render_head --;
+        m_tex_buf_render_head--;
     } else {
         m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
     }
@@ -231,7 +232,7 @@ void GLWidget::getData() {
 
 void GLWidget::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(0,0,1,1);
+    glClearColor(0, 0, 1, 1);
 
     m_Cvao.create();
     if (m_Cvao.isCreated()) {
@@ -250,12 +251,12 @@ void GLWidget::initializeGL() {
     m_CvertexBuffer->create();
     m_CvertexBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
     m_CvertexBuffer->bind();
-    m_CvertexBuffer->allocate(g_vertex_buffer_data,sizeof(g_vertex_buffer_data));
+    m_CvertexBuffer->allocate(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
 
     m_CindexBuffer->create();
     m_CindexBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
     m_CindexBuffer->bind();
-    m_CindexBuffer->allocate(g_element_buffer_data,sizeof(g_element_buffer_data));
+    m_CindexBuffer->allocate(g_element_buffer_data, sizeof(g_element_buffer_data));
 
     glActiveTexture(GL_TEXTURE0);
     m_Ctexture->create();
@@ -285,7 +286,7 @@ void GLWidget::initializeGL() {
 
     m_vao.release();
 
-    connect(&timer,SIGNAL(timeout()),this,SLOT(update()));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.start(16);
 }
 
@@ -317,16 +318,6 @@ void GLWidget::paintGL() {
 //    qDebug() << roll;
 
     // compute
-
-//    glTexImage2D(GL_TEXTURE_2D,
-//          0,                        // GLint  	   level
-//          GL_R8UI,                  // internal    format
-//          nWidth,                   // GLsizei  	width,
-//          nHeight,                  // GLsizei  	height,
-//          0,                        // GLint  	   border,
-//          GL_RED_INTEGER,           // GLenum  	   format,
-//          GL_UNSIGNED_BYTE,        // data type
-//          (const GLvoid*)_data.data());       // texels
     /**
      * @brief getData
      * (int mipLevel,
@@ -350,7 +341,7 @@ void GLWidget::paintGL() {
 
     // draw
     m_CrenderProgram->bind();
-    //glClear(GL_COLOR_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT);
     m_Ctexture->bind();
     glUniform1i(srcLoc, 0);
     glUniform1f(lineThicknessLoc, m_lineThickness);
@@ -377,7 +368,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
     m_lastPos = event->pos();
 }
 
-void GLWidget::mouseMoveEvent(QMouseEvent *event){
+void GLWidget::mouseMoveEvent(QMouseEvent *event) {
     int dx = event->x() - m_lastPos.x();
     int dy = event->y() - m_lastPos.y();
 

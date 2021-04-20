@@ -5,9 +5,7 @@
 #define PI 3.14159265358979323844
 
 uniform float roll;
-
 uniform float test_frequency;
-
 uniform int test_switch;
 
 layout (r32f, location = 0) uniform image1D destTex;

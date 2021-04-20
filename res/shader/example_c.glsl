@@ -6,6 +6,10 @@
 
 uniform float roll;
 
+uniform float test_frequency;
+
+uniform int test_switch;
+
 layout (r32f, location = 0) uniform image1D destTex;
 layout (local_size_x = SIZE) in;
 
@@ -40,24 +44,43 @@ void fft_pass(int ns, int source)
 
 void main() {
     ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
-    vec4 v_ = imageLoad(destTex, pos.x);
     uint i = gl_LocalInvocationID.x;
-    values[i][0] = vec2(v_.r, 0.);
-    synchronize();
 
-    int source = 0;
-
-    for (int n = 2; n <= SIZE; n *= 2) {
-        fft_pass(n, source);
-        source ^= 1;
+    if (test_switch == -1) {
+        float val = 0.25 + 0.2*sin((pos.x * test_frequency)/30.0 - roll);
+        imageStore(destTex, pos.x, vec4(val, 0.0f, 0.0f, 1.0f));
+    } else if (test_switch == 0) {
+        vec4 v_ = imageLoad(destTex, pos.x);
+        float val = v_.r;
+        values[i][0] = vec2(val, 0.);
         synchronize();
-    }
 
-    float v = length(values[i][source]);
+        int source = 0;
 
+        for (int n = 2; n <= SIZE; n *= 2) {
+            fft_pass(n, source);
+            source ^= 1;
+            synchronize();
+        }
 
-//    if(v_.r < 0.8f) {
-//        float val=0.25 + 0.2*sin((pos.x+pos.y)/30.0 - roll);
+        float v = length(values[i][source]);
+
         imageStore(destTex, pos.x, vec4(v / 100.f, 0.0f, 0.0f, 1.0f));
-//    }
+    } else if (test_switch == 1) {
+        float val = 0.25 + 0.2*sin((pos.x * test_frequency)/30.0 - roll);
+        values[i][0] = vec2(val, 0.);
+        synchronize();
+
+        int source = 0;
+
+        for (int n = 2; n <= SIZE; n *= 2) {
+            fft_pass(n, source);
+            source ^= 1;
+            synchronize();
+        }
+
+        float v = length(values[i][source]);
+
+        imageStore(destTex, pos.x, vec4(v / 100.f, 0.0f, 0.0f, 1.0f));
+    }
 }

@@ -135,6 +135,8 @@ private:
     float m_speed;
     float m_lineThickness;
     bool m_ComputeShaderSwitch;
+    int m_TestSwitch;
+    float m_TestFrequency;
 };
 
 #endif

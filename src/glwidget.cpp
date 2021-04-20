@@ -75,7 +75,9 @@ GLWidget::GLWidget(QWidget *parent)
       roll(0.0),
       m_speed(0.0333f),
       m_lineThickness(0.01f),
-      m_ComputeShaderSwitch(true) {
+      m_ComputeShaderSwitch(true),
+      m_TestSwitch(10),
+      m_TestFrequency(100.f) {
     m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
     // --transparent causes the clear color to be transparent. Therefore, on systems that
     // support it, the widget will become transparent apart from the logo.
@@ -91,7 +93,9 @@ GLWidget::GLWidget(QWidget *parent)
     cfg += {{class_obj_id.c_str(), {
                 {"Speed", m_speed},
                 {"lineThickness", m_lineThickness},
-                {"compute1_switch", m_ComputeShaderSwitch}
+                {"compute1_switch", m_ComputeShaderSwitch},
+                {"test_switch", m_TestSwitch},
+                {"test_frequency", m_TestFrequency}
         }}
     };
     auto cfg_local = cfg[class_obj_id.c_str()];
@@ -114,6 +118,20 @@ GLWidget::GLWidget(QWidget *parent)
         if (!b.is_bool()) return false;
         auto tg = bool(b);
         m_ComputeShaderSwitch = tg;
+        return true;
+      });
+
+    cfg_local["test_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+        if (!b.is_int()) return false;
+        auto tg = int(b);
+        m_TestSwitch = tg;
+        return true;
+      });
+
+    cfg_local["test_frequency"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+        if (!b.is_float()) return false;
+        auto tg = float(b);
+        m_TestFrequency = tg;
         return true;
       });
     reset();
@@ -289,6 +307,8 @@ void GLWidget::paintGL() {
     static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
     static GLint destLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
     static GLint rollLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
+    static GLint testFrequencyLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_frequency");
+    static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");
     static GLint lineThicknessLoc = glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
 
 //    qDebug() << srcLoc;
@@ -321,6 +341,8 @@ void GLWidget::paintGL() {
         m_Ctexture->bind();
         glUniform1i(destLoc, 0);
         glUniform1f(rollLoc, roll);
+        glUniform1f(testFrequencyLoc, m_TestFrequency);
+        glUniform1i(testSwitchLoc, m_TestSwitch);
         roll += m_speed;
         glDispatchCompute(m_Ctexture->width(), 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

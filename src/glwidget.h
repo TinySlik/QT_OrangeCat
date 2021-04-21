@@ -135,9 +135,9 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core {
   float roll;
   float m_speed;
   float m_lineThickness;
+  float m_TestFrequency;
   bool m_ComputeShaderSwitch;
   int m_TestSwitch;
-  float m_TestFrequency;
   int m_DisplaySwitch;
 };
 

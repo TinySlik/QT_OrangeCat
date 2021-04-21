@@ -76,9 +76,9 @@ GLWidget::GLWidget(QWidget *parent)
     roll(0.0),
     m_speed(0.0333f),
     m_lineThickness(0.01f),
+    m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(1),
-    m_TestFrequency(100.f),
     m_DisplaySwitch(1) {
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -160,6 +160,10 @@ void GLWidget::reset() {
 
 GLWidget::~GLWidget() {
   cleanup();
+  auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+  std::string class_obj_id = typeid(*this).name();
+  class_obj_id += std::to_string(int(this));
+  cfg.erase(class_obj_id);
 }
 
 QSize GLWidget::minimumSizeHint() const {
@@ -314,12 +318,6 @@ void GLWidget::paintGL() {
   static GLint displaySwitchLoc = glGetUniformLocation(m_CrenderProgram->programId(), "display_switch");
 
   // compute
-  /**
-   * @brief getData
-   * (int mipLevel,
-               PixelFormat sourceFormat, PixelType sourceType,
-                const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
-    */
   m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);
 
   m_Cvao.bind();
@@ -362,19 +360,19 @@ void GLWidget::resizeGL(int w, int h) {
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
-  m_lastPos = event->pos();
+//  m_lastPos = event->pos();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
-  int dx = event->x() - m_lastPos.x();
-  int dy = event->y() - m_lastPos.y();
+//  int dx = event->x() - m_lastPos.x();
+//  int dy = event->y() - m_lastPos.y();
 
-  if (event->buttons() & Qt::LeftButton) {
-      setXRotation(m_xRot + 8 * dy);
-      setYRotation(m_yRot + 8 * dx);
-  } else if (event->buttons() & Qt::RightButton) {
-      setXRotation(m_xRot + 8 * dy);
-      setZRotation(m_zRot + 8 * dx);
-  }
-  m_lastPos = event->pos();
+//  if (event->buttons() & Qt::LeftButton) {
+//      setXRotation(m_xRot + 8 * dy);
+//      setYRotation(m_yRot + 8 * dx);
+//  } else if (event->buttons() & Qt::RightButton) {
+//      setXRotation(m_xRot + 8 * dy);
+//      setZRotation(m_zRot + 8 * dx);
+//  }
+//  m_lastPos = event->pos();
 }

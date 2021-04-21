@@ -91,6 +91,14 @@ file(GLOB_RECURSE QRC_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/res/*.qrc)
 #set(QRC_SOURCE_FILES res.qrc)
 qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
+if(OS_WIN)
+  set(QT_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/impl.win32.cpp)
+else()
+  set(QT_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/impl.linux.cpp)
+endif()
+
+
+
 add_executable(${PROJECT_NAME}
     ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/certificateerrordialog.ui
@@ -119,6 +127,9 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/logo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/memorymapped.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/memorymapped.cpp
+    ${QT_PLATFORM_FILES}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick)

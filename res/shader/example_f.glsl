@@ -13,6 +13,6 @@ void main() {
         color=vec4(min(v1, v2));
     } else if (display_switch == 1) {
         float v1 = texture(srcTex, texCoord.s).r;
-        color = vec4(v1, v1, v1, 1.f);
+        color = vec4(0.f, v1, 0.f, 1.f);
     }
 }

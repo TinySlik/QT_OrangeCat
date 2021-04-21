@@ -50,6 +50,7 @@
 
 #include "browser.h"
 #include "browserwindow.h"
+#include "memorymapped.h"
 #include "tabwidget.h"
 #include "parameterserver.h"
 #include <QApplication>
@@ -66,6 +67,8 @@
 
 #include <QGuiApplication>
 
+#include "easylogging++.h"
+
 QUrl commandLineUrlArgument() {
   const QStringList args = QCoreApplication::arguments();
   for (const QString &arg : args.mid(1)) {
@@ -77,6 +80,28 @@ QUrl commandLineUrlArgument() {
 
 
 int main(int argc, char **argv) {
+  size_t i;
+  size_t sz;
+  size_t flushcnt;
+//#define TEST_MEMMAPED
+#ifdef TEST_MEMMAPED
+  auto st = GetTickCount();
+  MemoryMapped::File fh("C:/Users/dell-a6/Desktop/20210326-164400_wave.las");
+  sz = fh.size();
+  for(i=0, flushcnt=0; i<sz; i++, flushcnt++) {
+    if (rand() % 1000 < 50) {
+      std::cout << fh[i];
+      if(flushcnt == 128) {
+        std::cout << std::flush;
+        flushcnt = 0;
+      }
+    }
+  }
+  std::cout << std::endl;
+  LOG(INFO) << "size: " << sz << "  time spend: " << GetTickCount() - st << " ms ";
+  fh.close();
+#endif
+
   ParameterServer::instance()->CreateNewRoot("base", {
                                                   {"dev_ctrl", {
                                                   }},

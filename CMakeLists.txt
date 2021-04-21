@@ -97,8 +97,6 @@ else()
   set(QT_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/impl.linux.cpp)
 endif()
 
-
-
 add_executable(${PROJECT_NAME}
     ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/certificateerrordialog.ui

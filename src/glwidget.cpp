@@ -77,8 +77,9 @@ GLWidget::GLWidget(QWidget *parent)
     m_speed(0.0333f),
     m_lineThickness(0.01f),
     m_ComputeShaderSwitch(true),
-    m_TestSwitch(10),
-    m_TestFrequency(100.f) {
+    m_TestSwitch(1),
+    m_TestFrequency(100.f),
+    m_DisplaySwitch(1) {
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
   // support it, the widget will become transparent apart from the logo.
@@ -96,7 +97,8 @@ GLWidget::GLWidget(QWidget *parent)
       {"lineThickness", m_lineThickness},
       {"compute1_switch", m_ComputeShaderSwitch},
       {"test_switch", m_TestSwitch},
-      {"test_frequency", m_TestFrequency}
+      {"test_frequency", m_TestFrequency},
+      {"display_switch", m_DisplaySwitch}
     }}
   };
   auto cfg_local = cfg[class_obj_id.c_str()];
@@ -126,6 +128,13 @@ GLWidget::GLWidget(QWidget *parent)
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     m_TestSwitch = tg;
+    return true;
+  });
+
+  cfg_local["display_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+    if (!b.is_int()) return false;
+    auto tg = static_cast<int>(b);
+    m_DisplaySwitch = tg;
     return true;
   });
 
@@ -201,7 +210,7 @@ void GLWidget::cleanup() {
 }
 
 void GLWidget::getData() {
-    // 模擬
+    // 模拟通信数据流
 //    std::vector<float> cache;
 //    size_t sz = rand()%50 + 50;
 //    for (size_t i = 0; i < sz; i++) {
@@ -295,22 +304,14 @@ void GLWidget::setupVertexAttribs() {
 }
 
 void GLWidget::paintGL() {
-  getData();
-//    qDebug() << "======================" << m_tex_buf_render_head - m_tex_buf.data();
-//    for (size_t i = 0; i < 10; ++i) {
-//        qDebug() << m_tex_buf_render_head[i] << "|||";
-//    }
+  getData(); // for test
   static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
   static GLint destLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
   static GLint rollLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
   static GLint testFrequencyLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_frequency");
   static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");
   static GLint lineThicknessLoc = glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
-
-//    qDebug() << srcLoc;
-//    qDebug() << destLoc;
-//    qDebug() << rollLoc;
-//    qDebug() << roll;
+  static GLint displaySwitchLoc = glGetUniformLocation(m_CrenderProgram->programId(), "display_switch");
 
   // compute
   /**
@@ -339,6 +340,7 @@ void GLWidget::paintGL() {
   // glClear(GL_COLOR_BUFFER_BIT);
   m_Ctexture->bind();
   glUniform1i(srcLoc, 0);
+  glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 

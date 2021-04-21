@@ -138,6 +138,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core {
   bool m_ComputeShaderSwitch;
   int m_TestSwitch;
   float m_TestFrequency;
+  int m_DisplaySwitch;
 };
 
 #endif  // OIL_SRC_GLWIDGET_H_

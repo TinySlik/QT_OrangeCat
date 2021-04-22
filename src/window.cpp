@@ -52,6 +52,7 @@
 #include "glwidget.h"
 #include "window.h"
 #include "mainwindow.h"
+#include "dataprocesswidget.h"
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -63,18 +64,18 @@
 
 Window::Window(MainWindow *mw)
   : mainWindow(mw) {
-  glWidget = new GLWidget;
+  glWidget = new DataProcessWidget;
 
   xSlider = createSlider();
   ySlider = createSlider();
   zSlider = createSlider();
 
-  connect(xSlider, &QSlider::valueChanged, glWidget, &GLWidget::setXRotation);
-  connect(glWidget, &GLWidget::xRotationChanged, xSlider, &QSlider::setValue);
-  connect(ySlider, &QSlider::valueChanged, glWidget, &GLWidget::setYRotation);
-  connect(glWidget, &GLWidget::yRotationChanged, ySlider, &QSlider::setValue);
-  connect(zSlider, &QSlider::valueChanged, glWidget, &GLWidget::setZRotation);
-  connect(glWidget, &GLWidget::zRotationChanged, zSlider, &QSlider::setValue);
+//  connect(xSlider, &QSlider::valueChanged, glWidget, &GLWidget::setXRotation);
+//  connect(glWidget, &GLWidget::xRotationChanged, xSlider, &QSlider::setValue);
+//  connect(ySlider, &QSlider::valueChanged, glWidget, &GLWidget::setYRotation);
+//  connect(glWidget, &GLWidget::yRotationChanged, ySlider, &QSlider::setValue);
+//  connect(zSlider, &QSlider::valueChanged, glWidget, &GLWidget::setZRotation);
+//  connect(glWidget, &GLWidget::zRotationChanged, zSlider, &QSlider::setValue);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   QHBoxLayout *container = new QHBoxLayout;
@@ -92,9 +93,9 @@ Window::Window(MainWindow *mw)
 
   setLayout(mainLayout);
 
-  xSlider->setValue(15 * 16);
-  ySlider->setValue(345 * 16);
-  zSlider->setValue(0 * 16);
+//  xSlider->setValue(15 * 16);
+//  ySlider->setValue(345 * 16);
+//  zSlider->setValue(0 * 16);
 
   setWindowTitle(tr("Hello GL"));
 }

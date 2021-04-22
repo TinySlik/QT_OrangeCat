@@ -48,8 +48,8 @@
 **
 ****************************************************************************/
 
-#ifndef OIL_SRC_GLWIDGET_H_
-#define OIL_SRC_GLWIDGET_H_
+#ifndef OIL_SRC_DATAPROCESSWIDGET_H_
+#define OIL_SRC_DATAPROCESSWIDGET_H_
 
 #include <vector>
 #include <memory>
@@ -68,12 +68,12 @@
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core {
+class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core {
   Q_OBJECT
 
  public:
-  explicit GLWidget(QWidget *parent = nullptr);
-  ~GLWidget();
+  explicit DataProcessWidget(QWidget *parent = nullptr);
+  ~DataProcessWidget();
 
   static bool isTransparent() { return m_transparent; }
   static void setTransparent(bool t) { m_transparent = t; }
@@ -141,6 +141,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core {
   bool m_ComputeShaderSwitch;
   int m_TestSwitch;
   int m_DisplaySwitch;
+  size_t m_file_find_index;
 };
 
-#endif  // OIL_SRC_GLWIDGET_H_
+#endif  // OIL_SRC_DATAPROCESSWIDGET_H_

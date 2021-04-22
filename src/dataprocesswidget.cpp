@@ -49,7 +49,7 @@
 ****************************************************************************/
 
 #include <string>
-#include "glwidget.h"
+#include "dataprocesswidget.h"
 #include <math.h>
 #include <windows.h>
 #include <QMouseEvent>
@@ -59,9 +59,9 @@
 #include "parameterserver.h"
 #include "easylogging++.h"
 
-bool GLWidget::m_transparent = false;
+bool DataProcessWidget::m_transparent = false;
 
-GLWidget::GLWidget(QWidget *parent)
+DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
     m_xRot(0),
     m_yRot(0),
@@ -80,7 +80,8 @@ GLWidget::GLWidget(QWidget *parent)
     m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(1),
-    m_DisplaySwitch(1) {
+    m_DisplaySwitch(1),
+    m_file_find_index(0) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -114,6 +115,8 @@ GLWidget::GLWidget(QWidget *parent)
         if (ora != "null" && m_fileMMap) {
           LOG(INFO) << "file name: " << ora << " close";
           m_fileMMap->close();
+          m_fileMMap = nullptr;
+          m_file_find_index = 0;
         }
         return true;
     }
@@ -121,6 +124,8 @@ GLWidget::GLWidget(QWidget *parent)
     if (ora != "null" && m_fileMMap) {
       LOG(INFO) << "file name: " << ora << " close";
       m_fileMMap->close();
+      m_fileMMap = nullptr;
+      m_file_find_index = 0;
     }
 
 //    size_t i;
@@ -130,6 +135,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
+    this->setWindowTitle(QString(tg.c_str()));
 //    for(i = 0, flushcnt = 0; i < sz; i++, flushcnt++) {
 //      std::cout << (*m_fileMMap)[i];
 //      if(flushcnt == 128) {
@@ -191,13 +197,13 @@ GLWidget::GLWidget(QWidget *parent)
   setFormat(format);
 }
 
-void GLWidget::reset() {
+void DataProcessWidget::reset() {
   m_tex_buf.clear();
   m_tex_buf.resize(MAX_PAINT_BUF_SIZE * 2);
   m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
 }
 
-GLWidget::~GLWidget() {
+DataProcessWidget::~DataProcessWidget() {
   cleanup();
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
@@ -205,17 +211,17 @@ GLWidget::~GLWidget() {
   cfg.erase(class_obj_id);
 }
 
-QSize GLWidget::minimumSizeHint() const {
+QSize DataProcessWidget::minimumSizeHint() const {
   return QSize(50, 50);
 }
 
-QSize GLWidget::sizeHint() const {
+QSize DataProcessWidget::sizeHint() const {
   return QSize(768, 512);
 }
 
 static void qNormalizeAngle(const int &) {}
 
-void GLWidget::setXRotation(int angle) {
+void DataProcessWidget::setXRotation(int angle) {
   qNormalizeAngle(angle);
   if (angle != m_xRot) {
     m_xRot = angle;
@@ -224,7 +230,7 @@ void GLWidget::setXRotation(int angle) {
   }
 }
 
-void GLWidget::setYRotation(int angle) {
+void DataProcessWidget::setYRotation(int angle) {
   qNormalizeAngle(angle);
   if (angle != m_yRot) {
     m_yRot = angle;
@@ -233,7 +239,7 @@ void GLWidget::setYRotation(int angle) {
   }
 }
 
-void GLWidget::setZRotation(int angle) {
+void DataProcessWidget::setZRotation(int angle) {
   qNormalizeAngle(angle);
   if (angle != m_zRot) {
     m_zRot = angle;
@@ -242,7 +248,7 @@ void GLWidget::setZRotation(int angle) {
   }
 }
 
-void GLWidget::cleanup() {
+void DataProcessWidget::cleanup() {
   if (m_program == nullptr)
       return;
   makeCurrent();
@@ -252,7 +258,7 @@ void GLWidget::cleanup() {
   doneCurrent();
 }
 
-void GLWidget::getData() {
+void DataProcessWidget::getData() {
     // 模拟通信数据流
 //    std::vector<float> cache;
 //    size_t sz = rand()%50 + 50;
@@ -265,7 +271,28 @@ void GLWidget::getData() {
 //        qDebug() << "error";
 //        return;
 //    }
-  float value = static_cast<float>((rand() % 1000) / 1000.f);
+  float value = 0.f;
+  if (m_fileMMap) {
+    size_t size = m_fileMMap->size();
+    auto head = m_fileMMap->data();
+    auto cur_index = 1711 + m_file_find_index;
+    head[1711 + m_file_find_index];
+    if ((1711 + m_file_find_index) > size - 6) {
+      m_file_find_index = 0;
+    }
+
+    uint l1 = (uint)(head[cur_index]);
+    uint l2 = (uint)(head[cur_index + 1]);
+    uint l3 = (uint)(head[cur_index + 2]);
+    uint res_i = l3 | l2 << 2 | l1 << 4;
+    value = 10000.f * ((float)res_i/(float)(0xffffff));
+//    LOG(INFO) << value;
+
+    m_file_find_index += 6;
+  } else {
+    value = static_cast<float>((rand() % 1000) / 1000.f);
+  }
+//
 
   if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
     m_tex_buf_render_head--;
@@ -277,7 +304,7 @@ void GLWidget::getData() {
   *(m_tex_buf_render_head + MAX_PAINT_BUF_SIZE) = value;
 }
 
-void GLWidget::initializeGL() {
+void DataProcessWidget::initializeGL() {
   initializeOpenGLFunctions();
   glClearColor(0, 0, 1, 1);
 
@@ -337,7 +364,7 @@ void GLWidget::initializeGL() {
   timer.start(16);
 }
 
-void GLWidget::setupVertexAttribs() {
+void DataProcessWidget::setupVertexAttribs() {
   m_logoVbo.bind();
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
@@ -346,7 +373,7 @@ void GLWidget::setupVertexAttribs() {
   m_logoVbo.release();
 }
 
-void GLWidget::paintGL() {
+void DataProcessWidget::paintGL() {
   getData(); // for test
   static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
   static GLint destLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
@@ -384,7 +411,7 @@ void GLWidget::paintGL() {
   m_Cvao.release();
 }
 
-void GLWidget::resizeGL(int w, int h) {
+void DataProcessWidget::resizeGL(int w, int h) {
   // Calculate aspect ratio
   qreal aspect = qreal(w) / qreal(h ? h : 1);
 
@@ -398,11 +425,11 @@ void GLWidget::resizeGL(int w, int h) {
   m_proj.ortho(+0.5f, -0.5f, +0.5f, -0.5f, zNear, zFar);
 }
 
-void GLWidget::mousePressEvent(QMouseEvent *event) {
+void DataProcessWidget::mousePressEvent(QMouseEvent *event) {
 //  m_lastPos = event->pos();
 }
 
-void GLWidget::mouseMoveEvent(QMouseEvent *event) {
+void DataProcessWidget::mouseMoveEvent(QMouseEvent *event) {
 //  int dx = event->x() - m_lastPos.x();
 //  int dy = event->y() - m_lastPos.y();
 

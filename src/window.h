@@ -58,7 +58,7 @@ class QSlider;
 class QPushButton;
 QT_END_NAMESPACE
 
-class GLWidget;
+class DataProcessWidget;
 class MainWindow;
 
 class Window : public QWidget {
@@ -76,7 +76,7 @@ class Window : public QWidget {
  private:
   QSlider *createSlider();
 
-  GLWidget *glWidget;
+  DataProcessWidget *glWidget;
   QSlider *xSlider;
   QSlider *ySlider;
   QSlider *zSlider;

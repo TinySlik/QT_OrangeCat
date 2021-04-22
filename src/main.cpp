@@ -50,7 +50,6 @@
 
 #include "browser.h"
 #include "browserwindow.h"
-#include "memorymapped.h"
 #include "tabwidget.h"
 #include "parameterserver.h"
 #include <QApplication>
@@ -80,28 +79,6 @@ QUrl commandLineUrlArgument() {
 
 
 int main(int argc, char **argv) {
-  size_t i;
-  size_t sz;
-  size_t flushcnt;
-//#define TEST_MEMMAPED
-#ifdef TEST_MEMMAPED
-  auto st = GetTickCount();
-  MemoryMapped::File fh("C:/Users/dell-a6/Desktop/20210326-164400_wave.las");
-  sz = fh.size();
-  for(i=0, flushcnt=0; i<sz; i++, flushcnt++) {
-    if (rand() % 1000 < 50) {
-      std::cout << fh[i];
-      if(flushcnt == 128) {
-        std::cout << std::flush;
-        flushcnt = 0;
-      }
-    }
-  }
-  std::cout << std::endl;
-  LOG(INFO) << "size: " << sz << "  time spend: " << GetTickCount() - st << " ms ";
-  fh.close();
-#endif
-
   ParameterServer::instance()->CreateNewRoot("base", {
                                                   {"dev_ctrl", {
                                                   }},
@@ -120,13 +97,6 @@ int main(int argc, char **argv) {
   QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
   QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
   QWebEngineProfile::defaultProfile()->setUseForGlobalCertificateVerification();
-
-//    QUrl url = commandLineUrlArgument();
-
-//    Browser browser;
-//    BrowserWindow *window = browser.createWindow();
-//    window->show();
-//    window->tabWidget()->setUrl(url);
 
   QCoreApplication::setApplicationName("Oil paint demo.");
   QCoreApplication::setOrganizationName("Citek");
@@ -169,5 +139,14 @@ int main(int argc, char **argv) {
       mainWindow.show();
   else
       mainWindow.showMaximized();
+//#define TEST_QTWEB
+#ifdef TEST_QTWEB
+  QUrl url = commandLineUrlArgument();
+
+  Browser browser;
+  BrowserWindow *window = browser.createWindow();
+  window->show();
+  window->tabWidget()->setUrl(url);
+#endif
   return app.exec();
 }

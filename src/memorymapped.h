@@ -47,7 +47,7 @@ class IOError: public std::runtime_error {
 
 /// Portable read-only memory mapping (Windows and Linux)
 /// Filesize limited by size_t, usually 2^32 or 2^64
-class File {
+class File : public std::enable_shared_from_this<File>{
  public:
   /// tweak performance
   enum CacheHint {

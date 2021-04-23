@@ -135,7 +135,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
-    this->setWindowTitle(QString(tg.c_str()));
+//    this->setWindowTitle(QString(tg.c_str()));
 //    for(i = 0, flushcnt = 0; i < sz; i++, flushcnt++) {
 //      std::cout << (*m_fileMMap)[i];
 //      if(flushcnt == 128) {

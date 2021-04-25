@@ -94,6 +94,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   void xRotationChanged(int angle);
   void yRotationChanged(int angle);
   void zRotationChanged(int angle);
+  void TitelChanged(const QString &title);
 
  protected:
   void initializeGL() override;

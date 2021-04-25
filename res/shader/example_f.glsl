@@ -14,5 +14,9 @@ void main() {
     } else if (display_switch == 1) {
         float v1 = texture(srcTex, texCoord.s).r;
         color = vec4(0.f, v1, 0.f, 1.f);
+    } else if (display_switch == 2) {
+        vec4 c = texture(srcTex, texCoord.s);
+        float v1 = smoothstep(c.r - lineThickness/2.0, c.r, texCoord.y);
+        color=vec4(v1);
     }
 }

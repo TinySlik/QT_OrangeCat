@@ -107,6 +107,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   };
   auto cfg_local = cfg[class_obj_id.c_str()];
 
+  connect(this, SIGNAL(TitelChanged(const QString &)), this, SLOT(setWindowTitle(const QString &)));
+
   cfg_local["test_file_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
     auto tg = static_cast<std::string>(b);
@@ -135,6 +137,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
+    emit TitelChanged(QString(tg.c_str()));
+
 //    this->setWindowTitle(QString(tg.c_str()));
 //    for(i = 0, flushcnt = 0; i < sz; i++, flushcnt++) {
 //      std::cout << (*m_fileMMap)[i];

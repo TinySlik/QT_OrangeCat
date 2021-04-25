@@ -21,4 +21,6 @@ platform windows10/linux/mac
 5.显示方式 display_switch（0 点图）（1 能量条带）（2 黑白界限波形）
 
 6.测试波形文件路径 test_file_path
+
+需要多个窗口时先将当前窗口脱离主界面，然后new新的窗口即可，在控制端将会出现新的控制对象.
   

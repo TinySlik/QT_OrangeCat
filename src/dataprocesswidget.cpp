@@ -63,10 +63,6 @@ bool DataProcessWidget::m_transparent = false;
 
 DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
-    m_xRot(0),
-    m_yRot(0),
-    m_zRot(0),
-    m_program(nullptr),
     m_tex_buf_render_head(nullptr),
     m_fileMMap(nullptr),
     m_CvertexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer)),
@@ -130,24 +126,12 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       m_file_find_index = 0;
     }
 
-//    size_t i;
     size_t sz;
-//    size_t flushcnt;
     auto st = GetTickCount();
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
     emit TitelChanged(QString(tg.c_str()));
-
-//    this->setWindowTitle(QString(tg.c_str()));
-//    for(i = 0, flushcnt = 0; i < sz; i++, flushcnt++) {
-//      std::cout << (*m_fileMMap)[i];
-//      if(flushcnt == 128) {
-//        std::cout.flush();
-//        flushcnt = 0;
-//      }
-//    }
-//    std::cout << "finished !!!" << std::endl;
     LOG(INFO) << "file name: " << tg << " open, size: " << sz << "  time spend: " << GetTickCount() - st << " ms ";
     return true;
   });
@@ -208,7 +192,6 @@ void DataProcessWidget::reset() {
 }
 
 DataProcessWidget::~DataProcessWidget() {
-  cleanup();
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(int(this));
@@ -225,56 +208,7 @@ QSize DataProcessWidget::sizeHint() const {
 
 static void qNormalizeAngle(const int &) {}
 
-void DataProcessWidget::setXRotation(int angle) {
-  qNormalizeAngle(angle);
-  if (angle != m_xRot) {
-    m_xRot = angle;
-    emit xRotationChanged(angle);
-    update();
-  }
-}
-
-void DataProcessWidget::setYRotation(int angle) {
-  qNormalizeAngle(angle);
-  if (angle != m_yRot) {
-    m_yRot = angle;
-    emit yRotationChanged(angle);
-    update();
-  }
-}
-
-void DataProcessWidget::setZRotation(int angle) {
-  qNormalizeAngle(angle);
-  if (angle != m_zRot) {
-    m_zRot = angle;
-    emit zRotationChanged(angle);
-    update();
-  }
-}
-
-void DataProcessWidget::cleanup() {
-  if (m_program == nullptr)
-      return;
-  makeCurrent();
-  m_logoVbo.destroy();
-//    delete m_program;
-//    m_program = 0;
-  doneCurrent();
-}
-
 void DataProcessWidget::getData() {
-    // 模拟通信数据流
-//    std::vector<float> cache;
-//    size_t sz = rand()%50 + 50;
-//    for (size_t i = 0; i < sz; i++) {
-//        cache.push_back(float(rand() % 100));
-//    }
-
-    //==================
-//    if (sz > MAX_PAINT_BUF_SIZE) {
-//        qDebug() << "error";
-//        return;
-//    }
   float value = 0.f;
   if (m_fileMMap) {
     size_t size = m_fileMMap->size();
@@ -368,15 +302,6 @@ void DataProcessWidget::initializeGL() {
   timer.start(16);
 }
 
-void DataProcessWidget::setupVertexAttribs() {
-  m_logoVbo.bind();
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-  m_logoVbo.release();
-}
-
 void DataProcessWidget::paintGL() {
   getData(); // for test
   static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
@@ -429,20 +354,8 @@ void DataProcessWidget::resizeGL(int w, int h) {
   m_proj.ortho(+0.5f, -0.5f, +0.5f, -0.5f, zNear, zFar);
 }
 
-void DataProcessWidget::mousePressEvent(QMouseEvent *event) {
-//  m_lastPos = event->pos();
+void DataProcessWidget::mousePressEvent(QMouseEvent *) {
 }
 
-void DataProcessWidget::mouseMoveEvent(QMouseEvent *event) {
-//  int dx = event->x() - m_lastPos.x();
-//  int dy = event->y() - m_lastPos.y();
-
-//  if (event->buttons() & Qt::LeftButton) {
-//      setXRotation(m_xRot + 8 * dy);
-//      setYRotation(m_yRot + 8 * dx);
-//  } else if (event->buttons() & Qt::RightButton) {
-//      setXRotation(m_xRot + 8 * dy);
-//      setZRotation(m_zRot + 8 * dx);
-//  }
-//  m_lastPos = event->pos();
+void DataProcessWidget::mouseMoveEvent(QMouseEvent *) {
 }

@@ -85,15 +85,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   void getData();
 
  public slots:
-  void setXRotation(int angle);
-  void setYRotation(int angle);
-  void setZRotation(int angle);
-  void cleanup();
 
  signals:
-  void xRotationChanged(int angle);
-  void yRotationChanged(int angle);
-  void zRotationChanged(int angle);
   void TitelChanged(const QString &title);
 
  protected:
@@ -105,25 +98,10 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
  private:
   QTimer timer;
-  void setupVertexAttribs();
 
   bool m_core;
-  int m_xRot;
-  int m_yRot;
-  int m_zRot;
-  QPoint m_lastPos;
-  Logo m_logo;
   QOpenGLVertexArrayObject m_vao;
-  QOpenGLBuffer m_logoVbo;
-  std::shared_ptr<QOpenGLShaderProgram> m_program;
-  int m_projMatrixLoc;
-  int m_mvMatrixLoc;
-  int m_time_;
-  int m_normalMatrixLoc;
-  int m_lightPosLoc;
   QMatrix4x4 m_proj;
-  QMatrix4x4 m_camera;
-  QMatrix4x4 m_world;
   std::vector<float> m_tex_buf;
   float * m_tex_buf_render_head;
   static bool m_transparent;

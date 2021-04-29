@@ -76,7 +76,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(1),
-    m_DisplaySwitch(2),
+    m_DisplaySwitch(4),
     m_file_find_index(0) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
@@ -311,6 +311,8 @@ void DataProcessWidget::paintGL() {
   static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");
   static GLint lineThicknessLoc = glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
   static GLint displaySwitchLoc = glGetUniformLocation(m_CrenderProgram->programId(), "display_switch");
+  static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
+  static GLint resolutionLoc = glGetUniformLocation(m_CrenderProgram->programId(), "resolution");
 
   // compute
   m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);
@@ -335,6 +337,9 @@ void DataProcessWidget::paintGL() {
   glUniform1i(srcLoc, 0);
   glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
+  static float ori = GetTickCount()/ 1000.f;
+  glUniform1f(timeLoc, GetTickCount()/ 1000.f - ori);
+  glUniform2f(resolutionLoc, 1920, 1080);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 
   m_Cvao.release();

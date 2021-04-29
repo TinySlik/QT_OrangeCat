@@ -80,7 +80,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(1),
-    m_DisplaySwitch(1) {
+    m_DisplaySwitch(2) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -355,7 +355,8 @@ void GLWidget::paintGL() {
   static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");
   static GLint lineThicknessLoc = glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
   static GLint displaySwitchLoc = glGetUniformLocation(m_CrenderProgram->programId(), "display_switch");
-
+  static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
+  static GLint resolutionLoc = glGetUniformLocation(m_CrenderProgram->programId(), "resolution");
   // compute
   m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);
 
@@ -379,6 +380,8 @@ void GLWidget::paintGL() {
   glUniform1i(srcLoc, 0);
   glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
+  glUniform1f(timeLoc, GetTickCount()/1000.f);
+  glUniform2f(resolutionLoc, 640, 480);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 
   m_Cvao.release();

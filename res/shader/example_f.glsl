@@ -20,7 +20,7 @@ void main() {
         color=vec4(0.0, 1.0 - v1, 0.0, 1.0);
     } else if (display_switch == 3) {
         vec4 c = texture(srcTex, texCoord.s);
-        float v1 = pow(abs(c.r), 50.0);
+        float v1 = pow(1.0 - abs(texCoord.t - c.r), 50.0);
         color=vec4(v1);
     }
 }

@@ -17,6 +17,10 @@ void main() {
     } else if (display_switch == 2) {
         vec4 c = texture(srcTex, texCoord.s);
         float v1 = smoothstep(c.r - lineThickness/2.0, c.r, texCoord.y);
+        color=vec4(0.0, 1.0 - v1, 0.0, 1.0);
+    } else if (display_switch == 3) {
+        vec4 c = texture(srcTex, texCoord.s);
+        float v1 = pow(abs(c.r), 50.0);
         color=vec4(v1);
     }
 }

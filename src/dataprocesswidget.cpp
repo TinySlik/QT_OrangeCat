@@ -76,7 +76,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(1),
-    m_DisplaySwitch(0),
+    m_DisplaySwitch(2),
     m_file_find_index(0) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;

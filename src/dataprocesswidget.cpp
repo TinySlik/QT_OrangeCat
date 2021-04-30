@@ -339,7 +339,7 @@ void DataProcessWidget::paintGL() {
   glUniform1f(lineThicknessLoc, m_lineThickness);
   static float ori = GetTickCount()/ 1000.f;
   glUniform1f(timeLoc, GetTickCount()/ 1000.f - ori);
-  glUniform2f(resolutionLoc, 1920, 1080);
+  glUniform2f(resolutionLoc, 1920.f, 1080.f);
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 
   m_Cvao.release();

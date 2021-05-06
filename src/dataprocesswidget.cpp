@@ -206,8 +206,6 @@ QSize DataProcessWidget::sizeHint() const {
   return QSize(768, 512);
 }
 
-static void qNormalizeAngle(const int &) {}
-
 void DataProcessWidget::getData() {
   float value = 0.f;
   if (m_fileMMap) {
@@ -224,13 +222,11 @@ void DataProcessWidget::getData() {
     uint l3 = (uint)(head[cur_index + 2]);
     uint res_i = l3 | l2 << 2 | l1 << 4;
     value = 10000.f * ((float)res_i/(float)(0xffffff));
-//    LOG(INFO) << value;
 
     m_file_find_index += 6;
   } else {
     value = static_cast<float>((rand() % 1000) / 1000.f);
   }
-//
 
   if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
     m_tex_buf_render_head--;
@@ -272,7 +268,6 @@ void DataProcessWidget::initializeGL() {
 
   glActiveTexture(GL_TEXTURE0);
   m_Ctexture->create();
-//    m_Ctexture->setFormat(QOpenGLTexture::RGBA8_SNorm);
   m_Ctexture->setFormat(QOpenGLTexture::R32F);
   m_Ctexture->setSize(512, 1);
   m_Ctexture->setMinificationFilter(QOpenGLTexture::Linear);
@@ -280,7 +275,6 @@ void DataProcessWidget::initializeGL() {
   m_Ctexture->allocateStorage();
   m_Ctexture->bind();
 
-//    glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
   glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 
   m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, ":/shader/example_c.glsl");

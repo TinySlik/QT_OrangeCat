@@ -45,7 +45,12 @@ void main() {
     uint i = gl_LocalInvocationID.x;
 
     if (test_switch == -1) {
-        float val = 0.25 + 0.2*sin((pos.x * test_frequency)/30.0 - roll);
+        // test_frequency hz test
+        float val = 0.1*sin((pos.x * test_frequency)/30.0 - roll);
+        // 0.5 hz test
+        val += 0.25 + 0.4*sin((pos.x * 0.5f)/30.0 - roll);
+        // 5 hz test
+        val += 0.25 + 0.2*sin((pos.x * 5.f)/30.0 - roll);
         imageStore(destTex, pos.x, vec4(val, 0.0f, 0.0f, 1.0f));
     } else if (test_switch == 0) {
         vec4 v_ = imageLoad(destTex, pos.x);

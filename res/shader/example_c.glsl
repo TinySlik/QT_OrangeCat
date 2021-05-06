@@ -46,11 +46,11 @@ void main() {
 
     if (test_switch == -1) {
         // test_frequency hz test
-        float val = 0.1*sin((pos.x * test_frequency)/30.0 - roll);
+        float val = 0.1*sin((pos.x * test_frequency * 3.f)/30.0 - roll);
         // 0.5 hz test
-        val += 0.25 + 0.4*sin((pos.x * 0.5f)/30.0 - roll);
+        val += 0.25 + 0.3*sin((pos.x * 0.5f * 3.f)/30.0 - roll);
         // 5 hz test
-        val += 0.25 + 0.2*sin((pos.x * 5.f)/30.0 - roll);
+        val += 0.25 + 0.2*sin((pos.x * 5.f * 3.f)/30.0 - roll);
         imageStore(destTex, pos.x, vec4(val, 0.0f, 0.0f, 1.0f));
     } else if (test_switch == 0) {
         vec4 v_ = imageLoad(destTex, pos.x);
@@ -71,11 +71,11 @@ void main() {
         imageStore(destTex, pos.x, vec4(v / 100.f, 0.0f, 0.0f, 1.0f));
     } else if (test_switch == 1) {
         // test_frequency hz test
-        float val = 0.5 + 0.1*sin((pos.x * test_frequency)/30.0 - roll);
+        float val = 0.1*sin((pos.x * test_frequency * 3.f)/30.0 - roll);
         // 0.5 hz test
-        val += 0.25 + 0.4*sin((pos.x * 0.5f)/30.0 - roll);
+        val += 0.25 + 0.3*sin((pos.x * 0.5f * 3.f)/30.0 - roll);
         // 5 hz test
-        val += 0.25 + 0.2*sin((pos.x * 5.f)/30.0 - roll);
+        val += 0.25 + 0.2*sin((pos.x * 5.f * 3.f)/30.0 - roll);
 
         values[i][0] = vec2(val, 0.);
         synchronize();

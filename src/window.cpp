@@ -97,7 +97,9 @@ Window::Window(MainWindow *mw)
 //  ySlider->setValue(345 * 16);
 //  zSlider->setValue(0 * 16);
 
-  setWindowTitle(tr("Hello GL"));
+  std::string class_obj_id = typeid(*glWidget).name();
+  class_obj_id += std::to_string(int(glWidget));
+  setWindowTitle(QString(class_obj_id.c_str()));
 }
 
 QSlider *Window::createSlider() {

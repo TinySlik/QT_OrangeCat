@@ -91,6 +91,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(int(this));
+
+
   cfg += {{class_obj_id.c_str(), {
       {"Speed", m_speed},
       {"lineThickness", m_lineThickness},
@@ -98,12 +100,19 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"test_switch", m_TestSwitch},
       {"test_frequency", m_TestFrequency},
       {"display_switch", m_DisplaySwitch},
-      {"test_file_path", "null"}
+      {"test_file_path", "null"},
+      {"file_load_location", m_file_find_index}
     }}
   };
+
   auto cfg_local = cfg[class_obj_id.c_str()];
 
-  connect(this, SIGNAL(TitelChanged(const QString &)), this, SLOT(setWindowTitle(const QString &)));
+  cfg_local["file_load_location"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    if (!b.is_int()) return false;
+    auto tg = static_cast<int>(b);
+    m_file_find_index = tg;
+    return true;
+  });
 
   cfg_local["test_file_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
@@ -211,16 +220,23 @@ void DataProcessWidget::getData() {
   if (m_fileMMap) {
     size_t size = m_fileMMap->size();
     auto head = m_fileMMap->data();
+    if( m_file_find_index % 600 == 0) {
+      auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+      std::string class_obj_id = typeid(*this).name();
+      class_obj_id += std::to_string(int(this));
+      auto cfg_local = cfg[class_obj_id.c_str()];
+      cfg_local["file_load_location"] = m_file_find_index;
+    }
+
     auto cur_index = 1711 + m_file_find_index;
-    head[1711 + m_file_find_index];
-    if ((1711 + m_file_find_index) > size - 6) {
+    if (cur_index > size - 6) {
       m_file_find_index = 0;
     }
 
     uint l1 = (uint)(head[cur_index]);
     uint l2 = (uint)(head[cur_index + 1]);
     uint l3 = (uint)(head[cur_index + 2]);
-    uint res_i = l3 | l2 << 2 | l1 << 4;
+    uint res_i = l3 | l2 << 1 | l1 << 2;
     value = 10000.f * ((float)res_i/(float)(0xffffff));
 
     m_file_find_index += 6;

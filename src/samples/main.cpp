@@ -47,7 +47,7 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-
+#define CONFIGURU_IMPLEMENTATION 1
 #include "browser.h"
 #include "browserwindow.h"
 #include "tabwidget.h"
@@ -65,8 +65,9 @@
 #include <QWebEngineSettings>
 
 #include <QGuiApplication>
-
 #include "easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
 
 QUrl commandLineUrlArgument() {
   const QStringList args = QCoreApplication::arguments();
@@ -77,8 +78,8 @@ QUrl commandLineUrlArgument() {
   return QUrl(QStringLiteral("http://localhost:8099"));
 }
 
-
 int main(int argc, char **argv) {
+  std::cout << "dsafasdfasf" << std::endl;
   ParameterServer::instance()->CreateNewRoot("base", {
                                                   {"dev_ctrl", {
                                                   }},

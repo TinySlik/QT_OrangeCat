@@ -113,7 +113,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::shared_ptr<QOpenGLShaderProgram> m_CcomputeProgram;
   std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
   std::shared_ptr<QOpenGLTexture> m_Ctexture;
-  float roll;
+  float m_roll;
   float m_speed;
   float m_lineThickness;
   float m_TestFrequency;
@@ -121,6 +121,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   int m_TestSwitch;
   int m_DisplaySwitch;
   size_t m_file_find_index;
+  size_t m_fft_level;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

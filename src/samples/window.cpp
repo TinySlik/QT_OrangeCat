@@ -64,7 +64,7 @@
 
 Window::Window(MainWindow *mw)
   : mainWindow(mw) {
-  glWidget = new DataProcessWidget;
+  glWidget = new DataProcessWidget(this);
 
   xSlider = createSlider();
   ySlider = createSlider();

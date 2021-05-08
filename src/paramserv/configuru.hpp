@@ -362,7 +362,7 @@ namespace configuru
 		Config(Config&& o) noexcept;
 		Config& operator=(const Config& o);
 		Config& operator<<(const Config& o);
-        Config& operator+=(const Config& o);
+		Config& operator+=(const Config& o);
 
 		void add_callback(std::function<bool(Config& dst, const Config& in)> func) {
 		  func_array.push_back(func);
@@ -1648,7 +1648,8 @@ namespace configuru
 	  deep_async(*this, o);
 	  return *this;
 	}
-    Config& Config::operator+=(const Config& o)
+
+	Config& Config::operator+=(const Config& o)
     {
         if (&o == this) { return *this; }
         if (_type != o._type) { return *this; }
@@ -2011,7 +2012,7 @@ namespace configuru
 		auto&& a_array = a.as_array();
 		auto&& b_array = b.as_array();
 		for (size_t i=0; i<a_array.size(); ++i) {
-          result *= deep_async(a_array[i], b_array[i]);
+		  result *= deep_async(a_array[i], a_array[i]);
 		}
 	      }
 	    }

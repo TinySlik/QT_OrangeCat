@@ -70,14 +70,15 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_CcomputeProgram(std::make_shared<QOpenGLShaderProgram>()),
     m_CrenderProgram(std::make_shared<QOpenGLShaderProgram>()),
     m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
-    roll(0.0),
+    m_roll(0.0),
     m_speed(0.0333f),
     m_lineThickness(0.01f),
     m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(1),
     m_DisplaySwitch(4),
-    m_file_find_index(0) {
+    m_file_find_index(0),
+    m_fft_level(512) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -92,6 +93,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(int(this));
 
+  connect(this, SIGNAL(TitelChanged(const QString &)), parent, SLOT(setWindowTitle(const QString &)));
 
   cfg += {{class_obj_id.c_str(), {
       {"Speed", m_speed},
@@ -101,7 +103,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"test_frequency", m_TestFrequency},
       {"display_switch", m_DisplaySwitch},
       {"test_file_path", "null"},
-      {"file_load_location", m_file_find_index}
+      {"file_load_location", m_file_find_index},
+      {"fft_level", m_fft_level}
     }}
   };
 
@@ -205,6 +208,11 @@ DataProcessWidget::~DataProcessWidget() {
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(int(this));
   cfg.erase(class_obj_id);
+  m_CcomputeProgram->removeAllShaders();
+  m_CrenderProgram->removeAllShaders();
+  makeCurrent();
+  m_Ctexture->destroy();
+
 }
 
 QSize DataProcessWidget::minimumSizeHint() const {
@@ -228,7 +236,7 @@ void DataProcessWidget::getData() {
       cfg_local["file_load_location"] = m_file_find_index;
     }
 
-    auto cur_index = 1711 + m_file_find_index;
+    auto cur_index = 1711 + m_file_find_index + 2;
     if (cur_index > size - 6) {
       m_file_find_index = 0;
     }
@@ -310,6 +318,8 @@ void DataProcessWidget::initializeGL() {
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
   timer.start(16);
+  m_CcomputeProgram->release();
+  m_CrenderProgram->release();
 }
 
 void DataProcessWidget::paintGL() {
@@ -332,10 +342,10 @@ void DataProcessWidget::paintGL() {
     m_CcomputeProgram->bind();
     m_Ctexture->bind();
     glUniform1i(destLoc, 0);
-    glUniform1f(rollLoc, roll);
+    glUniform1f(rollLoc, m_roll);
     glUniform1f(testFrequencyLoc, m_TestFrequency);
     glUniform1i(testSwitchLoc, m_TestSwitch);
-    roll += m_speed;
+    m_roll += m_speed;
     glDispatchCompute(m_Ctexture->width(), 1, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
   }
@@ -353,6 +363,9 @@ void DataProcessWidget::paintGL() {
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 
   m_Cvao.release();
+  m_CcomputeProgram->release();
+  m_CrenderProgram->release();
+  m_Ctexture->release();
 }
 
 void DataProcessWidget::resizeGL(int w, int h) {

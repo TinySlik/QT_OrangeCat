@@ -25,6 +25,10 @@
 #include "parameterserver.h"
 #include "easylogging++.h"
 
+#define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_c.glsl"
+#define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
+#define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/example_f.glsl"
+
 bool DataProcessWidget::m_transparent = false;
 
 DataProcessWidget::DataProcessWidget(QWidget *parent)
@@ -45,7 +49,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_DisplaySwitch(4),
     m_file_find_index(0),
     m_fft_level(512),
-    m_reset_buf_tag(false),
+//    m_reset_buf_tag(false),
     m_reset_computeshader_tag(false) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
@@ -77,7 +81,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
-  cfg_local["fft_level"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+  cfg_local["fft_level"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     if (tg >= 256 && tg <= 512) {
@@ -91,7 +95,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     } else {
       return false;
     }
-    m_reset_buf_tag = true;
+//    m_reset_buf_tag = true;
     m_reset_computeshader_tag = true;
     LOG(INFO) << "FFT level set to " << m_fft_level;
     return true;
@@ -301,12 +305,12 @@ void DataProcessWidget::initializeGL() {
 
   glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 
-  m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, ":/shader/example_c.glsl");
+  m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, DEFAULT_COMPUTE_SHADER_PATH);
   m_CcomputeProgram->link();
   m_CcomputeProgram->bind();
 
-  m_CrenderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shader/example_v.glsl");
-  m_CrenderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shader/example_f.glsl");
+  m_CrenderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, DEFAULT_VERT_SHADER_PATH);
+  m_CrenderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, DEFAULT_FAGERMENT_SHADER_PATH);
   m_CrenderProgram->link();
   m_CrenderProgram->bind();
 
@@ -322,18 +326,24 @@ void DataProcessWidget::initializeGL() {
   m_CrenderProgram->release();
 }
 
-void DataProcessWidget::resetComputeShader(int level) {
+bool DataProcessWidget::resetComputeShader(int level) {
   m_CcomputeProgram->removeAllShaders();
 
   std::string ora = ":/shader/example_fft";
   ora += std::to_string(level);
   ora += "_c.glsl";
 
-  m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, QString(ora.c_str()));
-  m_CcomputeProgram->link();
-  m_CcomputeProgram->bind();
-  LOG(INFO) << "compute shader -" << ora << "load success.";
-  m_CcomputeProgram->release();
+  if (m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, QString(ora.c_str()))) {
+    m_CcomputeProgram->link();
+    m_CcomputeProgram->bind();
+    LOG(INFO) << "compute shader -" << ora << "load success.";
+    m_CcomputeProgram->release();
+    return true;
+  } else {
+    LOG(INFO) << "compute shader -" << ora << "load failed." << " back to 512 default size.";
+    m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, DEFAULT_COMPUTE_SHADER_PATH);
+    return false;
+  }
 }
 
 void DataProcessWidget::paintGL() {
@@ -348,13 +358,18 @@ void DataProcessWidget::paintGL() {
   static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
   static GLint resolutionLoc = glGetUniformLocation(m_CrenderProgram->programId(), "resolution");
 
-  if (m_reset_buf_tag) {
-    resetBuf(m_fft_level);
-    m_reset_buf_tag = false;
-  }
-
   if (m_reset_computeshader_tag) {
-    resetComputeShader(m_fft_level);
+    if (resetComputeShader(m_fft_level)) {
+      resetBuf(m_fft_level);
+    } else {
+      m_fft_level = 512;
+      resetBuf(m_fft_level);
+    }
+    auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+    std::string class_obj_id = typeid(*this).name();
+    class_obj_id += std::to_string(int(this));
+    auto cfg_local = cfg[class_obj_id.c_str()];
+    cfg_local["fft_level"] = m_fft_level;
     m_reset_computeshader_tag = false;
   }
   // compute

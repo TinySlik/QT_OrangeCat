@@ -91,7 +91,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   int m_DisplaySwitch;
   size_t m_file_find_index;
   int m_fft_level;
-//  bool m_reset_buf_tag;
+  bool m_reset_buf_tag;
+  size_t buffer_size;
   bool m_reset_computeshader_tag;
 };
 

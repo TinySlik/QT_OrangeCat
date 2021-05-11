@@ -31,9 +31,9 @@ Window::Window(MainWindow *mw)
   : mainWindow(mw) {
   glWidget = new DataProcessWidget(this);
 
-  xSlider = createSlider();
-  ySlider = createSlider();
-  zSlider = createSlider();
+//  xSlider = createSlider();
+//  ySlider = createSlider();
+//  zSlider = createSlider();
 
 //  connect(xSlider, &QSlider::valueChanged, glWidget, &GLWidget::setXRotation);
 //  connect(glWidget, &GLWidget::xRotationChanged, xSlider, &QSlider::setValue);
@@ -45,9 +45,9 @@ Window::Window(MainWindow *mw)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   QHBoxLayout *container = new QHBoxLayout;
   container->addWidget(glWidget);
-  container->addWidget(xSlider);
-  container->addWidget(ySlider);
-  container->addWidget(zSlider);
+//  container->addWidget(xSlider);
+//  container->addWidget(ySlider);
+//  container->addWidget(zSlider);
 
   QWidget *w = new QWidget;
   w->setLayout(container);

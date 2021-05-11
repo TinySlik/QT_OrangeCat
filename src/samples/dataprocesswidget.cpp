@@ -49,7 +49,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_DisplaySwitch(4),
     m_file_find_index(0),
     m_fft_level(512),
-//    m_reset_buf_tag(false),
+    m_reset_buf_tag(false),
+    buffer_size(512),
     m_reset_computeshader_tag(false) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
@@ -76,11 +77,25 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"display_switch", m_DisplaySwitch},
       {"test_file_path", "empty"},
       {"file_load_location", m_file_find_index},
-      {"fft_level", m_fft_level}
+      {"fft_level", m_fft_level},
+      {"buffer_size", buffer_size}
     }}
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
+  cfg_local["buffer_size"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_int()) return false;
+    auto tg = static_cast<int>(b);
+    if (tg <= 4096) {
+      buffer_size = tg;
+    } else {
+      return false;
+    }
+    m_reset_buf_tag = true;
+    LOG(INFO) << "Buf size set to " << buffer_size;
+    return true;
+  });
+
   cfg_local["fft_level"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
@@ -95,7 +110,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     } else {
       return false;
     }
-//    m_reset_buf_tag = true;
     m_reset_computeshader_tag = true;
     LOG(INFO) << "FFT level set to " << m_fft_level;
     return true;
@@ -358,6 +372,11 @@ void DataProcessWidget::paintGL() {
   static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
   static GLint resolutionLoc = glGetUniformLocation(m_CrenderProgram->programId(), "resolution");
 
+  if (m_reset_buf_tag) {
+    resetBuf(buffer_size);
+    m_reset_buf_tag = false;
+  }
+
   if (m_reset_computeshader_tag) {
     if (resetComputeShader(m_fft_level)) {
       resetBuf(m_fft_level);
@@ -370,6 +389,8 @@ void DataProcessWidget::paintGL() {
     class_obj_id += std::to_string(int(this));
     auto cfg_local = cfg[class_obj_id.c_str()];
     cfg_local["fft_level"] = m_fft_level;
+    buffer_size = m_fft_level;
+    cfg_local["buffer_size"] = buffer_size;
     m_reset_computeshader_tag = false;
   }
   // compute

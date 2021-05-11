@@ -45,7 +45,6 @@ QUrl commandLineUrlArgument() {
 }
 
 int main(int argc, char **argv) {
-  std::cout << "dsafasdfasf" << std::endl;
   ParameterServer::instance()->CreateNewRoot("base", {
                                                   {"dev_ctrl", {
                                                   }},

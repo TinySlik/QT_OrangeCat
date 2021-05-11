@@ -47,7 +47,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QSize minimumSizeHint() const override;
   QSize sizeHint() const override;
 
-  void reset();
+  void reset(size_t size);
+  void resetBuf(int size);
   void getData();
 
  public slots:
@@ -87,7 +88,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   int m_TestSwitch;
   int m_DisplaySwitch;
   size_t m_file_find_index;
-  size_t m_fft_level;
+  int m_fft_level;
+  bool m_reset_buf_tag;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

@@ -44,7 +44,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_TestSwitch(1),
     m_DisplaySwitch(4),
     m_file_find_index(0),
-    m_fft_level(512) {
+    m_fft_level(1024),
+    m_reset_buf_tag(false) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -68,13 +69,32 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"test_switch", m_TestSwitch},
       {"test_frequency", m_TestFrequency},
       {"display_switch", m_DisplaySwitch},
-      {"test_file_path", "null"},
+      {"test_file_path", "empty"},
       {"file_load_location", m_file_find_index},
       {"fft_level", m_fft_level}
     }}
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
+  cfg_local["fft_level"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    if (!b.is_int()) return false;
+    auto tg = static_cast<int>(b);
+    if (tg >= 256 && tg <= 512) {
+      m_fft_level = 512;
+    } else if (tg > 512 && tg <= 1024) {
+      m_fft_level = 1024;
+    } else if (tg > 1024 && tg <= 2048) {
+      m_fft_level = 2048;
+    } else if (tg > 2048 && tg <= 4096) {
+      m_fft_level = 4096;
+    } else {
+      return false;
+    }
+    m_reset_buf_tag = true;
+
+    LOG(INFO) << "FFT level set to " << m_fft_level;
+    return true;
+  });
 
   cfg_local["file_load_location"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
@@ -87,17 +107,17 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!b.is_string()) return false;
     auto tg = static_cast<std::string>(b);
     auto ora = static_cast<std::string>(a);
-    if (tg == "null") {
-        if (ora != "null" && m_fileMMap) {
-          LOG(INFO) << "file name: " << ora << " close";
-          m_fileMMap->close();
-          m_fileMMap = nullptr;
-          m_file_find_index = 0;
-        }
-        return true;
+    if (tg == "empty") {
+      if (ora != "empty" && m_fileMMap) {
+        LOG(INFO) << "file name: " << ora << " close";
+        m_fileMMap->close();
+        m_fileMMap = nullptr;
+        m_file_find_index = 0;
+      }
+      return true;
     }
 
-    if (ora != "null" && m_fileMMap) {
+    if (ora != "empty" && m_fileMMap) {
       LOG(INFO) << "file name: " << ora << " close";
       m_fileMMap->close();
       m_fileMMap = nullptr;
@@ -121,41 +141,41 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return true;
   });
 
-  cfg_local["lineThickness"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+  cfg_local["lineThickness"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_float()) return false;
     auto tg = static_cast<float>(b);
     m_lineThickness = tg;
     return true;
   });
 
-  cfg_local["compute1_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+  cfg_local["compute1_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_bool()) return false;
     auto tg = static_cast<bool>(b);
     m_ComputeShaderSwitch = tg;
     return true;
   });
 
-  cfg_local["test_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+  cfg_local["test_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     m_TestSwitch = tg;
     return true;
   });
 
-  cfg_local["display_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+  cfg_local["display_switch"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     m_DisplaySwitch = tg;
     return true;
   });
 
-  cfg_local["test_frequency"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+  cfg_local["test_frequency"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_float()) return false;
     auto tg = static_cast<float>(b);
     m_TestFrequency = tg;
     return true;
   });
-  reset();
+  reset(MAX_PAINT_BUF_SIZE * 2);
 
   QSurfaceFormat format;
   format.setVersion(4, 3);
@@ -163,10 +183,24 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   setFormat(format);
 }
 
-void DataProcessWidget::reset() {
+void DataProcessWidget::reset(size_t size) {
   m_tex_buf.clear();
-  m_tex_buf.resize(MAX_PAINT_BUF_SIZE * 2);
-  m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
+  m_tex_buf.resize(size);
+  m_tex_buf_render_head = m_tex_buf.data() + size / 2;
+}
+
+void DataProcessWidget::resetBuf(int size) {
+  makeCurrent();
+  m_Ctexture->destroy();
+  glActiveTexture(GL_TEXTURE0);
+  m_Ctexture->create();
+  m_Ctexture->setFormat(QOpenGLTexture::R32F);
+  m_Ctexture->setSize(size);
+  m_Ctexture->setMinificationFilter(QOpenGLTexture::Linear);
+  m_Ctexture->setMagnificationFilter(QOpenGLTexture::Linear);
+  m_Ctexture->allocateStorage();
+  m_Ctexture->bind();
+  glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 }
 
 DataProcessWidget::~DataProcessWidget() {
@@ -178,7 +212,6 @@ DataProcessWidget::~DataProcessWidget() {
   m_CrenderProgram->removeAllShaders();
   makeCurrent();
   m_Ctexture->destroy();
-
 }
 
 QSize DataProcessWidget::minimumSizeHint() const {
@@ -259,7 +292,7 @@ void DataProcessWidget::initializeGL() {
   glActiveTexture(GL_TEXTURE0);
   m_Ctexture->create();
   m_Ctexture->setFormat(QOpenGLTexture::R32F);
-  m_Ctexture->setSize(512, 1);
+  m_Ctexture->setSize(m_fft_level, 1);
   m_Ctexture->setMinificationFilter(QOpenGLTexture::Linear);
   m_Ctexture->setMagnificationFilter(QOpenGLTexture::Linear);
   m_Ctexture->allocateStorage();
@@ -300,6 +333,10 @@ void DataProcessWidget::paintGL() {
   static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
   static GLint resolutionLoc = glGetUniformLocation(m_CrenderProgram->programId(), "resolution");
 
+  if (m_reset_buf_tag) {
+    resetBuf(m_fft_level);
+    m_reset_buf_tag = false;
+  }
   // compute
   m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);
 

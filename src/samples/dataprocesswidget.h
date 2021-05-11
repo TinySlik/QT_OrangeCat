@@ -48,7 +48,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QSize sizeHint() const override;
 
   void reset(size_t size);
-  void resetBuf(int size);
+
   void getData();
 
  public slots:
@@ -64,6 +64,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   void mouseMoveEvent(QMouseEvent *event) override;
 
  private:
+  void resetBuf(int size);
+  void resetComputeShader(int level);
   QTimer timer;
 
   bool m_core;
@@ -90,6 +92,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   size_t m_file_find_index;
   int m_fft_level;
   bool m_reset_buf_tag;
+  bool m_reset_computeshader_tag;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

@@ -44,8 +44,9 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_TestSwitch(1),
     m_DisplaySwitch(4),
     m_file_find_index(0),
-    m_fft_level(1024),
-    m_reset_buf_tag(false) {
+    m_fft_level(512),
+    m_reset_buf_tag(false),
+    m_reset_computeshader_tag(false) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -91,7 +92,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       return false;
     }
     m_reset_buf_tag = true;
-
+    m_reset_computeshader_tag = true;
     LOG(INFO) << "FFT level set to " << m_fft_level;
     return true;
   });
@@ -292,7 +293,7 @@ void DataProcessWidget::initializeGL() {
   glActiveTexture(GL_TEXTURE0);
   m_Ctexture->create();
   m_Ctexture->setFormat(QOpenGLTexture::R32F);
-  m_Ctexture->setSize(m_fft_level, 1);
+  m_Ctexture->setSize(m_fft_level);
   m_Ctexture->setMinificationFilter(QOpenGLTexture::Linear);
   m_Ctexture->setMagnificationFilter(QOpenGLTexture::Linear);
   m_Ctexture->allocateStorage();
@@ -321,6 +322,20 @@ void DataProcessWidget::initializeGL() {
   m_CrenderProgram->release();
 }
 
+void DataProcessWidget::resetComputeShader(int level) {
+  m_CcomputeProgram->removeAllShaders();
+
+  std::string ora = ":/shader/example_fft";
+  ora += std::to_string(level);
+  ora += "_c.glsl";
+
+  m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, QString(ora.c_str()));
+  m_CcomputeProgram->link();
+  m_CcomputeProgram->bind();
+  LOG(INFO) << "compute shader -" << ora << "load success.";
+  m_CcomputeProgram->release();
+}
+
 void DataProcessWidget::paintGL() {
   getData(); // for test
   static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
@@ -336,6 +351,11 @@ void DataProcessWidget::paintGL() {
   if (m_reset_buf_tag) {
     resetBuf(m_fft_level);
     m_reset_buf_tag = false;
+  }
+
+  if (m_reset_computeshader_tag) {
+    resetComputeShader(m_fft_level);
+    m_reset_computeshader_tag = false;
   }
   // compute
   m_Ctexture->setData(0, QOpenGLTexture::Red, QOpenGLTexture::Float32, m_tex_buf_render_head);

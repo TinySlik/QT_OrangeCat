@@ -31,6 +31,14 @@
 
 bool DataProcessWidget::m_transparent = false;
 
+static GLfloat g_vertex_buffer_data[] = {
+    -1.0f, -1.0f,
+    -1.0f, 1.0f,
+    1.0f, -1.0f,
+    1.0f, 1.0f
+};
+static GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
+
 DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
     m_tex_buf_render_head(nullptr),
@@ -51,7 +59,11 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_fft_level(512),
     m_reset_buf_tag(false),
     buffer_size(512),
-    m_reset_computeshader_tag(false) {
+    m_reset_computeshader_tag(false),
+    m_position(0, 0, -1.f),
+    m_scale(.5f, .5f, 1.f),
+    m_rotation(0, 0, 1),
+    m_angle(180.f) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -78,11 +90,64 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"test_file_path", "empty"},
       {"file_load_location", m_file_find_index},
       {"fft_level", m_fft_level},
-      {"buffer_size", buffer_size}
+      {"buffer_size", buffer_size},
+      {"transform", {
+        {
+          "m_translate", {
+             {"x", m_position.x()},
+             {"y", m_position.y()},
+             {"z", m_position.z()},
+          }
+        },
+        {
+          "m_rotate", {
+             {"x", m_rotation.x()},
+             {"y", m_rotation.y()},
+             {"z", m_rotation.z()},
+          },
+
+        },
+        {"m_angle", m_angle},
+        {
+          "m_scale", {
+             {"x", m_scale.x()},
+             {"y", m_scale.y()},
+             {"z", m_scale.z()},
+          }
+        }
+      }}
     }}
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
+
+  cfg_local["transform"]["m_translate"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    m_position.setX(static_cast<float>(b["x"]));
+    m_position.setY(static_cast<float>(b["y"]));
+    m_position.setZ(static_cast<float>(b["z"]));
+    return true;
+  });
+
+  cfg_local["transform"]["m_rotate"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    m_rotation.setX(static_cast<float>(b["x"]));
+    m_rotation.setY(static_cast<float>(b["y"]));
+    m_rotation.setZ(static_cast<float>(b["z"]));
+    return true;
+  });
+
+  cfg_local["transform"]["m_angle"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    m_angle = static_cast<float>(b);
+    return true;
+  });
+
+  cfg_local["transform"]["m_scale"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    m_scale.setX(static_cast<float>(b["x"]));
+    m_scale.setY(static_cast<float>(b["y"]));
+    m_scale.setZ(static_cast<float>(b["z"]));
+    return true;
+  });
+
+
   cfg_local["buffer_size"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
@@ -290,14 +355,6 @@ void DataProcessWidget::initializeGL() {
       LOG(INFO) << "VAO created!";
   }
 
-  static const GLfloat g_vertex_buffer_data[] = {
-      -1.0f, -1.0f,
-      -1.0f, 1.0f,
-      1.0f, -1.0f,
-      1.0f, 1.0f
-  };
-  static const GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
-
   m_CvertexBuffer->create();
   m_CvertexBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
   m_CvertexBuffer->bind();
@@ -419,6 +476,16 @@ void DataProcessWidget::paintGL() {
   static float ori = GetTickCount()/ 1000.f;
   glUniform1f(timeLoc, GetTickCount()/ 1000.f - ori);
   glUniform2f(resolutionLoc, 1920.f, 1080.f);
+
+  // Calculate model view transformation
+  QMatrix4x4 matrix;
+  matrix.translate(m_position);
+  matrix.rotate(m_angle, m_rotation);
+  matrix.scale(m_scale);
+
+  // Set modelview-projection matrix
+  m_CrenderProgram->setUniformValue("mvp_matrix", m_proj * matrix);
+
   glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
 
   m_Cvao.release();

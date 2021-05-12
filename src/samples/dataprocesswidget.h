@@ -94,6 +94,11 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   bool m_reset_buf_tag;
   size_t buffer_size;
   bool m_reset_computeshader_tag;
+
+  QVector3D   m_position;
+  QVector3D   m_scale;
+  QVector3D   m_rotation;
+  float m_angle;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

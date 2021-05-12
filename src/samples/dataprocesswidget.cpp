@@ -147,7 +147,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return true;
   });
 
-
   cfg_local["buffer_size"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
@@ -303,7 +302,7 @@ QSize DataProcessWidget::minimumSizeHint() const {
 }
 
 QSize DataProcessWidget::sizeHint() const {
-  return QSize(768, 512);
+  return QSize(1024, 256);
 }
 
 void DataProcessWidget::getData() {

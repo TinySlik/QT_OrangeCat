@@ -99,6 +99,9 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QVector3D   m_scale;
   QVector3D   m_rotation;
   float m_angle;
+
+  float m_max_cut_filter;
+  float m_min_cut_filter;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

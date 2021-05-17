@@ -53,8 +53,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_lineThickness(0.01f),
     m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
-    m_TestSwitch(1),
-    m_DisplaySwitch(4),
+    m_TestSwitch(2),
+    m_DisplaySwitch(2),
     m_file_find_index(0),
     m_fft_level(512),
     m_reset_buf_tag(false),
@@ -63,7 +63,9 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_position(0, 0, -1.f),
     m_scale(.5f, .5f, 1.f),
     m_rotation(0, 0, 1),
-    m_angle(180.f) {
+    m_angle(180.f),
+    m_max_cut_filter(2.f),
+    m_min_cut_filter(1.f) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -91,6 +93,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"file_load_location", m_file_find_index},
       {"fft_level", m_fft_level},
       {"buffer_size", buffer_size},
+      {"m_max_cut_filter",m_max_cut_filter},
+      {"m_min_cut_filter",m_min_cut_filter},
       {"transform", {
         {
           "m_translate", {
@@ -105,7 +109,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
              {"y", m_rotation.y()},
              {"z", m_rotation.z()},
           },
-
         },
         {"m_angle", m_angle},
         {
@@ -120,6 +123,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
+
 
   cfg_local["transform"]["m_translate"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     m_position.setX(static_cast<float>(b["x"]));
@@ -183,9 +187,10 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     m_file_find_index = tg;
+    LOG(INFO) << "File load location set to : " << m_file_find_index;
     return true;
   });
-
+  cfg_local["file_load_location"].set_hiden(true);
   cfg_local["test_file_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
     auto tg = static_cast<std::string>(b);
@@ -214,6 +219,20 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     sz = m_fileMMap->size();
     emit TitelChanged(QString(tg.c_str()));
     LOG(INFO) << "file name: " << tg << " open, size: " << sz << "  time spend: " << GetTickCount() - st << " ms ";
+    return true;
+  });
+
+  cfg_local["m_max_cut_filter"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    if (!b.is_float()) return false;
+    auto tg = static_cast<float>(b);
+    m_max_cut_filter = tg;
+    return true;
+  });
+
+  cfg_local["m_min_cut_filter"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    if (!b.is_float()) return false;
+    auto tg = static_cast<float>(b);
+    m_min_cut_filter = tg;
     return true;
   });
 
@@ -410,7 +429,7 @@ bool DataProcessWidget::resetComputeShader(int level) {
     m_CcomputeProgram->release();
     return true;
   } else {
-    LOG(INFO) << "compute shader -" << ora << "load failed." << " back to 512 default size.";
+    LOG(INFO) << "compute shader -" << ora << "load failed, " << " back to 512 default size.";
     m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, DEFAULT_COMPUTE_SHADER_PATH);
     return false;
   }
@@ -423,6 +442,9 @@ void DataProcessWidget::paintGL() {
   static GLint rollLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
   static GLint testFrequencyLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_frequency");
   static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");
+  static GLint min_cut_filterLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "min_cut_filter");
+  static GLint max_cut_filterLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "max_cut_filter");
+
   static GLint lineThicknessLoc = glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
   static GLint displaySwitchLoc = glGetUniformLocation(m_CrenderProgram->programId(), "display_switch");
   static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
@@ -460,6 +482,8 @@ void DataProcessWidget::paintGL() {
     glUniform1f(rollLoc, m_roll);
     glUniform1f(testFrequencyLoc, m_TestFrequency);
     glUniform1i(testSwitchLoc, m_TestSwitch);
+    glUniform1f(min_cut_filterLoc, m_min_cut_filter);
+    glUniform1f(max_cut_filterLoc, m_max_cut_filter);
     m_roll += m_speed;
     glDispatchCompute(m_Ctexture->width(), 1, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

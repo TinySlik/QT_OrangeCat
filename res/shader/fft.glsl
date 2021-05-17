@@ -24,8 +24,23 @@ void synchronize()
     barrier();
 }
 
+uint twiddle_map(uint threadId, uint currentIteration, uint logTwo, uint N)
+{
+    return (threadId & (N / (1u << (logTwo - currentIteration)) - 1)) * (1u << (logTwo - currentIteration)) >> 1;
+}
+
+vec2 twiddle(float q, bool is_inverse, float N)
+{
+    float theta = float(int(!is_inverse) * 2 - 1) * 2.0 * PI * q / N;
+
+    float r = cos(theta);
+    float i = sqrt(1.0 - r*r) * float(int(theta < 0.0) * 2 - 1);
+
+    return vec2(r, i);
+}
+
 void
-fft_pass(int ns, int source)
+fft_pass(int ns, int source, bool is_inverse)
 {
     uint i = gl_LocalInvocationID.x;
 
@@ -43,8 +58,16 @@ fft_pass(int ns, int source)
     float t_re = cos(a);
     float t_im = sin(a);
 
-    values[i][source ^ 1] = v0 + vec2(dot(vec2(t_re, -t_im), v1), dot(vec2(t_im, t_re), v1));
+    uint q = twiddle_map(i, ns, SIZE, SIZE);
+
+    vec2 tmp_twd = twiddle(float(q), is_inverse, SIZE);
+
+    values[i][source ^ 1] = v0 + vec2(dot(vec2(tmp_twd.x, -tmp_twd.y), v1), dot(vec2(tmp_twd.x, tmp_twd.y), v1));
+
+//    values[i][source ^ 1] = v0 + vec2(dot(vec2(t_re, -t_im), v1), dot(vec2(t_im, t_re), v1));
 }
+
+
 
 void main()
 {
@@ -56,7 +79,7 @@ void main()
     int source = 0;
 
     for (int n = 2; n <= SIZE; n *= 2) {
-        fft_pass(n, source);
+        fft_pass(n, source, false);
         source ^= 1;
         synchronize();
     }

@@ -353,8 +353,8 @@ void DataProcessWidget::getData() {
     uint l1 = (uint)(head[cur_index]);
     uint l2 = (uint)(head[cur_index + 1]);
     uint l3 = (uint)(head[cur_index + 2]);
-    uint res_i = l3 | l2 << 1 | l1 << 2;
-    value = 10000.f * ((float)res_i/(float)(0xffffff));
+    uint res_i = l3 | l2 << 8 | l1 << 16;
+    value = ((float)res_i/(float)(0xffffff));
 
     m_file_find_index += 6;
   } else {

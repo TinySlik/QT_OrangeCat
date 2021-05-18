@@ -29,3 +29,132 @@
         }
     }
 }
+
+"class DataProcessWidget530093824": {
+    "Speed": 0.0333,
+    "lineThickness": 0.01,
+    "compute1_switch": true,
+    "test_switch": 3,
+    "test_frequency": 100,
+    "display_switch": 2,
+    "test_file_path": "C:/Users/dell-a6/Desktop/wavearch/WaveArch/Default.005",
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 1000,
+    "m_min_cut_filter": 23,
+    "m_fft_display_scale": 0.1,
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": -3,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 6,
+        "z": 1
+      }
+    }
+  },
+  "class DataProcessWidget559743104": {
+    "Speed": 0.0333,
+    "lineThickness": 0.01,
+    "compute1_switch": true,
+    "test_switch": 0,
+    "test_frequency": 100,
+    "display_switch": 2,
+    "test_file_path": "C:/Users/dell-a6/Desktop/wavearch/WaveArch/Default.005",
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 1000,
+    "m_min_cut_filter": 23,
+    "m_fft_display_scale": 0.1,
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": -3,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 6,
+        "z": 1
+      }
+    }
+  },
+  "class DataProcessWidget569996688": {
+    "Speed": 0.0333,
+    "lineThickness": 0.01,
+    "compute1_switch": true,
+    "test_switch": 1,
+    "test_frequency": 100,
+    "display_switch": 2,
+    "test_file_path": "C:/Users/dell-a6/Desktop/wavearch/WaveArch/Default.005",
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 2,
+    "m_min_cut_filter": 1,
+    "m_fft_display_scale": 0.1,
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 1
+      }
+    }
+  },
+  "class DataProcessWidget569994720": {
+    "Speed": 0.0333,
+    "lineThickness": 0.01,
+    "compute1_switch": true,
+    "test_switch": 2,
+    "test_frequency": 100,
+    "display_switch": 2,
+    "test_file_path": "C:/Users/dell-a6/Desktop/wavearch/WaveArch/Default.005",
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 1000,
+    "m_min_cut_filter": 23,
+    "m_fft_display_scale": 0.1,
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 1
+      }
+    }
+  }

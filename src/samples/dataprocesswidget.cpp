@@ -25,7 +25,7 @@
 #include "parameterserver.h"
 #include "easylogging++.h"
 
-#define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_c.glsl"
+#define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
 #define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/example_f.glsl"
 
@@ -53,8 +53,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_lineThickness(0.01f),
     m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
-    m_TestSwitch(2),
-    m_DisplaySwitch(2),
+    m_TestSwitch(3),
+    m_DisplaySwitch(4),
     m_file_find_index(0),
     m_fft_level(512),
     m_reset_buf_tag(false),
@@ -65,7 +65,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_rotation(0, 0, 1),
     m_angle(180.f),
     m_max_cut_filter(2.f),
-    m_min_cut_filter(1.f) {
+    m_min_cut_filter(1.f),
+    m_fft_display_scale(0.01f) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -93,8 +94,9 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"file_load_location", m_file_find_index},
       {"fft_level", m_fft_level},
       {"buffer_size", buffer_size},
-      {"m_max_cut_filter",m_max_cut_filter},
-      {"m_min_cut_filter",m_min_cut_filter},
+      {"m_max_cut_filter", m_max_cut_filter},
+      {"m_min_cut_filter", m_min_cut_filter},
+      {"m_fft_display_scale", m_fft_display_scale},
       {"transform", {
         {
           "m_translate", {
@@ -123,7 +125,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
-
 
   cfg_local["transform"]["m_translate"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     m_position.setX(static_cast<float>(b["x"]));
@@ -233,6 +234,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!b.is_float()) return false;
     auto tg = static_cast<float>(b);
     m_min_cut_filter = tg;
+    return true;
+  });
+
+  cfg_local["m_fft_display_scale"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    if (!b.is_float()) return false;
+    auto tg = static_cast<float>(b);
+    m_fft_display_scale = tg;
     return true;
   });
 
@@ -444,7 +452,7 @@ void DataProcessWidget::paintGL() {
   static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");
   static GLint min_cut_filterLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "min_cut_filter");
   static GLint max_cut_filterLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "max_cut_filter");
-
+  static GLint fft_display_scaleLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "fft_display_scale");
   static GLint lineThicknessLoc = glGetUniformLocation(m_CrenderProgram->programId(), "lineThickness");
   static GLint displaySwitchLoc = glGetUniformLocation(m_CrenderProgram->programId(), "display_switch");
   static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
@@ -484,6 +492,7 @@ void DataProcessWidget::paintGL() {
     glUniform1i(testSwitchLoc, m_TestSwitch);
     glUniform1f(min_cut_filterLoc, m_min_cut_filter);
     glUniform1f(max_cut_filterLoc, m_max_cut_filter);
+    glUniform1f(fft_display_scaleLoc, m_fft_display_scale);
     m_roll += m_speed;
     glDispatchCompute(m_Ctexture->width(), 1, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

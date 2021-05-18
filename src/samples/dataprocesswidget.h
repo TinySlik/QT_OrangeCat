@@ -102,6 +102,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   float m_max_cut_filter;
   float m_min_cut_filter;
+
+  float m_fft_display_scale;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

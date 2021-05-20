@@ -39,7 +39,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
  public:
   explicit DataProcessWidget(QWidget *parent = nullptr);
-  ~DataProcessWidget();
+  ~DataProcessWidget() override;
 
   static bool isTransparent() { return m_transparent; }
   static void setTransparent(bool t) { m_transparent = t; }
@@ -73,6 +73,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QMatrix4x4 m_proj;
   std::vector<float> m_tex_buf;
   float * m_tex_buf_render_head;
+  std::vector<float> m_tex_tmp;
   static bool m_transparent;
   std::shared_ptr<MemoryMapped::File> m_fileMMap;
 
@@ -92,8 +93,10 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   size_t m_file_find_index;
   int m_fft_level;
   bool m_reset_buf_tag;
-  size_t buffer_size;
+  int buffer_size;
   bool m_reset_computeshader_tag;
+  int  m_match_alpha;
+  int m_matchClockFrequency;
 
   QVector3D   m_position;
   QVector3D   m_scale;

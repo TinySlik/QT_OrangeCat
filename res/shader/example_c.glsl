@@ -132,11 +132,6 @@ void main() {
 
         float v = length(values[i][source]);
 
-        // filter---------
-        if (pos.x >= min_cut_filter && pos.x <= max_cut_filter ) {
-            v = 0;
-        }
-
         imageStore(destTex, pos.x, vec4(v  * fft_display_scale , 0.0f, 0.0f, 1.0f));
     } else if (test_switch == 2) {
         vec4 v_ = imageLoad(destTex, pos.x);
@@ -160,7 +155,7 @@ void main() {
         float v = length(values[i][source]);
 
         imageStore(destTex, pos.x, vec4(v  * fft_display_scale, 0.0f, 0.0f, 1.0f));
-    } else if (test_switch == 3) {
+    } else if (test_switch == 3 || test_switch == 4) {
         vec4 v_ = imageLoad(destTex, pos.x);
         float val = v_.r;
         values[i][0] = vec2(val, 0.);

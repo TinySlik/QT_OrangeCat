@@ -551,7 +551,6 @@ void DataProcessWidget::paintGL() {
       m_Ctexture->release();
       m_Ctexture->bind();
 
-
       float average = 0.f;
       auto sz = static_cast<int>(m_tex_tmp.size());
       for(int i = 0; i < sz; i++) {

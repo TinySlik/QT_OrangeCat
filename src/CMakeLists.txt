@@ -42,44 +42,6 @@ set(SOURCE_FILES ${QRC_FILES}
     ${QT_PLATFORM_FILES}
 )
 
-#add_executable(${PROJECT_NAME}
-#    ${QRC_FILES}
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/certificateerrordialog.ui
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/passworddialog.ui
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadmanagerwidget.ui
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadwidget.ui
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/browser.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/browserwindow.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadmanagerwidget.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/downloadwidget.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/tabwidget.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/webpage.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/webpopupwindow.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/webview.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/mongoose.c
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/configuru.hpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/parameterserver.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/urldecode.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/glwidget.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/window.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/mainwindow.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/logo.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/glwidget.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/logo.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/memorymapped.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/memorymapped.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/dataprocesswidget.h
-#    ${CMAKE_CURRENT_SOURCE_DIR}/src/dataprocesswidget.cpp
-#    ${QT_PLATFORM_FILES}
-#)
-
-# target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick)
-
-
 include_directories(log)
 include_directories(paramserv)
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )

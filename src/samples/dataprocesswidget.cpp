@@ -215,12 +215,12 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     }
 
     size_t sz;
-    auto st = GetTickCount();
+//    auto st = GetTickCount();
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
     emit TitelChanged(QString(tg.c_str()));
-    LOG(INFO) << "file name: " << tg << " open, size: " << sz << "  time spend: " << GetTickCount() - st << " ms ";
+//    LOG(INFO) << "file name: " << tg << " open, size: " << sz << "  time spend: " << GetTickCount() - st << " ms ";
     return true;
   });
 
@@ -310,7 +310,7 @@ void DataProcessWidget::resetBuf(int size) {
 DataProcessWidget::~DataProcessWidget() {
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
-  class_obj_id += std::to_string(int(this));
+  class_obj_id += std::to_string(long(this));
   cfg.erase(class_obj_id);
   m_CcomputeProgram->removeAllShaders();
   m_CrenderProgram->removeAllShaders();
@@ -334,7 +334,7 @@ void DataProcessWidget::getData() {
     if( m_file_find_index % 600 == 0) {
       auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
       std::string class_obj_id = typeid(*this).name();
-      class_obj_id += std::to_string(int(this));
+      class_obj_id += std::to_string(long(this));
       auto cfg_local = cfg[class_obj_id.c_str()];
       cfg_local["file_load_location"] = m_file_find_index;
     }
@@ -466,7 +466,7 @@ void DataProcessWidget::paintGL() {
     }
     auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
     std::string class_obj_id = typeid(*this).name();
-    class_obj_id += std::to_string(int(this));
+    class_obj_id += std::to_string(long(this));
     auto cfg_local = cfg[class_obj_id.c_str()];
     cfg_local["fft_level"] = m_fft_level;
     buffer_size = m_fft_level;
@@ -498,8 +498,8 @@ void DataProcessWidget::paintGL() {
   glUniform1i(srcLoc, 0);
   glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
-  static float ori = GetTickCount()/ 1000.f;
-  glUniform1f(timeLoc, GetTickCount()/ 1000.f - ori);
+//  static float ori = GetTickCount()/ 1000.f;
+  glUniform1f(timeLoc, 2000);
   glUniform2f(resolutionLoc, 1920.f, 1080.f);
 
   // Calculate model view transformation

@@ -17,7 +17,9 @@
 #include <string>
 #include "dataprocesswidget.h"
 #include <math.h>
+#ifdef OS_WIN
 #include <windows.h>
+#endif
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
@@ -78,7 +80,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
-  class_obj_id += std::to_string(int(this));
+  class_obj_id += std::to_string(long(this));
 
   connect(this, SIGNAL(TitelChanged(const QString &)), parent, SLOT(setWindowTitle(const QString &)));
 

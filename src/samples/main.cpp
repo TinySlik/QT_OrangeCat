@@ -24,7 +24,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
-#include "glwidget.h"
 #include "mainwindow.h"
 #include <QApplication>
 #include <QWebEngineProfile>
@@ -62,7 +61,7 @@ int main(int argc, char **argv) {
 
   QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
   QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
-  QWebEngineProfile::defaultProfile()->setUseForGlobalCertificateVerification();
+//  QWebEngineProfile::defaultProfile()->setUseForGlobalCertificateVerification();
 
   QCoreApplication::setApplicationName("Oil paint demo.");
   QCoreApplication::setOrganizationName("Citek");
@@ -92,11 +91,11 @@ int main(int argc, char **argv) {
 
   MainWindow mainWindow;
 
-  GLWidget::setTransparent(parser.isSet(transparentOption));
-  if (GLWidget::isTransparent()) {
-    mainWindow.setAttribute(Qt::WA_TranslucentBackground);
-    mainWindow.setAttribute(Qt::WA_NoSystemBackground, false);
-  }
+//  GLWidget::setTransparent(parser.isSet(transparentOption));
+//  if (GLWidget::isTransparent()) {
+//    mainWindow.setAttribute(Qt::WA_TranslucentBackground);
+//    mainWindow.setAttribute(Qt::WA_NoSystemBackground, false);
+//  }
   mainWindow.resize(mainWindow.sizeHint());
   int desktopArea = QApplication::desktop()->width() *
                     QApplication::desktop()->height();

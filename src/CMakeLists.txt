@@ -29,11 +29,9 @@ set(SOURCE_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/urldecode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/mainwindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/glwidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/window.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/mainwindow.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/logo.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/glwidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/window.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/logo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/main.cpp

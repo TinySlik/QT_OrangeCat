@@ -14,7 +14,6 @@
  */
 
 #include <utility>
-#include "glwidget.h"
 #include "window.h"
 #include "mainwindow.h"
 #include "dataprocesswidget.h"
@@ -63,7 +62,7 @@ Window::Window(MainWindow *mw)
 //  zSlider->setValue(0 * 16);
 
   std::string class_obj_id = typeid(*glWidget).name();
-  class_obj_id += std::to_string(int(glWidget));
+  class_obj_id += std::to_string(long(glWidget));
   setWindowTitle(QString(class_obj_id.c_str()));
 }
 

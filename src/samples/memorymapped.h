@@ -19,6 +19,7 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <memory>
 
 // define fixed size integer types
 #if defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64) // || defined(__CYGWIN__)

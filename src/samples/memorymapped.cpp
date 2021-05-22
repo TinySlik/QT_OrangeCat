@@ -47,20 +47,20 @@ namespace MemoryMapped {
     m_filename   (),
     m_filesize   (0),
     m_hint       (Normal),
-    m_handle     (nullptr),
+    m_handle     (0),
     m_mappedBytes(0),
     m_mappedView (nullptr),
-    m_mappedFile (nullptr) {
+    m_mappedFile (0) {
   }
 
   File::File(const std::string& filename, size_t mappedBytes, CacheHint hint):
     m_filename   (filename),
     m_filesize   (0),
     m_hint       (hint),
-    m_handle     (nullptr),
+    m_handle     (0),
     m_mappedBytes(mappedBytes),
     m_mappedView (nullptr),
-    m_mappedFile (nullptr) {
+    m_mappedFile (0) {
     open(filename, mappedBytes, hint);
   }
 

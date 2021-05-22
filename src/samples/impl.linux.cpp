@@ -15,6 +15,13 @@
 
 
 #pragma once
+#include <string>
+#include <sys/mman.h>
+#include <sys/file.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include "memorymapped.h"
 
 namespace MemoryMapped
 {

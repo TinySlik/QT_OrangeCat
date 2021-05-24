@@ -500,7 +500,7 @@ void DataProcessWidget::paintGL() {
     glUniform1f(max_cut_filterLoc, m_max_cut_filter);
     glUniform1f(fft_display_scaleLoc, m_fft_display_scale);
     m_roll += m_speed;
-    glDispatchCompute(512, static_cast<GLuint>(m_Ctexture->width()) / 512, 1);
+    glDispatchCompute(static_cast<GLuint>(m_Ctexture->width()), 1, 1);
     // add cpu mutil thread code here for compute time improve.
     if (m_TestSwitch == 4 || m_TestSwitch == 5) {
 //      auto data_ptr = m_tex_tmp.data();
@@ -558,7 +558,7 @@ void DataProcessWidget::paintGL() {
       }
       bool init_test_case = m_tex_tmp[0] > average;
 
-      bool tg = ++count_case4 >= 100;
+      bool tg = ++count_case4 >= 20;
       std::vector<int> tm;
       if (tg) count_case4 = 0;
       for(int i = 0; i < sz; i++) {
@@ -572,6 +572,7 @@ void DataProcessWidget::paintGL() {
             } else if (count_i > 15) {
               res = 5;
             }
+            if (i > 30 && i < (sz - 30))
             tm.push_back(res);
 //            LOG(INFO) << "compute decode test 0:" << res <<"   "<< count_i;
             count_i = 0;
@@ -587,6 +588,7 @@ void DataProcessWidget::paintGL() {
               res = 2;
             }
 //            LOG(INFO) << "compute decode test 1:" << res <<"   "<< count_i;
+            if (i > 30 && i < (sz - 30))
             tm.push_back(res);
             count_i = 0;
             init_test_case = false;
@@ -594,12 +596,28 @@ void DataProcessWidget::paintGL() {
         }
         count_i++;
       }
-
-      if (tg && tm.size() > 5) {
+      static bool m_code_step1_tmp_start_tag = false;
+      if (tg && tm.size() > 3) {
+        static int code_step1_trust_count = 0;
         std::string tms="";
         for (size_t h = 1; h < tm.size() - 1; h++) {
           tms += std::to_string(tm[h]);
         }
+        if (!m_code_step1_tmp_start_tag ) {
+          if (m_code_step1_tmp_str == tms) {
+            code_step1_trust_count ++;
+            if (code_step1_trust_count > 2) {
+              m_code_step1_tmp_start_tag = true;
+              for (size_t n = 0; n < tms.size(); n++) {
+                m_code_step1_tmp.push_back(tms.c_str()[n]);
+              }
+            }
+          } else {
+            code_step1_trust_count = 0;
+          }
+        }
+
+        m_code_step1_tmp_str = tms;
         LOG(INFO) << tms << ".";
       }
 

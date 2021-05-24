@@ -74,6 +74,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::vector<float> m_tex_buf;
   float * m_tex_buf_render_head;
   std::vector<float> m_tex_tmp;
+  std::vector<uchar> m_code_step1_tmp;
+  std::string m_code_step1_tmp_str;
   static bool m_transparent;
   std::shared_ptr<MemoryMapped::File> m_fileMMap;
 

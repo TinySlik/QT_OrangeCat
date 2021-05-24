@@ -14,7 +14,7 @@ uniform float max_cut_filter;
 uniform float fft_display_scale;
 
 layout (r32f, location = 0) uniform image1D destTex;
-layout (local_size_x = 512, local_size_y = 2) in;
+layout (local_size_x = SIZE) in;
 
 shared vec2 values[SIZE][2];
 
@@ -26,7 +26,7 @@ void synchronize()
 
 void fft_pass(int ns, int source, bool is_inverse)
 {
-    uint i = gl_LocalInvocationID.x + gl_LocalInvocationID.y * 512;
+    uint i = gl_LocalInvocationID.x;
 
     uint base = (i/ns) * (ns/2);
     uint offs = i % (ns/2);
@@ -46,11 +46,11 @@ void fft_pass(int ns, int source, bool is_inverse)
 }
 
 void main() {
-    int pos = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * 512;
-    uint i = gl_LocalInvocationID.x + gl_LocalInvocationID.y * 512;
+    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    uint i = gl_LocalInvocationID.x;
 
     if (test_switch == 1) {
-        vec4 v_ = imageLoad(destTex, pos);
+        vec4 v_ = imageLoad(destTex, pos.x);
         float val = v_.r;
         values[i][0] = vec2(val, 0.);
         synchronize();
@@ -65,9 +65,9 @@ void main() {
 
         float v = length(values[i][source]);
 
-        imageStore(destTex, pos, vec4(v  * fft_display_scale , 0.0f, 0.0f, 1.0f));
+        imageStore(destTex, pos.x, vec4(v  * fft_display_scale , 0.0f, 0.0f, 1.0f));
     } else if (test_switch == 2) {
-        vec4 v_ = imageLoad(destTex, pos);
+        vec4 v_ = imageLoad(destTex, pos.x);
         float val = v_.r;
         values[i][0] = vec2(val, 0.);
         synchronize();
@@ -81,15 +81,15 @@ void main() {
         }
 
         // filter---------
-        if (pos >= min_cut_filter && pos <= max_cut_filter ) {
+        if (pos.x >= min_cut_filter && pos.x <= max_cut_filter ) {
             values[i][source] = vec2(0, 0);
         }
 
         float v = length(values[i][source]);
 
-        imageStore(destTex, pos, vec4(v  * fft_display_scale, 0.0f, 0.0f, 1.0f));
+        imageStore(destTex, pos.x, vec4(v  * fft_display_scale, 0.0f, 0.0f, 1.0f));
     } else if (test_switch == 3 || test_switch == 4 || test_switch == 5) {
-        vec4 v_ = imageLoad(destTex, pos);
+        vec4 v_ = imageLoad(destTex, pos.x);
         float val = v_.r;
         values[i][0] = vec2(val, 0.);
         synchronize();
@@ -103,7 +103,7 @@ void main() {
         }
 
         // filter---------
-        if (pos >= min_cut_filter && pos <= max_cut_filter ) {
+        if (pos.x >= min_cut_filter && pos.x <= max_cut_filter ) {
             values[i][source] = vec2(0, 0);
         }
         // end-------------
@@ -116,6 +116,6 @@ void main() {
 
         float v = length(values[i][source]);
 
-        imageStore(destTex, pos, vec4(v / SIZE, 0.0f, 0.0f, 1.0f));
+        imageStore(destTex, pos.x, vec4(v / SIZE, 0.0f, 0.0f, 1.0f));
     }
 }

@@ -18,6 +18,7 @@
 #define OIL_SRC_DATAPROCESSWIDGET_H_
 
 #include <vector>
+#include <deque>
 #include <memory>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_3_Core>
@@ -28,6 +29,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
 #include <QTimer>
+
 #include "logo.h"
 #include "memorymapped.h"
 #define MAX_PAINT_BUF_SIZE (4096)
@@ -74,7 +76,9 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::vector<float> m_tex_buf;
   float * m_tex_buf_render_head;
   std::vector<float> m_tex_tmp;
-  std::vector<uchar> m_code_step1_tmp;
+  std::deque <uchar> m_code_step1_tmp;
+  size_t m_code_step1_tmp_cur_head;
+  size_t m_decode_step2_tmp_cur_head;
   std::string m_code_step1_tmp_str;
   static bool m_transparent;
   std::shared_ptr<MemoryMapped::File> m_fileMMap;

@@ -565,15 +565,15 @@ void DataProcessWidget::paintGL() {
         static int count_i = 0;
         if (m_tex_tmp[static_cast<size_t>(i)] > average) {
           m_tex_tmp[static_cast<size_t>(i)] = 1.f;
-          if (tg && !init_test_case) {
+          if (!init_test_case) {
             int res = 4;
             if (count_i > 150) {
               res = 6;
             } else if (count_i > 15) {
               res = 5;
             }
-            if (i > 30 && i < (sz - 30))
-            tm.push_back(res);
+            if (tg && i > 30 && i < (sz - 30))
+                tm.push_back(res);
 //            LOG(INFO) << "compute decode test 0:" << res <<"   "<< count_i;
             count_i = 0;
             init_test_case = true;
@@ -588,8 +588,8 @@ void DataProcessWidget::paintGL() {
               res = 2;
             }
 //            LOG(INFO) << "compute decode test 1:" << res <<"   "<< count_i;
-            if (i > 30 && i < (sz - 30))
-            tm.push_back(res);
+            if (tg && i > 30 && i < (sz - 30))
+                tm.push_back(res);
             count_i = 0;
             init_test_case = false;
           }
@@ -598,27 +598,184 @@ void DataProcessWidget::paintGL() {
       }
       static bool m_code_step1_tmp_start_tag = false;
       if (tg && tm.size() > 3) {
-        static int code_step1_trust_count = 0;
-        std::string tms="";
-        for (size_t h = 1; h < tm.size() - 1; h++) {
-          tms += std::to_string(tm[h]);
-        }
         if (!m_code_step1_tmp_start_tag ) {
+          // before start
+          static int code_step1_trust_count = 0;
+          std::string tms="";
+          for (size_t h = tm.size() - 2; h > 0; h--) {
+            tms += std::to_string(tm[h]);
+          }
           if (m_code_step1_tmp_str == tms) {
             code_step1_trust_count ++;
             if (code_step1_trust_count > 2) {
+              LOG(INFO) << "Repeat code repeat times > 2, start decode: ";
               m_code_step1_tmp_start_tag = true;
               for (size_t n = 0; n < tms.size(); n++) {
                 m_code_step1_tmp.push_back(tms.c_str()[n]);
               }
+              m_code_step1_tmp_cur_head = 0;
+              m_decode_step2_tmp_cur_head = 0;
             }
           } else {
             code_step1_trust_count = 0;
           }
-        }
+          m_code_step1_tmp_str = tms;
+          LOG(INFO) << tms << ".";
+        } else {
+          // start to decode.
+          std::string tms="";
+          for (size_t h = tm.size() - 2; h > 0; h--) {
+            tms += std::to_string(tm[h]);
+          }
 
-        m_code_step1_tmp_str = tms;
-        LOG(INFO) << tms << ".";
+          std::string tp;
+          for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
+            tp += m_code_step1_tmp[bp];
+          }
+          int case_ = 0;
+
+          // case 1:
+          // xxxxx^abcdefg... + abcyyyyy -> xxxxx^abcyyyyy
+          if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) > 2 &&!strncmp(tp.c_str(), tms.c_str(), 3)) {
+//            LOG(INFO) << "case 1";
+            case_ = 1;
+            if (tms.size() > tp.size()) {
+//              LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size();
+              for (size_t i = 0; i < tms.size() - tp.size(); i++) {
+                m_code_step1_tmp.push_back('0');
+              }
+            }
+            for (size_t n = 0; n < tms.size(); n++) {
+              m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
+            }
+          }
+
+          // case 2:
+          // xxxxx^abcdefg... + bcdyyyy -> xxxxx^abcdyyyy
+          else if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) > 3 &&
+              !strncmp(tp.c_str() + 1, tms.c_str(), 3)) {
+//            LOG(INFO) << "case 2";
+            case_ = 2;
+            if (tms.size() > (tp.size() - 1)) {
+//              LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size() - 1;
+              for (size_t i = 0; i < (tms.size() - (tp.size() - 1)); i++) {
+                m_code_step1_tmp.push_back('0');
+              }
+            }
+            for (size_t n = 0; n < tms.size(); n++) {
+              m_code_step1_tmp[m_code_step1_tmp_cur_head + 1 + n] = tms.c_str()[n];
+            }
+            m_code_step1_tmp_cur_head++;
+          }
+
+          // case 3:
+          // xxxxx^abc + bc
+          else if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) == 3 &&
+              !strncmp(tp.c_str() + 1, tms.c_str(), 2)) {
+            LOG(INFO) << "case 3" << "[warning] may error occor.";
+            case_ = 3;
+            m_code_step1_tmp_cur_head++;
+          }
+          // case 4:
+          // xxxxx^ab + abcXXX
+          else if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) == 2 &&
+              !strncmp(tp.c_str(), tms.c_str(), 2)) {
+//            LOG(INFO) << "case 4";
+            case_ = 4;
+            if (tms.size() > (tp.size())) {
+//              LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size() - 1;
+              for (size_t i = 0; i < (tms.size() - (tp.size() - 1)); i++) {
+                m_code_step1_tmp.push_back('0');
+              }
+            }
+            for (size_t n = 0; n < tms.size(); n++) {
+              m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
+            }
+          }
+
+//          // case 4:
+//          // xxxxx^abcdefg... + cdexxxxx
+
+//          // case 5:
+//          // xxxxx^abcdefg... + wabcxxxxx
+
+//          // case 6:
+//          // xxxxx^abcdefg... + wbcdxxxx
+
+//          // case 7:
+//          // xxxxx^abcdefg... + sfdgsdgsd
+
+
+#define DEBUG_CAT_STR
+#ifdef DEBUG_CAT_STR
+//          LOG(INFO) << "decode: " << tms;
+          std::string tp2;
+          std::string tp1;
+//          LOG(INFO) << "current cache: " << tp;
+          for (size_t bp = 0; bp < m_code_step1_tmp.size(); bp++) {
+            tp1 += m_code_step1_tmp[bp];
+          }
+
+          for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
+            tp2 += m_code_step1_tmp[bp];
+          }
+//          LOG(INFO) << "current cache: " << tp1 << " || curindex: " << tp2;
+#endif
+
+          if (case_ == 2 ||
+              case_ == 3) {
+            static bool m_decode_step2_tmp_start_tag = false;
+            if (!m_decode_step2_tmp_start_tag &&
+                (m_code_step1_tmp[m_code_step1_tmp_cur_head] == '3' ||
+                m_code_step1_tmp[m_code_step1_tmp_cur_head] == '6')) {
+              m_decode_step2_tmp_cur_head = m_code_step1_tmp_cur_head;
+              m_decode_step2_tmp_start_tag = TRUE;
+            }
+            if (m_decode_step2_tmp_start_tag) {
+              if (m_code_step1_tmp_cur_head - m_decode_step2_tmp_cur_head == 1) {
+                int t1 = m_code_step1_tmp[m_code_step1_tmp_cur_head];
+                int t2 = m_code_step1_tmp[m_decode_step2_tmp_cur_head];
+                if (t2 == '3') {
+                  if (t1 == '6') {
+                    LOG(INFO) << "---------------------" << 0;
+                    m_decode_step2_tmp_cur_head++;
+                  } else if (t1 == '5') {
+                    LOG(INFO) << "---------------------" << 0;
+                    m_decode_step2_tmp_cur_head++;
+                  }
+                } else if (t2 == '6') {
+                  if (t1 == '3') {
+                    LOG(INFO) << "---------------------" << 1;
+                    m_decode_step2_tmp_cur_head++;
+                  } else if (t1 == '2') {
+                    LOG(INFO) << "---------------------" << 1;
+                    m_decode_step2_tmp_cur_head++;
+                  }
+                } else if (t2 == '2') {
+                  if (t1 == '6') {
+                    LOG(INFO) << "Clock error!";
+                    m_decode_step2_tmp_cur_head++;
+                  } else if (t1 == '5') {
+                    LOG(INFO) << "---------------------" << 1;
+                    m_decode_step2_tmp_cur_head++;
+                    m_decode_step2_tmp_cur_head++;
+                  }
+                } else if (t2 == '5') {
+                  if (t1 == '3') {
+                    LOG(INFO) << "Clock error!";
+                    m_decode_step2_tmp_cur_head++;
+                  } else if (t1 == '2') {
+                    LOG(INFO) << "---------------------" << 0;
+                    m_decode_step2_tmp_cur_head++;
+                    m_decode_step2_tmp_cur_head++;
+                  }
+                }
+              } else if (m_code_step1_tmp_cur_head - m_decode_step2_tmp_cur_head > 0) {
+                LOG(ERROR) << (m_code_step1_tmp_cur_head - m_decode_step2_tmp_cur_head) << "error";
+              }
+            }
+          }
+        }
       }
 
       bool is_case_5_pass = true;

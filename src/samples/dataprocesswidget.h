@@ -77,6 +77,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   float * m_tex_buf_render_head;
   std::vector<float> m_tex_tmp;
   std::deque <uchar> m_code_step1_tmp;
+  int code_step1_trust_count;
   size_t m_code_step1_tmp_cur_head;
   size_t m_decode_step2_tmp_cur_head;
   std::string m_code_step1_tmp_str;

@@ -44,6 +44,7 @@ static GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
     m_tex_buf_render_head(nullptr),
+    code_step1_trust_count(0),
     m_fileMMap(nullptr),
     m_CvertexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer)),
     m_CindexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::IndexBuffer)),
@@ -597,10 +598,11 @@ void DataProcessWidget::paintGL() {
         count_i++;
       }
       static bool m_code_step1_tmp_start_tag = false;
+      static bool m_decode_step2_tmp_start_tag = false;
       if (tg && tm.size() > 3) {
         if (!m_code_step1_tmp_start_tag ) {
           // before start
-          static int code_step1_trust_count = 0;
+//          static int code_step1_trust_count = 0;
           std::string tms="";
           for (size_t h = tm.size() - 2; h > 0; h--) {
             tms += std::to_string(tm[h]);
@@ -615,6 +617,7 @@ void DataProcessWidget::paintGL() {
               }
               m_code_step1_tmp_cur_head = 0;
               m_decode_step2_tmp_cur_head = 0;
+              code_step1_trust_count = 0;
             }
           } else {
             code_step1_trust_count = 0;
@@ -680,17 +683,22 @@ void DataProcessWidget::paintGL() {
           // xxxxx^ab + abcXXX
           else if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) == 2 &&
               !strncmp(tp.c_str(), tms.c_str(), 2)) {
-//            LOG(INFO) << "case 4";
+            LOG(INFO) << "case 4";
             case_ = 4;
             if (tms.size() > (tp.size())) {
-//              LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size() - 1;
-              for (size_t i = 0; i < (tms.size() - (tp.size() - 1)); i++) {
+              LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size();
+              for (size_t i = 0; i < (tms.size() - (tp.size())); i++) {
                 m_code_step1_tmp.push_back('0');
               }
             }
             for (size_t n = 0; n < tms.size(); n++) {
               m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
             }
+          } else {
+            LOG(INFO) << "other case";
+            m_code_step1_tmp.clear();
+            m_code_step1_tmp_start_tag = false;
+            m_decode_step2_tmp_start_tag = false;
           }
 
 //          // case 4:
@@ -709,22 +717,16 @@ void DataProcessWidget::paintGL() {
 #define DEBUG_CAT_STR
 #ifdef DEBUG_CAT_STR
 //          LOG(INFO) << "decode: " << tms;
-          std::string tp2;
           std::string tp1;
-//          LOG(INFO) << "current cache: " << tp;
           for (size_t bp = 0; bp < m_code_step1_tmp.size(); bp++) {
             tp1 += m_code_step1_tmp[bp];
           }
 
-          for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
-            tp2 += m_code_step1_tmp[bp];
-          }
-//          LOG(INFO) << "current cache: " << tp1 << " || curindex: " << tp2;
+          LOG(INFO) << "current cache: " << tp1 << " || curdecode_target: " << tms << " || head:" << m_code_step1_tmp_cur_head;
 #endif
 
           if (case_ == 2 ||
               case_ == 3) {
-            static bool m_decode_step2_tmp_start_tag = false;
             if (!m_decode_step2_tmp_start_tag &&
                 (m_code_step1_tmp[m_code_step1_tmp_cur_head] == '3' ||
                 m_code_step1_tmp[m_code_step1_tmp_cur_head] == '6')) {
@@ -737,35 +739,35 @@ void DataProcessWidget::paintGL() {
                 int t2 = m_code_step1_tmp[m_decode_step2_tmp_cur_head];
                 if (t2 == '3') {
                   if (t1 == '6') {
-                    LOG(INFO) << "---------------------" << 0;
+                    LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
                     m_decode_step2_tmp_cur_head++;
                   } else if (t1 == '5') {
-                    LOG(INFO) << "---------------------" << 0;
+                    LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
                     m_decode_step2_tmp_cur_head++;
                   }
                 } else if (t2 == '6') {
                   if (t1 == '3') {
-                    LOG(INFO) << "---------------------" << 1;
+                    LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
                     m_decode_step2_tmp_cur_head++;
                   } else if (t1 == '2') {
-                    LOG(INFO) << "---------------------" << 1;
+                    LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
                     m_decode_step2_tmp_cur_head++;
                   }
                 } else if (t2 == '2') {
                   if (t1 == '6') {
-                    LOG(INFO) << "Clock error!";
+                    LOG(INFO) << "file_location" << m_file_find_index << "Clock error!";
                     m_decode_step2_tmp_cur_head++;
                   } else if (t1 == '5') {
-                    LOG(INFO) << "---------------------" << 1;
+                    LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
                     m_decode_step2_tmp_cur_head++;
                     m_decode_step2_tmp_cur_head++;
                   }
                 } else if (t2 == '5') {
                   if (t1 == '3') {
-                    LOG(INFO) << "Clock error!";
+                    LOG(INFO) << "file_location" << m_file_find_index << "Clock error!";
                     m_decode_step2_tmp_cur_head++;
                   } else if (t1 == '2') {
-                    LOG(INFO) << "---------------------" << 0;
+                    LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
                     m_decode_step2_tmp_cur_head++;
                     m_decode_step2_tmp_cur_head++;
                   }

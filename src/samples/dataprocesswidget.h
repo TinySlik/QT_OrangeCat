@@ -90,10 +90,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::shared_ptr<QOpenGLShaderProgram> m_CcomputeProgram;
   std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
   std::shared_ptr<QOpenGLTexture> m_Ctexture;
-  float m_roll;
-  float m_speed;
   float m_lineThickness;
-  float m_TestFrequency;
   bool m_ComputeShaderSwitch;
   int m_TestSwitch;
   int m_DisplaySwitch;

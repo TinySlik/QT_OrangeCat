@@ -4,8 +4,6 @@
 
 #define PI 3.14159265358979323844
 
-uniform float roll;
-uniform float test_frequency;
 uniform int test_switch;
 
 uniform float min_cut_filter;

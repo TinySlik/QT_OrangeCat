@@ -51,10 +51,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_CcomputeProgram(std::make_shared<QOpenGLShaderProgram>()),
     m_CrenderProgram(std::make_shared<QOpenGLShaderProgram>()),
     m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
-    m_roll(0.0),
-    m_speed(0.0333f),
     m_lineThickness(0.01f),
-    m_TestFrequency(100.f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(0),
     m_DisplaySwitch(4),
@@ -89,11 +86,9 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   connect(this, SIGNAL(TitelChanged(const QString &)), parent, SLOT(setWindowTitle(const QString &)));
 
   cfg += {{class_obj_id.c_str(), {
-      {"Speed", m_speed},
       {"lineThickness", m_lineThickness},
       {"compute1_switch", m_ComputeShaderSwitch},
       {"test_switch", m_TestSwitch},
-      {"test_frequency", m_TestFrequency},
       {"display_switch", m_DisplaySwitch},
       {"test_file_path", "empty"},
       {"file_load_location", m_file_find_index},
@@ -248,13 +243,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return true;
   });
 
-  cfg_local["Speed"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
-    if (!b.is_float()) return false;
-    auto tg = static_cast<float>(b);
-    m_speed = tg;
-    return true;
-  });
-
   cfg_local["lineThickness"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_float()) return false;
     auto tg = static_cast<float>(b);
@@ -283,12 +271,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return true;
   });
 
-  cfg_local["test_frequency"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
-    if (!b.is_float()) return false;
-    auto tg = static_cast<float>(b);
-    m_TestFrequency = tg;
-    return true;
-  });
   reset(MAX_PAINT_BUF_SIZE * 2);
 
   QSurfaceFormat format;
@@ -454,8 +436,6 @@ void DataProcessWidget::paintGL() {
   getData();
   static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
   static GLint destLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
-  static GLint rollLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "roll");
-  static GLint testFrequencyLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_frequency");
   static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");
   static GLint min_cut_filterLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "min_cut_filter");
   static GLint max_cut_filterLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "max_cut_filter");
@@ -494,43 +474,40 @@ void DataProcessWidget::paintGL() {
     m_CcomputeProgram->bind();
     m_Ctexture->bind();
     glUniform1i(destLoc, 0);
-    glUniform1f(rollLoc, m_roll);
-    glUniform1f(testFrequencyLoc, m_TestFrequency);
     glUniform1i(testSwitchLoc, m_TestSwitch);
     glUniform1f(min_cut_filterLoc, m_min_cut_filter);
     glUniform1f(max_cut_filterLoc, m_max_cut_filter);
     glUniform1f(fft_display_scaleLoc, m_fft_display_scale);
-    m_roll += m_speed;
     glDispatchCompute(static_cast<GLuint>(m_Ctexture->width()), 1, 1);
     // add cpu mutil thread code here for compute time improve.
     if (m_TestSwitch == 4 || m_TestSwitch == 5) {
-//      auto data_ptr = m_tex_tmp.data();
-//      auto task_cpu = async::spawn([this, data_ptr] {
-//          float average = 0.f;
-//          auto sz = static_cast<int>(m_tex_tmp.size());
-//          for(int i = 0; i < sz; i++) {
-//            average += m_tex_tmp[static_cast<size_t>(i)] / sz;
-//          }
-//          for(int i = 0; i < sz; i++) {
-////            static int count_1 = 1;
-////            static int count_0 = 1;
-//            if (m_tex_tmp[static_cast<size_t>(i)] > average) {
-//              data_ptr[static_cast<size_t>(i)] = 1.f;
-////              count_1++;
-////              if (count_0) {
-////                LOG(INFO) << "0 :" << count_0;
-////                count_0 = 0;
-////              }
-//            } else {
-////              count_0 ++;
-////              if (count_1) {
-////                LOG(INFO) << "1 :" << count_1;
-////                count_1 = 0;
-////              }
-//              data_ptr[static_cast<size_t>(i)] = 0.f;
-//            }
-//          }
-//      });
+      auto data_ptr = m_tex_tmp.data();
+      auto task_cpu = async::spawn([this, data_ptr] {
+          float average = 0.f;
+          auto sz = static_cast<int>(m_tex_tmp.size());
+          for(int i = 0; i < sz; i++) {
+            average += m_tex_tmp[static_cast<size_t>(i)] / sz;
+          }
+          for(int i = 0; i < sz; i++) {
+//            static int count_1 = 1;
+//            static int count_0 = 1;
+            if (m_tex_tmp[static_cast<size_t>(i)] > average) {
+              data_ptr[static_cast<size_t>(i)] = 1.f;
+//              count_1++;
+//              if (count_0) {
+//                LOG(INFO) << "0 :" << count_0;
+//                count_0 = 0;
+//              }
+            } else {
+//              count_0 ++;
+//              if (count_1) {
+//                LOG(INFO) << "1 :" << count_1;
+//                count_1 = 0;
+//              }
+              data_ptr[static_cast<size_t>(i)] = 0.f;
+            }
+          }
+      });
 
       glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
       glFinish();

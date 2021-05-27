@@ -32,12 +32,18 @@
 
 #include "logo.h"
 #include "memorymapped.h"
+#include "manchesterdecoder.h"
 #define MAX_PAINT_BUF_SIZE (4096)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core {
   Q_OBJECT
+
+  typedef struct {
+    std::string                           name;
+    std::shared_ptr<ManchesterDecoder>    object;
+  } PLUG_PROCESS_UNIT;
 
  public:
   explicit DataProcessWidget(QWidget *parent = nullptr);
@@ -68,6 +74,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
  private:
   void resetBuf(int size);
   bool resetComputeShader(int level);
+  bool registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj);
+  bool unRegisterDecoder(const std::string & name);
   QTimer timer;
 
   bool m_core;
@@ -75,7 +83,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QMatrix4x4 m_proj;
   std::vector<float> m_tex_buf;
   float * m_tex_buf_render_head;
-  std::vector<float> m_tex_tmp;
+  std::shared_ptr<std::vector<float>> m_tex_tmp_ptr;
   std::deque <uchar> m_code_step1_tmp;
   int code_step1_trust_count;
   size_t m_code_step1_tmp_cur_head;
@@ -90,6 +98,11 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::shared_ptr<QOpenGLShaderProgram> m_CcomputeProgram;
   std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
   std::shared_ptr<QOpenGLTexture> m_Ctexture;
+
+//  std::shared_ptr<ManchesterDecoder> _decoder;
+  int _decoder_active_index;
+  std::vector<PLUG_PROCESS_UNIT> _decoders;
+
   float m_lineThickness;
   bool m_ComputeShaderSwitch;
   int m_TestSwitch;

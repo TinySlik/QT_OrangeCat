@@ -841,7 +841,6 @@ void DataProcessWidget::paintGL() {
   glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
 
-  LOG(INFO) << float(get_micro_second() % 1000000000) / 1000.f;
   glUniform1f(timeLoc, float((get_micro_second() % 1000000000)) / 1000.f);
   glUniform2f(resolutionLoc, 1920.f, 1080.f);
 

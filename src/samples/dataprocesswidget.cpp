@@ -26,6 +26,7 @@
 #include <QBasicTimer>
 #include "parameterserver.h"
 #include "easylogging++.h"
+#include "time.h"
 #include "async++.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
@@ -839,8 +840,9 @@ void DataProcessWidget::paintGL() {
   glUniform1i(srcLoc, 0);
   glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
-//  static float ori = GetTickCount()/ 1000.f;
-  glUniform1f(timeLoc, 2000);
+
+  LOG(INFO) << float(get_micro_second() % 1000000000) / 1000.f;
+  glUniform1f(timeLoc, float((get_micro_second() % 1000000000)) / 1000.f);
   glUniform2f(resolutionLoc, 1920.f, 1080.f);
 
   // Calculate model view transformation

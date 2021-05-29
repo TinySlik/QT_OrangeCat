@@ -18,6 +18,7 @@
 #define OIL_SRC_DATAPROCESSWIDGET_H_
 
 #include <vector>
+#include <deque>
 #include <memory>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_3_Core>
@@ -28,8 +29,10 @@
 #include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
 #include <QTimer>
+
 #include "logo.h"
 #include "memorymapped.h"
+#include "manchesterdecoder.h"
 #define MAX_PAINT_BUF_SIZE (4096)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
@@ -37,9 +40,14 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core {
   Q_OBJECT
 
+  typedef struct {
+    std::string                           name;
+    std::shared_ptr<ManchesterDecoder>    object;
+  } PLUG_PROCESS_UNIT;
+
  public:
   explicit DataProcessWidget(QWidget *parent = nullptr);
-  ~DataProcessWidget();
+  ~DataProcessWidget() override;
 
   static bool isTransparent() { return m_transparent; }
   static void setTransparent(bool t) { m_transparent = t; }
@@ -66,6 +74,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
  private:
   void resetBuf(int size);
   bool resetComputeShader(int level);
+  bool registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj);
+  bool unRegisterDecoder(const std::string & name);
   QTimer timer;
 
   bool m_core;
@@ -73,6 +83,12 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QMatrix4x4 m_proj;
   std::vector<float> m_tex_buf;
   float * m_tex_buf_render_head;
+  std::shared_ptr<std::vector<float>> m_tex_tmp_ptr;
+  std::deque <uchar> m_code_step1_tmp;
+  int code_step1_trust_count;
+  size_t m_code_step1_tmp_cur_head;
+  size_t m_decode_step2_tmp_cur_head;
+  std::string m_code_step1_tmp_str;
   static bool m_transparent;
   std::shared_ptr<MemoryMapped::File> m_fileMMap;
 
@@ -82,18 +98,22 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::shared_ptr<QOpenGLShaderProgram> m_CcomputeProgram;
   std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
   std::shared_ptr<QOpenGLTexture> m_Ctexture;
-  float m_roll;
-  float m_speed;
+
+//  std::shared_ptr<ManchesterDecoder> _decoder;
+  int _decoder_active_index;
+  std::vector<PLUG_PROCESS_UNIT> _decoders;
+
   float m_lineThickness;
-  float m_TestFrequency;
   bool m_ComputeShaderSwitch;
   int m_TestSwitch;
   int m_DisplaySwitch;
   size_t m_file_find_index;
   int m_fft_level;
   bool m_reset_buf_tag;
-  size_t buffer_size;
+  int buffer_size;
   bool m_reset_computeshader_tag;
+  int  m_match_alpha;
+  int m_matchClockFrequency;
 
   QVector3D   m_position;
   QVector3D   m_scale;
@@ -102,6 +122,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   float m_max_cut_filter;
   float m_min_cut_filter;
+
+  float m_fft_display_scale;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

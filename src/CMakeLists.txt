@@ -39,11 +39,17 @@ set(SOURCE_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/memorymapped.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/dataprocesswidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/dataprocesswidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/manchesterdecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/manchesterdecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/personificationdecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/personificationdecoder.cpp
     ${QT_PLATFORM_FILES}
 )
 
 include_directories(log)
 include_directories(paramserv)
+include_directories(../3rdparty/asyncplusplus/include)
+
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
 add_executable(sample ${SOURCE_FILES})
-target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick paramserv)
+target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick paramserv Async++)

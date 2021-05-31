@@ -25,6 +25,7 @@
 #include "parameterserver.h"
 #include "easylogging++.h"
 #include "async++.h"
+#include "personificationdecoder.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
@@ -80,6 +81,10 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     fmt.setAlphaBufferSize(8);
     setFormat(fmt);
   }
+
+  auto per_decoder = std::make_shared<PersonificationDecoder>();
+  registerDecoder("PersonificationDecoder", per_decoder);
+  _decoder_active_index = 0;
 
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
@@ -215,7 +220,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     }
 
     size_t sz;
-//    auto st = GetTickCount();
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
@@ -482,19 +486,15 @@ void DataProcessWidget::paintGL() {
     glUniform1f(fft_display_scaleLoc, m_fft_display_scale);
     glDispatchCompute(static_cast<GLuint>(m_Ctexture->width()), 1, 1);
 
-    // add cpu mutil thread code here for compute time improve.
     if (m_TestSwitch == 4 || m_TestSwitch == 5 || m_TestSwitch == 6) {
       std::shared_ptr<ManchesterDecoder> _decoder = nullptr;
-      if (_decoder_active_index >= 0)
-          _decoder = _decoders[static_cast<size_t>(_decoder_active_index)].object;
-      auto task_cpu = async::spawn([this, _decoder] {
-//        LOG(INFO) << "in size: " << m_tex_tmp_ptr->size();
-//        for (size_t i = 0; i < m_tex_tmp_ptr->size(); i++) {
-//          LOG(INFO) <<"in " << "i: " << i << " ||"<< (*m_tex_tmp_ptr)[i];
-//        }
+        if (_decoder_active_index >= 0)
+            _decoder = _decoders[static_cast<size_t>(_decoder_active_index)].object;
+        auto task_cpu = async::spawn([this, _decoder] {
         if (_decoder) _decoder->decodeBeforeWait(m_tex_tmp_ptr);
       });
 
+      // about 16ms ~ 32 ms
       glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
       glFinish();
       task_cpu.get();
@@ -812,7 +812,8 @@ void DataProcessWidget::paintGL() {
         m_Ctexture->release();
         m_Ctexture->bind();
 
-        const void *const_data_ptr = _decoder ? _decoder->displayBuffer()->data() : m_tex_tmp_ptr->data();
+//        const void *const_data_ptr = _decoder ? _decoder->displayBuffer()->data() : m_tex_tmp_ptr->data();
+        const void *const_data_ptr = m_tex_tmp_ptr->data();
         m_Ctexture->setData(QOpenGLTexture::Red, QOpenGLTexture::Float32, const_data_ptr);
       }
 //      static int asdadsy = 0;

@@ -99,7 +99,6 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
   std::shared_ptr<QOpenGLTexture> m_Ctexture;
 
-//  std::shared_ptr<ManchesterDecoder> _decoder;
   int _decoder_active_index;
   std::vector<PLUG_PROCESS_UNIT> _decoders;
 

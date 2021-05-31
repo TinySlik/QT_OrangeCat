@@ -35,6 +35,7 @@ public:
 protected:
   std::shared_ptr<std::vector<char>> _resualt;
   std::shared_ptr<std::vector<float>> _displayBuffer;
+  size_t _resualt_mem_size_tag;
 };
 
 #endif // MANCHESTERDECODER_H

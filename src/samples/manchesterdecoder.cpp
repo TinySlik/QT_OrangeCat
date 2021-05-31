@@ -15,19 +15,22 @@
 
 #include "manchesterdecoder.h"
 using namespace configuru;
+#include "easylogging++.h"
 
 
 ManchesterDecoder::ManchesterDecoder():
-_resualt(nullptr),
-_displayBuffer(nullptr) {
+_resualt(std::make_shared<std::vector<char>>()),
+_displayBuffer(nullptr),
+_resualt_mem_size_tag(_resualt->size()) {
 }
 
 ManchesterDecoder::~ManchesterDecoder() {
 }
 
 char ManchesterDecoder::getCurrentResualt() {
-  if (_resualt && _resualt->size() > 0) {
-    return *(_resualt->begin());
+  if (_resualt && _resualt_mem_size_tag != _resualt->size()) {
+    _resualt_mem_size_tag = _resualt->size();
+    return _resualt->back();
   }
   return -1;
 }

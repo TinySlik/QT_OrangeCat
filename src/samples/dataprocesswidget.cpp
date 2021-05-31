@@ -491,9 +491,9 @@ void DataProcessWidget::paintGL() {
 
     if (m_TestSwitch == 4 || m_TestSwitch == 5 || m_TestSwitch == 6) {
       std::shared_ptr<ManchesterDecoder> _decoder = nullptr;
-        if (_decoder_active_index >= 0)
-            _decoder = _decoders[static_cast<size_t>(_decoder_active_index)].object;
-        auto task_cpu = async::spawn([this, _decoder] {
+      if (_decoder_active_index >= 0)
+          _decoder = _decoders[static_cast<size_t>(_decoder_active_index)].object;
+      auto task_cpu = async::spawn([this, _decoder] {
         if (_decoder) _decoder->decodeBeforeWait(m_tex_tmp_ptr);
       });
 
@@ -508,7 +508,8 @@ void DataProcessWidget::paintGL() {
         if (_decoder->getCurrentResualt() == -1) {
           // todo
         } else {
-          LOG(INFO) << _decoders[static_cast<size_t>(_decoder_active_index)].name << ": current res---" << _decoder->getCurrentResualt();
+          auto kk = _decoder->getResualtList();
+          LOG(INFO) << _decoders[static_cast<size_t>(_decoder_active_index)].name << ": current res---" << kk->back();
         }
       }
       if (m_TestSwitch == 4 || m_TestSwitch == 5) {
@@ -815,8 +816,8 @@ void DataProcessWidget::paintGL() {
         m_Ctexture->release();
         m_Ctexture->bind();
 
-//        const void *const_data_ptr = _decoder ? _decoder->displayBuffer()->data() : m_tex_tmp_ptr->data();
-        const void *const_data_ptr = m_tex_tmp_ptr->data();
+        const void *const_data_ptr = _decoder ? _decoder->displayBuffer()->data() : m_tex_tmp_ptr->data();
+//        const void *const_data_ptr = m_tex_tmp_ptr->data();
         m_Ctexture->setData(QOpenGLTexture::Red, QOpenGLTexture::Float32, const_data_ptr);
       }
 //      static int asdadsy = 0;

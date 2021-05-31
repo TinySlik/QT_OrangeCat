@@ -34,7 +34,6 @@ class PersonificationDecoder : public ManchesterDecoder {
   std::deque <unsigned char> m_code_step1_tmp;
   size_t m_code_step1_tmp_cur_head;
   size_t m_decode_step2_tmp_cur_head;
-  size_t m_file_find_index;
   int count;
   int init_wait;
   int count_case4;

@@ -19,7 +19,6 @@
 
 PersonificationDecoder::PersonificationDecoder():
   code_step1_trust_count(0),
-  m_file_find_index(0),
   count(0),
   init_wait(1024),
   count_case4(0),
@@ -35,12 +34,14 @@ configuru::Config PersonificationDecoder::defaultParams() {
 }
 
 bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>> data) {
-  LOG(INFO) << __FUNCTION__ << __LINE__ << data->size();
+//  LOG(INFO) << __FUNCTION__ << __LINE__ << data->size();
 //  for (size_t i = 0; i < data->size(); i++) {
 //    LOG(INFO) <<"in " << "i: " << i << " ||"<< (*data)[i];
 //  }
   if (init_wait >= 0) init_wait --;
   count++;
+
+  auto cache = *data;
 
   float average = 0.f;
   auto sz = static_cast<int>(data->size());
@@ -55,7 +56,7 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
   for(int i = 0; i < sz; i++) {
     static int count_i = 0;
     if ((*data)[static_cast<size_t>(i)] > average) {
-      (*data)[static_cast<size_t>(i)] = 1.f;
+      cache[static_cast<size_t>(i)] = 1.f;
       if (!init_test_case) {
         int res = 4;
         if (count_i > 150) {
@@ -70,7 +71,7 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
         init_test_case = true;
       }
     } else {
-      (*data)[static_cast<size_t>(i)] = 0.f;
+      cache[static_cast<size_t>(i)] = 0.f;
       if (tg && init_test_case) {
         int res = 1;
         if (count_i > 130) {
@@ -203,7 +204,7 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
 //          // xxxxx^abcdefg... + sfdgsdgsd
 
 
-#define DEBUG_CAT_STR
+//#define DEBUG_CAT_STR
 #ifdef DEBUG_CAT_STR
       std::string tp1;
       for (size_t bp = 0; bp < m_code_step1_tmp.size(); bp++) {
@@ -227,35 +228,43 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
             int t2 = m_code_step1_tmp[m_decode_step2_tmp_cur_head];
             if (t2 == '3') {
               if (t1 == '6') {
-                LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
+//                LOG(INFO) << "file_location" << "---------------------" << 1;
+                _resualt->push_back('1');
                 m_decode_step2_tmp_cur_head++;
               } else if (t1 == '5') {
-                LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
+//                LOG(INFO) << "file_location" << "---------------------" << 1;
+                _resualt->push_back('1');
                 m_decode_step2_tmp_cur_head++;
               }
             } else if (t2 == '6') {
               if (t1 == '3') {
-                LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
+//                LOG(INFO) << "file_location" << "---------------------" << 0;
+                _resualt->push_back('0');
                 m_decode_step2_tmp_cur_head++;
               } else if (t1 == '2') {
-                LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
+//                LOG(INFO) << "file_location" << "---------------------" << 0;
+                _resualt->push_back('0');
                 m_decode_step2_tmp_cur_head++;
               }
             } else if (t2 == '2') {
               if (t1 == '6') {
-                LOG(INFO) << "file_location" << m_file_find_index << "Clock error!";
+//                LOG(INFO) << "file_location" << "Clock error!";
+                _resualt->push_back('X');
                 m_decode_step2_tmp_cur_head++;
               } else if (t1 == '5') {
-                LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
+//                LOG(INFO) << "file_location" << "---------------------" << 0;
+                _resualt->push_back('0');
                 m_decode_step2_tmp_cur_head++;
                 m_decode_step2_tmp_cur_head++;
               }
             } else if (t2 == '5') {
               if (t1 == '3') {
-                LOG(INFO) << "file_location" << m_file_find_index << "Clock error!";
+//                LOG(INFO) << "file_location" << "Clock error!";
+                _resualt->push_back('X');
                 m_decode_step2_tmp_cur_head++;
               } else if (t1 == '2') {
-                LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
+//                LOG(INFO) << "file_location" << "---------------------" << 1;
+                _resualt->push_back('1');
                 m_decode_step2_tmp_cur_head++;
                 m_decode_step2_tmp_cur_head++;
               }
@@ -267,11 +276,13 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
       }
     }
   }
+  _displayBuffer = std::make_shared<std::vector<float>>(cache);
 
   return true;
 }
 bool PersonificationDecoder::decodeAfterWait() {
-  LOG(INFO) << __FUNCTION__ << __LINE__;
+//  LOG(INFO) << __FUNCTION__ << __LINE__;
+
   return false;
 }
 

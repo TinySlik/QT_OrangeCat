@@ -19,11 +19,10 @@
 
 PersonificationDecoder::PersonificationDecoder():
   code_step1_trust_count(0),
-  count(0),
-  init_wait(1024),
-  count_case4(0),
   m_code_step1_tmp_start_tag(false),
-  m_decode_step2_tmp_start_tag(false) {}
+  m_decode_step2_tmp_start_tag(false),
+  m_samplingRate(20),
+  _samplingIndex(0) {}
 
 PersonificationDecoder::~PersonificationDecoder()
 {}
@@ -33,14 +32,15 @@ configuru::Config PersonificationDecoder::defaultParams() {
   return {};
 }
 
-bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>> data) {
-//  LOG(INFO) << __FUNCTION__ << __LINE__ << data->size();
-//  for (size_t i = 0; i < data->size(); i++) {
-//    LOG(INFO) <<"in " << "i: " << i << " ||"<< (*data)[i];
-//  }
-  if (init_wait >= 0) init_wait --;
-  count++;
+bool PersonificationDecoder::reset() {
+  _samplingIndex = 0;
+  m_code_step1_tmp.clear();
+  m_code_step1_tmp_start_tag = false;
+  m_decode_step2_tmp_start_tag = false;
+  return true;
+}
 
+bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>> data) {
   auto cache = *data;
 
   float average = 0.f;
@@ -50,9 +50,10 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
   }
   bool init_test_case = (*data)[0] > average;
 
-  bool tg = ++count_case4 >= 20;
+  bool tg = ++_samplingIndex >= m_samplingRate;
+  if (tg) _samplingIndex = 0;
+
   std::vector<int> tm;
-  if (tg) count_case4 = 0;
   for(int i = 0; i < sz; i++) {
     static int count_i = 0;
     if ((*data)[static_cast<size_t>(i)] > average) {
@@ -186,9 +187,7 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
         }
       } else {
         LOG(INFO) << "other case";
-        m_code_step1_tmp.clear();
-        m_code_step1_tmp_start_tag = false;
-        m_decode_step2_tmp_start_tag = false;
+        reset();
       }
 
 //          // case 4:
@@ -282,7 +281,6 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
 }
 bool PersonificationDecoder::decodeAfterWait() {
 //  LOG(INFO) << __FUNCTION__ << __LINE__;
-
   return false;
 }
 

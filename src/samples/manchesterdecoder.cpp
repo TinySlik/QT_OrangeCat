@@ -17,19 +17,18 @@
 using namespace configuru;
 #include "easylogging++.h"
 
-
 ManchesterDecoder::ManchesterDecoder():
 _resualt(std::make_shared<std::vector<char>>()),
 _displayBuffer(nullptr),
-_resualt_mem_size_tag(_resualt->size()) {
+_resualtMemSizeTag(_resualt->size()) {
 }
 
 ManchesterDecoder::~ManchesterDecoder() {
 }
 
 char ManchesterDecoder::getCurrentResualt() {
-  if (_resualt && _resualt_mem_size_tag != _resualt->size()) {
-    _resualt_mem_size_tag = _resualt->size();
+  if (_resualt && _resualtMemSizeTag != _resualt->size()) {
+    _resualtMemSizeTag = _resualt->size();
     return _resualt->back();
   }
   return -1;

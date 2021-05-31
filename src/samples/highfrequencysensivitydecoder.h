@@ -13,33 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef PERSONIFICATIONDECODER_H
-#define PERSONIFICATIONDECODER_H
+#ifndef HIGHFREQUENCYSENSIVITYDECODER_H
+#define HIGHFREQUENCYSENSIVITYDECODER_H
+
 #include "manchesterdecoder.h"
 #include <deque>
 #include <string>
 
-
-class PersonificationDecoder : public ManchesterDecoder {
+class HighFrequencySensivityDecoder : public ManchesterDecoder {
  public:
-  PersonificationDecoder();
-  virtual ~PersonificationDecoder() override;
+  HighFrequencySensivityDecoder();
+  virtual ~HighFrequencySensivityDecoder() override;
   virtual bool decodeBeforeWait(std::shared_ptr<std::vector<float>> data) override;
   virtual bool decodeAfterWait() override;
   virtual configuru::Config defaultParams() override;
   virtual bool reset() override;
 
  private:
-  int code_step1_trust_count;
-  std::string m_code_step1_tmp_str;
-  std::deque <unsigned char> m_code_step1_tmp;
-  size_t m_code_step1_tmp_cur_head;
-  size_t m_decode_step2_tmp_cur_head;
-  bool m_code_step1_tmp_start_tag;
-  bool m_decode_step2_tmp_start_tag;
-
-  size_t m_samplingRate;
-  size_t _samplingIndex;
+  int m_match_alpha;
+  int m_matchClockFrequency;
+  int count;
+  int init_wait;
+  bool ct_tag;
+  std::shared_ptr<std::vector<float>> s_tmpBuffer;
 };
 
-#endif // PERSONIFICATIONDECODER_H
+#endif // HIGHFREQUENCYSENSIVITYDECODER_H

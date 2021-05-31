@@ -29,6 +29,7 @@
 #include "time.h"
 #include "async++.h"
 #include "personificationdecoder.h"
+#include "highfrequencysensivitydecoder.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
@@ -84,10 +85,15 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     fmt.setAlphaBufferSize(8);
     setFormat(fmt);
   }
+  PLUG_PROCESS_UNIT register_table[] = {
+    {"PersonificationDecoder",                    std::make_shared<PersonificationDecoder>()        },
+    {"HighFrequencySensivityDecoder",             std::make_shared<HighFrequencySensivityDecoder>() }
+  };
 
-  auto per_decoder = std::make_shared<PersonificationDecoder>();
-  registerDecoder("PersonificationDecoder", per_decoder);
-  _decoder_active_index = 0;
+  for (size_t i = 0; i < sizeof(register_table) / sizeof(PLUG_PROCESS_UNIT); ++i) {
+    registerDecoder(register_table[i].name, register_table[i].object);
+  }
+  _decoder_active_index = 1;
 
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
@@ -489,7 +495,10 @@ void DataProcessWidget::paintGL() {
     glUniform1f(fft_display_scaleLoc, m_fft_display_scale);
     glDispatchCompute(static_cast<GLuint>(m_Ctexture->width()), 1, 1);
 
-    if (m_TestSwitch == 4 || m_TestSwitch == 5 || m_TestSwitch == 6) {
+    if (m_TestSwitch == 1 || m_TestSwitch == 2) {
+      glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+      glFinish();
+    } else {
       std::shared_ptr<ManchesterDecoder> _decoder = nullptr;
       if (_decoder_active_index >= 0)
           _decoder = _decoders[static_cast<size_t>(_decoder_active_index)].object;
@@ -505,333 +514,26 @@ void DataProcessWidget::paintGL() {
       if (_decoder) _decoder->decodeAfterWait();
 
       if (_decoder) {
-        if (_decoder->getCurrentResualt() == -1) {
+        auto res = _decoder->getCurrentResualt();
+        if (res == -1) {
           // todo
         } else {
-          auto kk = _decoder->getResualtList();
-          LOG(INFO) << _decoders[static_cast<size_t>(_decoder_active_index)].name << ": current res---" << kk->back();
+          LOG(INFO) << _decoders[static_cast<size_t>(_decoder_active_index)].name << ": current res---" << res;
         }
       }
-      if (m_TestSwitch == 4 || m_TestSwitch == 5) {
-          static int count = 0;
-          static int init_wait = 1024;
-          static int count_case4 = 0;
-          if (init_wait >= 0) init_wait --;
-          count++;
-          const void *const_data_ptr = m_tex_tmp_ptr->data();
-          glGetTexImage(
-            GL_TEXTURE_1D,
-            0,
-            GL_RED,
-            GL_FLOAT,
-            m_tex_tmp_ptr->data()
-          );
-          m_Ctexture->release();
-          m_Ctexture->bind();
 
-          float average = 0.f;
-          auto sz = static_cast<int>(m_tex_tmp_ptr->size());
-          for(int i = 0; i < sz; i++) {
-            average += (*m_tex_tmp_ptr)[static_cast<size_t>(i)] / sz;
-          }
-          bool init_test_case = (*m_tex_tmp_ptr)[0] > average;
+      glGetTexImage(
+        GL_TEXTURE_1D,
+        0,
+        GL_RED,
+        GL_FLOAT,
+        m_tex_tmp_ptr->data()
+      );
+      m_Ctexture->release();
+      m_Ctexture->bind();
 
-          bool tg = ++count_case4 >= 20;
-          std::vector<int> tm;
-          if (tg) count_case4 = 0;
-          for(int i = 0; i < sz; i++) {
-            static int count_i = 0;
-            if ((*m_tex_tmp_ptr)[static_cast<size_t>(i)] > average) {
-              (*m_tex_tmp_ptr)[static_cast<size_t>(i)] = 1.f;
-              if (!init_test_case) {
-                int res = 4;
-                if (count_i > 150) {
-                  res = 6;
-                } else if (count_i > 15) {
-                  res = 5;
-                }
-                if (tg && i > 30 && i < (sz - 30))
-                    tm.push_back(res);
-    //            LOG(INFO) << "compute decode test 0:" << res <<"   "<< count_i;
-                count_i = 0;
-                init_test_case = true;
-              }
-            } else {
-              (*m_tex_tmp_ptr)[static_cast<size_t>(i)] = 0.f;
-              if (tg && init_test_case) {
-                int res = 1;
-                if (count_i > 130) {
-                  res = 3;
-                } else if (count_i > 15) {
-                  res = 2;
-                }
-    //            LOG(INFO) << "compute decode test 1:" << res <<"   "<< count_i;
-                if (tg && i > 30 && i < (sz - 30))
-                    tm.push_back(res);
-                count_i = 0;
-                init_test_case = false;
-              }
-            }
-            count_i++;
-          }
-          static bool m_code_step1_tmp_start_tag = false;
-          static bool m_decode_step2_tmp_start_tag = false;
-          if (tg && tm.size() > 3) {
-            if (!m_code_step1_tmp_start_tag ) {
-              // before start
-    //          static int code_step1_trust_count = 0;
-              std::string tms="";
-              for (size_t h = tm.size() - 2; h > 0; h--) {
-                tms += std::to_string(tm[h]);
-              }
-              if (m_code_step1_tmp_str == tms) {
-                code_step1_trust_count ++;
-                if (code_step1_trust_count > 2) {
-                  LOG(INFO) << "Repeat code repeat times > 2, start decode: ";
-                  m_code_step1_tmp_start_tag = true;
-                  for (size_t n = 0; n < tms.size(); n++) {
-                    m_code_step1_tmp.push_back(tms.c_str()[n]);
-                  }
-                  m_code_step1_tmp_cur_head = 0;
-                  m_decode_step2_tmp_cur_head = 0;
-                  code_step1_trust_count = 0;
-                }
-              } else {
-                code_step1_trust_count = 0;
-              }
-              m_code_step1_tmp_str = tms;
-              LOG(INFO) << tms << ".";
-            } else {
-              // start to decode.
-              std::string tms="";
-              for (size_t h = tm.size() - 2; h > 0; h--) {
-                tms += std::to_string(tm[h]);
-              }
-
-              std::string tp;
-              for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
-                tp += m_code_step1_tmp[bp];
-              }
-              int case_ = 0;
-
-              // case 1:
-              // xxxxx^abcdefg... + abcyyyyy -> xxxxx^abcyyyyy
-              if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) > 2 &&!strncmp(tp.c_str(), tms.c_str(), 3)) {
-    //            LOG(INFO) << "case 1";
-                case_ = 1;
-                if (tms.size() > tp.size()) {
-    //              LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size();
-                  for (size_t i = 0; i < tms.size() - tp.size(); i++) {
-                    m_code_step1_tmp.push_back('0');
-                  }
-                }
-                for (size_t n = 0; n < tms.size(); n++) {
-                  m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
-                }
-              }
-
-              // case 2:
-              // xxxxx^abcdefg... + bcdyyyy -> xxxxx^abcdyyyy
-              else if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) > 3 &&
-                  !strncmp(tp.c_str() + 1, tms.c_str(), 3)) {
-    //            LOG(INFO) << "case 2";
-                case_ = 2;
-                if (tms.size() > (tp.size() - 1)) {
-    //              LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size() - 1;
-                  for (size_t i = 0; i < (tms.size() - (tp.size() - 1)); i++) {
-                    m_code_step1_tmp.push_back('0');
-                  }
-                }
-                for (size_t n = 0; n < tms.size(); n++) {
-                  m_code_step1_tmp[m_code_step1_tmp_cur_head + 1 + n] = tms.c_str()[n];
-                }
-                m_code_step1_tmp_cur_head++;
-              }
-
-              // case 3:
-              // xxxxx^abc + bc
-              else if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) == 3 &&
-                  !strncmp(tp.c_str() + 1, tms.c_str(), 2)) {
-                LOG(INFO) << "case 3" << "[warning] may error occor.";
-                case_ = 3;
-                m_code_step1_tmp_cur_head++;
-              }
-              // case 4:
-              // xxxxx^ab + abcXXX
-              else if (int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head) == 2 &&
-                  !strncmp(tp.c_str(), tms.c_str(), 2)) {
-                LOG(INFO) << "case 4";
-                case_ = 4;
-                if (tms.size() > (tp.size())) {
-                  LOG(INFO) << "tms.size()" << tms.size() << "|" << tp.size();
-                  for (size_t i = 0; i < (tms.size() - (tp.size())); i++) {
-                    m_code_step1_tmp.push_back('0');
-                  }
-                }
-                for (size_t n = 0; n < tms.size(); n++) {
-                  m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
-                }
-              } else {
-                LOG(INFO) << "other case";
-                m_code_step1_tmp.clear();
-                m_code_step1_tmp_start_tag = false;
-                m_decode_step2_tmp_start_tag = false;
-              }
-
-    //          // case 4:
-    //          // xxxxx^abcdefg... + cdexxxxx
-
-    //          // case 5:
-    //          // xxxxx^abcdefg... + wabcxxxxx
-
-    //          // case 6:
-    //          // xxxxx^abcdefg... + wbcdxxxx
-
-    //          // case 7:
-    //          // xxxxx^abcdefg... + sfdgsdgsd
-
-
-    #define DEBUG_CAT_STR
-    #ifdef DEBUG_CAT_STR
-    //          LOG(INFO) << "decode: " << tms;
-              std::string tp1;
-              for (size_t bp = 0; bp < m_code_step1_tmp.size(); bp++) {
-                tp1 += m_code_step1_tmp[bp];
-              }
-
-              LOG(INFO) << "current cache: " << tp1 << " || curdecode_target: " << tms << " || head:" << m_code_step1_tmp_cur_head;
-    #endif
-
-              if (case_ == 2 ||
-                  case_ == 3) {
-                if (!m_decode_step2_tmp_start_tag &&
-                    (m_code_step1_tmp[m_code_step1_tmp_cur_head] == '3' ||
-                    m_code_step1_tmp[m_code_step1_tmp_cur_head] == '6')) {
-                  m_decode_step2_tmp_cur_head = m_code_step1_tmp_cur_head;
-                  m_decode_step2_tmp_start_tag = true;
-                }
-                if (m_decode_step2_tmp_start_tag) {
-                  if (m_code_step1_tmp_cur_head - m_decode_step2_tmp_cur_head == 1) {
-                    int t1 = m_code_step1_tmp[m_code_step1_tmp_cur_head];
-                    int t2 = m_code_step1_tmp[m_decode_step2_tmp_cur_head];
-                    if (t2 == '3') {
-                      if (t1 == '6') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
-                        m_decode_step2_tmp_cur_head++;
-                      } else if (t1 == '5') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
-                        m_decode_step2_tmp_cur_head++;
-                      }
-                    } else if (t2 == '6') {
-                      if (t1 == '3') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
-                        m_decode_step2_tmp_cur_head++;
-                      } else if (t1 == '2') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
-                        m_decode_step2_tmp_cur_head++;
-                      }
-                    } else if (t2 == '2') {
-                      if (t1 == '6') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "Clock error!";
-                        m_decode_step2_tmp_cur_head++;
-                      } else if (t1 == '5') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 0;
-                        m_decode_step2_tmp_cur_head++;
-                        m_decode_step2_tmp_cur_head++;
-                      }
-                    } else if (t2 == '5') {
-                      if (t1 == '3') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "Clock error!";
-                        m_decode_step2_tmp_cur_head++;
-                      } else if (t1 == '2') {
-                        LOG(INFO) << "file_location" << m_file_find_index << "---------------------" << 1;
-                        m_decode_step2_tmp_cur_head++;
-                        m_decode_step2_tmp_cur_head++;
-                      }
-                    }
-                  } else if (m_code_step1_tmp_cur_head - m_decode_step2_tmp_cur_head > 0) {
-                    LOG(ERROR) << (m_code_step1_tmp_cur_head - m_decode_step2_tmp_cur_head) << "error";
-                  }
-                }
-              }
-            }
-          }
-
-          bool is_case_5_pass = true;
-          static std::vector<float> s_tmp(4096);
-          if (init_wait < 0 && count >= (m_matchClockFrequency - 1)) {
-            if (m_TestSwitch == 5) {
-              for(int j = 0; j < sz / m_matchClockFrequency; j++) {
-                int count_j = 0;
-                for (int k = 0; k < m_matchClockFrequency; k++) {
-                  if ((*m_tex_tmp_ptr)[static_cast<size_t>(j * m_matchClockFrequency + k) + sz % m_matchClockFrequency] > average) {
-                    count_j++;
-                  }
-                }
-      //          LOG(INFO) << "Reindex num: " << count;
-                if (count_j > m_match_alpha) {
-                  for (int k = 0; k < m_matchClockFrequency; k++) {
-                    (*m_tex_tmp_ptr)[static_cast<size_t>(j * m_matchClockFrequency + k) + sz % m_matchClockFrequency] = 1.f;
-                  }
-                } else {
-                  for (int k = 0; k < m_matchClockFrequency; k++) {
-                    (*m_tex_tmp_ptr)[static_cast<size_t>(j * m_matchClockFrequency + k) + sz % m_matchClockFrequency] = 0.f;
-                  }
-                }
-              }
-              static bool ct_tag = true;
-              if (ct_tag) {
-                if ((*m_tex_tmp_ptr)[m_matchClockFrequency * 1.5 + sz % m_matchClockFrequency] > .5f && (*m_tex_tmp_ptr)[m_matchClockFrequency * 2.5 + sz % m_matchClockFrequency] < .5f) {
-                  LOG(INFO) << "1";
-                } else if ((*m_tex_tmp_ptr)[m_matchClockFrequency * 1.5 + sz % m_matchClockFrequency] < .5f && (*m_tex_tmp_ptr)[m_matchClockFrequency * 2.5 + sz % m_matchClockFrequency] > .5f) {
-                  LOG(INFO) << "0";
-                } else {
-                  LOG(INFO) << "Clock Frequency Error.";
-                  ct_tag = !ct_tag;
-                }
-              }
-              s_tmp = *m_tex_tmp_ptr;
-              ct_tag = !ct_tag;
-            }
-
-            count = 0;
-          } else {
-            if (m_TestSwitch == 5) {
-              is_case_5_pass = false;
-            }
-          }
-          if (is_case_5_pass)
-              m_Ctexture->setData(QOpenGLTexture::Red, QOpenGLTexture::Float32, const_data_ptr);
-          else {
-              m_Ctexture->setData(QOpenGLTexture::Red, QOpenGLTexture::Float32, s_tmp.data());
-          }
-      } else {
-        glGetTexImage(
-          GL_TEXTURE_1D,
-          0,
-          GL_RED,
-          GL_FLOAT,
-          m_tex_tmp_ptr->data()
-        );
-        m_Ctexture->release();
-        m_Ctexture->bind();
-
-        const void *const_data_ptr = _decoder ? _decoder->displayBuffer()->data() : m_tex_tmp_ptr->data();
-//        const void *const_data_ptr = m_tex_tmp_ptr->data();
-        m_Ctexture->setData(QOpenGLTexture::Red, QOpenGLTexture::Float32, const_data_ptr);
-      }
-//      static int asdadsy = 0;
-//      m_test_tmp.push_back(asdadsy ++);
-//      LOG(INFO) << "out size: " << m_test_tmp.size();
-//      for (size_t i = 0; i < m_test_tmp.size(); i++) {
-//        LOG(INFO) << "out "<< m_test_tmp[i];
-//        qDebug() << "out "<< m_test_tmp[i];
-//      }
-    // ---end of cpu mutil thread here
-
-    } else {
-      glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-      glFinish();
+      const void *const_data_ptr = _decoder ? _decoder->displayBuffer()->data() : m_tex_tmp_ptr->data();
+      m_Ctexture->setData(QOpenGLTexture::Red, QOpenGLTexture::Float32, const_data_ptr);
     }
   }
 

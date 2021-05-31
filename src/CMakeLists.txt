@@ -44,6 +44,8 @@ set(SOURCE_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/personificationdecoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/personificationdecoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/time.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/highfrequencysensivitydecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/highfrequencysensivitydecoder.cpp
     ${QT_PLATFORM_FILES}
 )
 

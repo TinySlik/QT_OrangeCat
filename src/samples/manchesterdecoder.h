@@ -24,6 +24,7 @@ public:
   virtual bool decodeBeforeWait(std::shared_ptr<std::vector<float>> data) = 0;
   virtual bool decodeAfterWait() =  0;
   virtual configuru::Config defaultParams() = 0;
+  virtual bool reset() = 0;
   virtual std::shared_ptr<std::vector<float>> displayBuffer();
   virtual configuru::Config syncParams(configuru::Config &cfg);
 
@@ -35,7 +36,7 @@ public:
 protected:
   std::shared_ptr<std::vector<char>> _resualt;
   std::shared_ptr<std::vector<float>> _displayBuffer;
-  size_t _resualt_mem_size_tag;
+  size_t _resualtMemSizeTag;
 };
 
 #endif // MANCHESTERDECODER_H

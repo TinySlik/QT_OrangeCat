@@ -67,8 +67,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_reset_buf_tag(false),
     buffer_size(512),
     m_reset_computeshader_tag(false),
-    m_match_alpha(50),
-    m_matchClockFrequency(100),
     m_position(0, 0, -1.f),
     m_scale(.5f, .5f, 1.f),
     m_rotation(0, 0, 1),
@@ -113,8 +111,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_max_cut_filter", m_max_cut_filter},
       {"m_min_cut_filter", m_min_cut_filter},
       {"m_fft_display_scale", m_fft_display_scale},
-      {"m_match_alpha", m_match_alpha},
-      {"m_matchClockFrequency", m_matchClockFrequency},
       {"transform", {
         {
           "m_translate", {

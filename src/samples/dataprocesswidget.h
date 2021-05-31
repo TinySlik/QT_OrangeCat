@@ -111,8 +111,6 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   bool m_reset_buf_tag;
   int buffer_size;
   bool m_reset_computeshader_tag;
-  int  m_match_alpha;
-  int m_matchClockFrequency;
 
   QVector3D   m_position;
   QVector3D   m_scale;

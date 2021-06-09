@@ -39,4 +39,15 @@ protected:
   size_t _resualtMemSizeTag;
 };
 
+class EmptyDefault : public ManchesterDecoder {
+ public:
+  EmptyDefault();
+  virtual ~EmptyDefault() override;
+  virtual bool decodeBeforeWait(std::shared_ptr<std::vector<float>> data) override;
+  virtual bool decodeAfterWait() override;
+  virtual configuru::Config defaultParams() override;
+  virtual bool reset() override;
+};
+
+
 #endif // MANCHESTERDECODER_H

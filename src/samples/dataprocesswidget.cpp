@@ -84,6 +84,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     setFormat(fmt);
   }
   PLUG_PROCESS_UNIT register_table[] = {
+    {"EmptyDefault",                              std::make_shared<EmptyDefault>()                  },
     {"PersonificationDecoder",                    std::make_shared<PersonificationDecoder>()        },
     {"HighFrequencySensivityDecoder",             std::make_shared<HighFrequencySensivityDecoder>() }
   };
@@ -91,7 +92,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   for (size_t i = 0; i < sizeof(register_table) / sizeof(PLUG_PROCESS_UNIT); ++i) {
     registerDecoder(register_table[i].name, register_table[i].object);
   }
-  _decoder_active_index = 1;
+//  _decoder_active_index = 0;
 
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
@@ -111,6 +112,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_max_cut_filter", m_max_cut_filter},
       {"m_min_cut_filter", m_min_cut_filter},
       {"m_fft_display_scale", m_fft_display_scale},
+      {"m_decoder", "empty"},
       {"transform", {
         {
           "m_translate", {
@@ -139,6 +141,21 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
+
+  cfg_local["m_decoder"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_string()) return false;
+    auto str1 = std::string(a);
+    auto str2 = std::string(b);
+    if (str1 == str2) return false;
+    size_t i = 0;
+    for(auto it:_decoders) {
+      if (it.name == str2) {
+        _decoder_active_index = i;
+      }
+      i++;
+    }
+    return true;
+  });
 
   cfg_local["transform"]["m_translate"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     m_position.setX(static_cast<float>(b["x"]));

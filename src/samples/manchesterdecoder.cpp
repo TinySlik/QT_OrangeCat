@@ -45,3 +45,29 @@ configuru::Config ManchesterDecoder::syncParams(configuru::Config &cfg) {
 std::shared_ptr<std::vector<float>>  ManchesterDecoder::displayBuffer() {
   return _displayBuffer;
 }
+
+EmptyDefault::EmptyDefault() {}
+
+EmptyDefault::~EmptyDefault()
+{}
+
+configuru::Config EmptyDefault::defaultParams() {
+  LOG(INFO) << __FUNCTION__ << __LINE__;
+  return {};
+}
+
+bool EmptyDefault::reset() {
+  return true;
+}
+
+bool EmptyDefault::decodeBeforeWait(std::shared_ptr<std::vector<float>> data) {
+//  auto cache = *data;
+
+  _displayBuffer = data;
+  return true;
+}
+
+bool EmptyDefault::decodeAfterWait() {
+//  LOG(INFO) << __FUNCTION__ << __LINE__;
+  return false;
+}

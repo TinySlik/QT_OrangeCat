@@ -5,14 +5,13 @@
     "test_switch": 4,
     "display_switch": 2,
     "test_file_path": "C:/Users/dell-a6/Desktop/wavearch/WaveArch/Default.006",
-    "file_load_location": 140400,
+    "file_load_location": 0,
     "fft_level": 1024,
     "buffer_size": 1024,
     "m_max_cut_filter": 1000,
     "m_min_cut_filter": 24,
     "m_fft_display_scale": 0.01,
-    "m_match_alpha": 37,
-    "m_matchClockFrequency": 100,
+    "m_decoder": "PersonificationDecoder",
     "transform": {
       "m_translate": {
         "x": 0,
@@ -44,8 +43,6 @@
     "m_max_cut_filter": 1000,
     "m_min_cut_filter": 24,
     "m_fft_display_scale": 0.01,
-    "m_match_alpha": 50,
-    "m_matchClockFrequency": 100,
     "transform": {
       "m_translate": {
         "x": 0,
@@ -77,8 +74,6 @@
     "m_max_cut_filter": 2,
     "m_min_cut_filter": 1,
     "m_fft_display_scale": 0.01,
-    "m_match_alpha": 50,
-    "m_matchClockFrequency": 100,
     "transform": {
       "m_translate": {
         "x": 0,

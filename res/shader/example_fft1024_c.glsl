@@ -86,7 +86,7 @@ void main() {
         float v = length(values[i][source]);
 
         imageStore(destTex, pos.x, vec4(v  * fft_display_scale, 0.0f, 0.0f, 1.0f));
-    } else {
+    } else if (test_switch == 3) {
         vec4 v_ = imageLoad(destTex, pos.x);
         float val = v_.r;
         values[i][0] = vec2(val, 0.);

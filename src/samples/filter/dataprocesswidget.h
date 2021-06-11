@@ -33,7 +33,7 @@
 #include "logo.h"
 #include "memorymapped.h"
 #include "manchesterdecoder.h"
-#define MAX_PAINT_BUF_SIZE (4096)
+#define MAX_PAINT_BUF_SIZE (32768)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -59,8 +59,6 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   void getData();
 
- public slots:
-
  signals:
   void TitelChanged(const QString &title);
 
@@ -68,8 +66,18 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   void initializeGL() override;
   void paintGL() override;
   void resizeGL(int width, int height) override;
+
+  bool mousePressedTag_;
+  int  mouseX_;
+  int  mouseY_;
+  bool ctrlPressed_;
   void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+//  void mouseDoubleClickEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
+  void keyReleaseEvent(QKeyEvent *event) override;
 
  private:
   void resetBuf(int size);
@@ -111,6 +119,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   bool m_reset_buf_tag;
   int buffer_size;
   bool m_reset_computeshader_tag;
+  int m_samplingSpeed;
 
   QVector3D   m_position;
   QVector3D   m_scale;

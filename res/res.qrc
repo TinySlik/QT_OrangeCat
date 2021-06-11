@@ -26,6 +26,5 @@
         <file>shader/example_fft2048_c.glsl</file>
         <file>shader/example_fft4096_c.glsl</file>
         <file>shader/example_c.glsl</file>
-        <file>shader/example_fft512_c_ach.glsl</file>
     </qresource>
 </RCC>

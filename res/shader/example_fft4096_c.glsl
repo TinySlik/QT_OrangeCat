@@ -104,7 +104,6 @@ void main() {
         if (pos.x >= min_cut_filter && pos.x <= max_cut_filter ) {
             values[i][source] = vec2(0, 0);
         }
-        // end-------------
 
         for (int n = 2; n <= SIZE; n *= 2) {
             fft_pass(n, source, true);

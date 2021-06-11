@@ -32,7 +32,6 @@ void main() {
         float v1 = pow(1.0 - abs(texCoord.t - c.r), 50.0);
         color=vec4(v1);
     } else if (display_switch == 4) {
-
         vec2 uv = (texCoord.xy * 2. - resolution) / resolution.x;
         vec3 color_;
         float y = uv.y + time;
@@ -41,7 +40,6 @@ void main() {
             color_[i] = .01 / (d * d);
         }
         color = vec4(color_, 1.0);
-
     } else if (display_switch == 5) {
         vec2 p = (texCoord.xy * 2.0 - resolution) / min(resolution, resolution);
         vec3 color_ = vec3(0.0, 0.3, 0.5);

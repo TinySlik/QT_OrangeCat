@@ -464,11 +464,11 @@ bool DataProcessWidget::resetComputeShader(int level) {
   if (m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, QString(ora.c_str()))) {
     m_CcomputeProgram->link();
     m_CcomputeProgram->bind();
-    LOG(INFO) << "compute shader -" << ora << "load success.";
+    LOG(INFO) << "compute shader -" << ora << " load success.";
     m_CcomputeProgram->release();
     return true;
   } else {
-    LOG(INFO) << "compute shader -" << ora << "load failed, " << " back to 512 default size.";
+    LOG(INFO) << "compute shader -" << ora << " load failed, " << " back to 512 default size.";
     m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, DEFAULT_COMPUTE_SHADER_PATH);
     return false;
   }

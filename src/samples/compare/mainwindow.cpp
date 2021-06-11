@@ -27,7 +27,7 @@ MainWindow::MainWindow() {
     menuWindow->addAction(addNew);
     connect(addNew, &QAction::triggered, this, &MainWindow::onAddNew);
     setMenuBar(menuBar);
-
+    setWindowOpacity(0.5);
     onAddNew();
 }
 

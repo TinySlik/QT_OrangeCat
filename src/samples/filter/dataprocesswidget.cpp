@@ -30,6 +30,7 @@
 #include "async++.h"
 #include "personificationdecoder.h"
 #include "highfrequencysensivitydecoder.h"
+#include "renderutil.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
@@ -76,6 +77,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_scale(.5f, .5f, 1.f),
     m_rotation(0, 0, 1),
     m_angle(180.f),
+    m_color(0x00FF00FF),
     m_max_cut_filter(2.f),
     m_min_cut_filter(1.f),
     m_fft_display_scale(0.01f) {
@@ -120,6 +122,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_fft_display_scale", m_fft_display_scale},
       {"m_samplingSpeed", m_samplingSpeed},
       {"m_decoder", "empty"},
+      {"front_color", color_format_int_to_string(m_color).c_str()},
       {"transform", {
         {
           "m_translate", {
@@ -148,6 +151,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   };
 
   auto cfg_local = cfg[class_obj_id.c_str()];
+
+  cfg_local["front_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+      if (!b.is_string()) return false;
+      std::string color_string = (std::string)b;
+      m_color = color_format_string_to_int(color_string);
+      return true;
+    });
 
   cfg_local["m_decoder"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
@@ -573,6 +583,13 @@ void DataProcessWidget::paintGL() {
   glUniform1i(srcLoc, 0);
   glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
+
+  auto color = color_format_int_to_qcolor(m_color);
+  m_CrenderProgram->setUniformValue("front_color",
+                                   (GLfloat)(color.redF()),
+                                   (GLfloat)(color.greenF()),
+                                   (GLfloat)(color.blueF()),
+                                   (GLfloat)(color.alphaF()));
 
 #ifdef OS_WIN
   static float ori = get_micro_second() / 1000.f;

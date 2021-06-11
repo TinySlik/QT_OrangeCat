@@ -30,6 +30,7 @@
 #include "async++.h"
 #include "personificationdecoder.h"
 #include "highfrequencysensivitydecoder.h"
+#include "renderutil.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
@@ -48,6 +49,10 @@ static GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 
 DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
+    mousePressedTag_(false),
+    mouseX_(0),
+    mouseY_(0),
+    ctrlPressed_(false),
     m_tex_buf_render_head(nullptr),
     m_tex_tmp_ptr(new std::vector<float>()),
     code_step1_trust_count(0),
@@ -72,6 +77,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_scale(.5f, .5f, 1.f),
     m_rotation(0, 0, 1),
     m_angle(180.f),
+    m_color(0x00FF00FF),
     m_max_cut_filter(2.f),
     m_min_cut_filter(1.f),
     m_fft_display_scale(0.01f) {
@@ -98,6 +104,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(reinterpret_cast<long>(this));
+  this->grabKeyboard();
 
   connect(this, SIGNAL(TitelChanged(const QString &)), parent, SLOT(setWindowTitle(const QString &)));
 
@@ -113,8 +120,9 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_max_cut_filter", m_max_cut_filter},
       {"m_min_cut_filter", m_min_cut_filter},
       {"m_fft_display_scale", m_fft_display_scale},
-      {"m_decoder", "empty"},
       {"m_samplingSpeed", m_samplingSpeed},
+      {"m_decoder", "empty"},
+      {"front_color", color_format_int_to_string(m_color).c_str()},
       {"transform", {
         {
           "m_translate", {
@@ -144,12 +152,12 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
   auto cfg_local = cfg[class_obj_id.c_str()];
 
-  cfg_local["m_samplingSpeed"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
-    if (!b.is_int()) return false;
-    auto tg = int(b);
-    m_samplingSpeed = tg;
-    return true;
-  });
+  cfg_local["front_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+      if (!b.is_string()) return false;
+      std::string color_string = (std::string)b;
+      m_color = color_format_string_to_int(color_string);
+      return true;
+    });
 
   cfg_local["m_decoder"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
@@ -163,6 +171,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       }
       i++;
     }
+    return true;
+  });
+
+  cfg_local["m_samplingSpeed"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_int()) return false;
+    auto tg = int(b);
+    m_samplingSpeed = tg;
     return true;
   });
 
@@ -255,10 +270,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
     emit TitelChanged(QString(tg.c_str()));
-    for (int i = buffer_size; i > 0; i--) {
-      getData();
-    }
-
     LOG(INFO) << "file name: " << tg << " open, size: " << sz;
     return true;
   });
@@ -463,18 +474,18 @@ bool DataProcessWidget::resetComputeShader(int level) {
   if (m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, QString(ora.c_str()))) {
     m_CcomputeProgram->link();
     m_CcomputeProgram->bind();
-    LOG(INFO) << "compute shader -" << ora << "load success.";
+    LOG(INFO) << "compute shader -" << ora << " load success.";
     m_CcomputeProgram->release();
     return true;
   } else {
-    LOG(INFO) << "compute shader -" << ora << "load failed, " << " back to 512 default size.";
+    LOG(INFO) << "compute shader -" << ora << " load failed, " << " back to 512 default size.";
     m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, DEFAULT_COMPUTE_SHADER_PATH);
     return false;
   }
 }
 
 void DataProcessWidget::paintGL() {
-  for (int i = m_samplingSpeed; i >0; i--) {
+  for (size_t i = m_samplingSpeed; i >0; i--) {
     getData();
   }
   static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
@@ -573,6 +584,13 @@ void DataProcessWidget::paintGL() {
   glUniform1i(displaySwitchLoc, m_DisplaySwitch);
   glUniform1f(lineThicknessLoc, m_lineThickness);
 
+  auto color = color_format_int_to_qcolor(m_color);
+  m_CrenderProgram->setUniformValue("front_color",
+                                   (GLfloat)(color.redF()),
+                                   (GLfloat)(color.greenF()),
+                                   (GLfloat)(color.blueF()),
+                                   (GLfloat)(color.alphaF()));
+
 #ifdef OS_WIN
   static float ori = get_micro_second() / 1000.f;
   glUniform1f(timeLoc, float((get_micro_second() / 1000.f)) - ori);
@@ -628,8 +646,57 @@ void DataProcessWidget::resizeGL(int /*w*/, int /*h*/) {
   m_proj.ortho(+0.5f, -0.5f, +0.5f, -0.5f, zNear, zFar);
 }
 
-void DataProcessWidget::mousePressEvent(QMouseEvent *) {
+void DataProcessWidget::mousePressEvent(QMouseEvent *event) {
+  mousePressedTag_ = true;
+  mouseX_ = event->x();
+  mouseY_ = event->y();
+//  LOG(INFO) << __FUNCTION__ << __LINE__ << event->x();
+}
+void DataProcessWidget::mouseReleaseEvent(QMouseEvent *event) {
+  mousePressedTag_ = false;
+  mouseX_ = event->x();
+  mouseY_ = event->y();
+//  LOG(INFO) << __FUNCTION__ << __LINE__ << event->x();
+}
+//void DataProcessWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+//  LOG(INFO) << __FUNCTION__ << __LINE__ << event->x();
+//}
+void DataProcessWidget::mouseMoveEvent(QMouseEvent *event) {
+  auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+  std::string class_obj_id = typeid(*this).name();
+  class_obj_id += std::to_string(reinterpret_cast<long>(this));
+  auto cfg_local = cfg[class_obj_id.c_str()];
+  configuru::Config translate{
+    {"x",     m_position.x() - (float(event->x()) / (float)(this->width()) - float(mouseX_) / (float)(this->width()))},
+    {"y",     m_position.y() + (float(event->y()) / (float)(this->height()) - float(mouseY_) / (float)(this->height()))},
+    {"z",     m_position.z()}
+  };
+  cfg_local["transform"]["m_translate"] << translate;
+  mouseX_ = event->x();
+  mouseY_ = event->y();
 }
 
-void DataProcessWidget::mouseMoveEvent(QMouseEvent *) {
+void DataProcessWidget::wheelEvent(QWheelEvent *event) {
+  auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+  std::string class_obj_id = typeid(*this).name();
+  class_obj_id += std::to_string(reinterpret_cast<long>(this));
+  auto cfg_local = cfg[class_obj_id.c_str()];
+  configuru::Config sc{
+    {"x",     (ctrlPressed_) ? m_scale.x() : (m_scale.x() + float(event->angleDelta().ry()) * 1.0 / 4800.0)},
+    {"y",     (!ctrlPressed_) ? m_scale.y() : (m_scale.y() + float(event->angleDelta().ry()) * 1.0 / 4800.0)},
+    {"z",     m_scale.z()}
+  };
+
+  cfg_local["transform"]["m_scale"] << sc;
+}
+
+void DataProcessWidget::keyPressEvent(QKeyEvent *event) {
+  if(event->key() == Qt::Key_Control) {
+    ctrlPressed_ = true;
+  }
+}
+void DataProcessWidget::keyReleaseEvent(QKeyEvent *event) {
+  if(event->key() == Qt::Key_Control) {
+    ctrlPressed_ = false;
+  }
 }

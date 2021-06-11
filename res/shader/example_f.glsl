@@ -6,6 +6,7 @@ precision mediump float;
 
 uniform sampler1D srcTex;
 uniform float lineThickness;
+uniform vec4 front_color;
 in vec2 texCoord;
 out vec4 color;
 uniform int display_switch;
@@ -19,18 +20,18 @@ void main() {
         vec4 c = texture(srcTex, texCoord.s);
         float v1 = smoothstep(c.r - lineThickness/2.0, c.r, texCoord.y);
         float v2 = smoothstep(c.r + lineThickness/2.0, c.r, texCoord.y);
-        color=vec4(min(v1, v2));
+        color=vec4(min(v1, v2) * front_color);
     } else if (display_switch == 1) {
         float v1 = texture(srcTex, texCoord.s).r;
-        color = vec4(0.f, v1, 0.f, 1.f);
+        color = vec4(v1 * front_color);
     } else if (display_switch == 2) {
         vec4 c = texture(srcTex, texCoord.s);
         float v1 = smoothstep(c.r - lineThickness/2.0, c.r, texCoord.y);
-        color=vec4(0.0, 1.0 - v1, 0.0, 1.0);
+        color=vec4((1.0 - v1) * front_color);
     } else if (display_switch == 3) {
         vec4 c = texture(srcTex, texCoord.s);
         float v1 = pow(1.0 - abs(texCoord.t - c.r), 50.0);
-        color=vec4(v1);
+        color=vec4(v1 * front_color);
     } else if (display_switch == 4) {
         vec2 uv = (texCoord.xy * 2. - resolution) / resolution.x;
         vec3 color_;

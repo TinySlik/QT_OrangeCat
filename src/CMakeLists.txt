@@ -46,6 +46,8 @@ set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/time.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/highfrequencysensivitydecoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/highfrequencysensivitydecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.cpp
     ${QT_FILTER_PLATFORM_FILES}
 )
 
@@ -89,6 +91,8 @@ set(SOURCE_COMPARE_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/compare/time.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/compare/highfrequencysensivitydecoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/compare/highfrequencysensivitydecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/compare/renderutil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/compare/renderutil.cpp
     ${QT_COMPARE_PLATFORM_FILES}
 )
 

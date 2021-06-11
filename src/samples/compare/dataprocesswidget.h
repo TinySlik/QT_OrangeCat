@@ -59,8 +59,6 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   void getData();
 
- public slots:
-
  signals:
   void TitelChanged(const QString &title);
 
@@ -68,8 +66,18 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   void initializeGL() override;
   void paintGL() override;
   void resizeGL(int width, int height) override;
+
+  bool mousePressedTag_;
+  int  mouseX_;
+  int  mouseY_;
+  bool ctrlPressed_;
   void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+//  void mouseDoubleClickEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
+  void keyReleaseEvent(QKeyEvent *event) override;
 
  private:
   void resetBuf(int size);
@@ -117,6 +125,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QVector3D   m_scale;
   QVector3D   m_rotation;
   float m_angle;
+  uint32_t    m_color;
 
   float m_max_cut_filter;
   float m_min_cut_filter;

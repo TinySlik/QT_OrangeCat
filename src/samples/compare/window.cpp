@@ -29,6 +29,7 @@
 Window::Window(MainWindow *mw)
   : mainWindow(mw) {
   glWidget = new DataProcessWidget(this);
+  glWidget->setWindowOpacity(0.5);
 
 //  xSlider = createSlider();
 //  ySlider = createSlider();
@@ -49,6 +50,7 @@ Window::Window(MainWindow *mw)
 //  container->addWidget(zSlider);
 
   QWidget *w = new QWidget;
+  w->setWindowOpacity(0.5);
   w->setLayout(container);
   mainLayout->addWidget(w);
   dockBtn = new QPushButton(tr("Undock"), this);

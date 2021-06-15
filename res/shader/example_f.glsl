@@ -7,6 +7,7 @@ precision mediump float;
 uniform sampler1D srcTex;
 uniform float lineThickness;
 uniform vec4 front_color;
+uniform vec4 background_color;
 in vec2 texCoord;
 out vec4 color;
 uniform int display_switch;
@@ -20,18 +21,26 @@ void main() {
         vec4 c = texture(srcTex, texCoord.s);
         float v1 = smoothstep(c.r - lineThickness/2.0, c.r, texCoord.y);
         float v2 = smoothstep(c.r + lineThickness/2.0, c.r, texCoord.y);
-        color=vec4(min(v1, v2) * front_color);
+        float k = min(v1, v2);
+        float k_ = 1 - k ;
+        color=vec4(k * front_color + k_ * background_color);
     } else if (display_switch == 1) {
         float v1 = texture(srcTex, texCoord.s).r;
-        color = vec4(v1 * front_color);
+        float k = v1;
+        float k_ = 1 - k ;
+        color = vec4(k * front_color + k_ * background_color);
     } else if (display_switch == 2) {
         vec4 c = texture(srcTex, texCoord.s);
         float v1 = smoothstep(c.r - lineThickness/2.0, c.r, texCoord.y);
-        color=vec4((1.0 - v1) * front_color);
+        float k = v1;
+        float k_ = 1 - k ;
+        color = vec4(k_ * front_color + k * background_color);
     } else if (display_switch == 3) {
         vec4 c = texture(srcTex, texCoord.s);
         float v1 = pow(1.0 - abs(texCoord.t - c.r), 50.0);
-        color=vec4(v1 * front_color);
+        float k = v1;
+        float k_ = 1 - k ;
+        color = vec4(k * front_color + k_ * background_color);
     } else if (display_switch == 4) {
         vec2 uv = (texCoord.xy * 2. - resolution) / resolution.x;
         vec3 color_;
@@ -55,5 +64,7 @@ void main() {
           f += 0.001 / pow( pow(abs(p.x + c),2.) + pow(abs(p.y + s),2.),.534+0.5*sin(-time*3.321+i/3.14159265+s*c*0.1));
         }
         color = vec4(vec3(  f*color_), 1.0);
+    } else {
+      color = background_color;
     }
 }

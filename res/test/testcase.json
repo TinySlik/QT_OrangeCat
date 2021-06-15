@@ -1,17 +1,19 @@
 {
   "class DataProcessWidget76538080": {
     "lineThickness": 0.01,
-    "compute1_switch": true,
-    "test_switch": 4,
+    "compute1_switch": false,
+    "test_switch": 3,
     "display_switch": 2,
     "test_file_path": "C:/Users/dell-a6/Desktop/wavearch/WaveArch/Default.006",
-    "file_load_location": 0,
-    "fft_level": 1024,
-    "buffer_size": 1024,
-    "m_max_cut_filter": 1000,
-    "m_min_cut_filter": 24,
+    "fft_level": 512,
+    "buffer_size": 10000,
+    "m_max_cut_filter": 2,
+    "m_min_cut_filter": 1,
     "m_fft_display_scale": 0.01,
-    "m_decoder": "PersonificationDecoder",
+    "m_samplingSpeed": 64,
+    "m_decoder": "empty",
+    "front_color": "#ff0078",
+    "background_color": "#00000000",
     "transform": {
       "m_translate": {
         "x": 0,

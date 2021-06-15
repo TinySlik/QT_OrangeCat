@@ -78,6 +78,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_rotation(0, 0, 1),
     m_angle(180.f),
     m_color(0x00FF00FF),
+    m_backgroundColor(0x00000000),
     m_max_cut_filter(2.f),
     m_min_cut_filter(1.f),
     m_fft_display_scale(0.01f) {
@@ -123,6 +124,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_samplingSpeed", m_samplingSpeed},
       {"m_decoder", "empty"},
       {"front_color", color_format_int_to_string(m_color).c_str()},
+      {"background_color", color_format_int_to_string(m_backgroundColor).c_str()},
       {"transform", {
         {
           "m_translate", {
@@ -156,6 +158,12 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       if (!b.is_string()) return false;
       std::string color_string = (std::string)b;
       m_color = color_format_string_to_int(color_string);
+      return true;
+    });
+  cfg_local["background_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+      if (!b.is_string()) return false;
+      std::string color_string = (std::string)b;
+      m_backgroundColor = color_format_string_to_int(color_string);
       return true;
     });
 
@@ -590,6 +598,12 @@ void DataProcessWidget::paintGL() {
                                    (GLfloat)(color.greenF()),
                                    (GLfloat)(color.blueF()),
                                    (GLfloat)(color.alphaF()));
+  auto back_color = color_format_int_to_qcolor(m_backgroundColor);
+  m_CrenderProgram->setUniformValue("background_color",
+                                   (GLfloat)(back_color.redF()),
+                                   (GLfloat)(back_color.greenF()),
+                                   (GLfloat)(back_color.blueF()),
+                                   (GLfloat)(back_color.alphaF()));
 
 #ifdef OS_WIN
   static float ori = get_micro_second() / 1000.f;

@@ -126,6 +126,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   QVector3D   m_rotation;
   float m_angle;
   uint32_t    m_color;
+  uint32_t    m_backgroundColor;
 
   float m_max_cut_filter;
   float m_min_cut_filter;

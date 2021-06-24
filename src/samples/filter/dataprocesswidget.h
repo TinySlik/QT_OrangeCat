@@ -115,6 +115,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   int m_TestSwitch;
   int m_DisplaySwitch;
   size_t m_file_find_index;
+  size_t _file_find_index_set_tmp;
   int m_fft_level;
   bool m_reset_buf_tag;
   int buffer_size;
@@ -132,6 +133,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   float m_min_cut_filter;
 
   float m_fft_display_scale;
+  bool m_decoder_unsigned;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

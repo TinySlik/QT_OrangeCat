@@ -35,7 +35,8 @@
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
 #define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/example_f.glsl"
-#define FILE_FORMAT_LOCATION_FIX 1713
+//#define FILE_FORMAT_LOCATION_FIX 1713
+#define FILE_FORMAT_LOCATION_FIX 0
 
 bool DataProcessWidget::m_transparent = false;
 
@@ -68,6 +69,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_TestSwitch(0),
     m_DisplaySwitch(4),
     m_file_find_index(0),
+    _file_find_index_set_tmp(0),
     m_fft_level(512),
     m_reset_buf_tag(false),
     buffer_size(512),
@@ -81,7 +83,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_backgroundColor(0x00000000),
     m_max_cut_filter(2.f),
     m_min_cut_filter(1.f),
-    m_fft_display_scale(0.01f) {
+    m_fft_display_scale(0.01f),
+    m_decoder_unsigned(true) {
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -123,6 +126,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_fft_display_scale", m_fft_display_scale},
       {"m_samplingSpeed", m_samplingSpeed},
       {"m_decoder", "empty"},
+      {"m_decoder_unsigned", m_decoder_unsigned},
       {"front_color", color_format_int_to_string(m_color).c_str()},
       {"background_color", color_format_int_to_string(m_backgroundColor).c_str()},
       {"transform", {
@@ -181,6 +185,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     }
     return true;
   });
+
+
 
   cfg_local["m_samplingSpeed"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
@@ -248,6 +254,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     m_file_find_index = static_cast<size_t>(tg);
+    _file_find_index_set_tmp = m_file_find_index;
     LOG(INFO) << "File load location set to : " << m_file_find_index;
     return true;
   });
@@ -314,6 +321,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!b.is_bool()) return false;
     auto tg = static_cast<bool>(b);
     m_ComputeShaderSwitch = tg;
+    return true;
+  });
+
+  cfg_local["m_decoder_unsigned"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+    if (!b.is_bool()) return false;
+    auto tg = static_cast<bool>(b);
+    m_decoder_unsigned = tg;
     return true;
   });
 
@@ -384,7 +398,7 @@ void DataProcessWidget::getData() {
   if (m_fileMMap) {
     size_t size = m_fileMMap->size();
     auto head = m_fileMMap->data();
-    if( m_file_find_index % 600 == 0) {
+    if((m_file_find_index - _file_find_index_set_tmp) % 600 == 0) {
       auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
       std::string class_obj_id = typeid(*this).name();
       class_obj_id += std::to_string(reinterpret_cast<long>(this));
@@ -400,8 +414,15 @@ void DataProcessWidget::getData() {
     uint l1 = static_cast<uint>(head[cur_index]);
     uint l2 = static_cast<uint>(head[cur_index + 1]);
     uint l3 = static_cast<uint>(head[cur_index + 2]);
-    uint res_i = l3 | l2 << 8 | l1 << 16;
-    value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
+    if (m_decoder_unsigned) {
+      uint res_i = l3 | l2 << 8 | l1 << 16;
+      value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
+    } else {
+      uint res_i = l3 | l2 << 8 | l1 << 16;
+      value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
+      if (value < 0.5f) value += 0.5f;
+      else value -= 0.5f;
+    }
 
     m_file_find_index += 6;
   } else {
@@ -467,7 +488,7 @@ void DataProcessWidget::initializeGL() {
   m_vao.release();
 
   connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
-  timer.start(20);
+  timer.start(10);
   m_CcomputeProgram->release();
   m_CrenderProgram->release();
 }
@@ -565,7 +586,8 @@ void DataProcessWidget::paintGL() {
         if (res == -1) {
           // todo
         } else {
-          LOG(INFO) << _decoders[static_cast<size_t>(_decoder_active_index)].name << ": current res---" << res;
+          LOG(INFO) << _decoders[static_cast<size_t>(_decoder_active_index)].name << ": current res---" << res << " || file location: "
+                    << m_file_find_index;
         }
       }
 

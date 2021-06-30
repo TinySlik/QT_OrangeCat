@@ -408,7 +408,7 @@ void DataProcessWidget::getData() {
 
     auto cur_index = FILE_FORMAT_LOCATION_FIX + m_file_find_index ;
     if (cur_index > size - 6) {
-      m_file_find_index = 0;
+      m_file_find_index = _file_find_index_set_tmp;
     }
 
     uint l1 = static_cast<uint>(head[cur_index]);

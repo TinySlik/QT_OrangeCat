@@ -16,6 +16,7 @@
     "m_decoder": "PersonificationDecoder",
     "front_color": "#ff0078",
     "background_color": "#00000000",
+    "m_decoder_unsigned": true,
     "transform": {
       "m_translate": {
         "x": 0,

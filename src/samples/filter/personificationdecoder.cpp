@@ -14,7 +14,11 @@
  */
 
 #include "personificationdecoder.h"
+#define ELPP_THREAD_SAFE
 #include "easylogging++.h"
+
+#include "async++.h"
+//INITIALIZE_EASYLOGGINGPP
 
 
 PersonificationDecoder::PersonificationDecoder():
@@ -40,18 +44,216 @@ bool PersonificationDecoder::reset() {
   return true;
 }
 
+PersonificationDecoder::S_RES PersonificationDecoder::ThreadProcess(
+    const std::string &tp,
+    const int &sz, const bool &tg, const float &avg,
+    const float &scale, std::shared_ptr<std::vector<float>> data) {
+  auto cache = *data;
+  auto avg_fix = avg * scale;
+  bool status_change_tag = (*data)[0] > avg_fix;
+  S_RES res = {std::make_shared<std::vector<float>>(cache), "", 0};
+  std::string tms = "";
+  std::vector<int> tm;
+  for(int i = 0; i < sz; i++) {
+    static int count_i = 0;
+    if ((*data)[static_cast<size_t>(i)] > avg_fix) {
+      cache[static_cast<size_t>(i)] = 1.f;
+      if (tg && !status_change_tag) {
+        int res_local = 4;
+        if (count_i > 150) {
+          res_local = 6;
+        } else if (count_i > 15) {
+          res_local = 5;
+        }
+
+        if (res_local == 4) {
+            res.confidence_level = 12;
+            return res;
+        }
+        if (i > 30 && i < (sz - 30)) {
+          tm.push_back(res_local);
+        }
+        count_i = 0;
+        status_change_tag = true;
+      }
+    } else {
+      cache[static_cast<size_t>(i)] = 0.f;
+      if (tg && status_change_tag) {
+        int res_local = 1;
+        if (count_i > 130) {
+          res_local = 3;
+        } else if (count_i > 15) {
+          res_local = 2;
+        }
+        if (res_local == 1) {
+            res.confidence_level = 12;
+            return res;
+        }
+        if (i > 30 && i < (sz - 30)) {
+          tm.push_back(res_local);
+        }
+        count_i = 0;
+        status_change_tag = false;
+      }
+    }
+    count_i++;
+  }
+  if (tm.size() > 3) {
+    for (size_t h = tm.size() - 2; h > 0; h--) {
+      tms += std::to_string(tm[h]);
+    }
+    _log_locker.lock();
+    std::cout  << scale << " target: " << tms << std::endl;
+    std::cout.flush();
+    _log_locker.unlock();
+    static int e_count = 0;
+
+    // start to decode.
+    for (size_t h = tm.size() - 2; h > 0; h--) {
+      tms += std::to_string(tm[h]);
+    }
+
+//    std::string tp;
+//    for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
+//      tp += m_code_step1_tmp[bp];
+//    }
+    auto asize = int(m_code_step1_tmp.size()) - int(m_code_step1_tmp_cur_head);
+
+//        std::cout  << scale <<" " << tp <<" " << tms << std::endl;
+
+    // case 1:
+    // xxxxx^abcdefg... + abcyyyyy -> xxxxx^abcyyyyy
+    if (asize > 2 && !strncmp(tp.c_str(), tms.c_str(), 3))
+        res.confidence_level = 1;
+    // case 2:
+    // xxxxx^abcdefg... + bcdyyyy -> xxxxxa^bcdyyyy
+    else if (asize > 3 && !strncmp(tp.c_str() + 1, tms.c_str(), 3))
+        res.confidence_level = 2;
+    // case 3:
+    // xxxxx^abc + bc -> xxxxxa^bc
+    else if (asize == 3 && !strncmp(tp.c_str() + 1, tms.c_str(), 2))
+        res.confidence_level = 3;
+    // case 4:
+    // xxxxx^ab + abcXXX -> xxxxx^abcXXX
+    else if (asize == 2 && !strncmp(tp.c_str(), tms.c_str(), 2))
+        res.confidence_level = 4;
+    // case 5:
+    // xxxxx^abcdxxxx + iabcdyyy -> xxxxx^abcdyyy
+    else if (asize > 3 && tms.size() > 4 &&
+             !strncmp(tp.c_str(), tms.c_str() + 1, 4))
+        res.confidence_level = 5;
+    // case 6:
+    // xxxxx^abcdxxxx + iabcdyyy -> xxxxx^abcdyyy
+    else if (asize > 3 && tms.size() > 5 &&
+             !strncmp(tp.c_str(), tms.c_str() + 2, 4))
+        res.confidence_level =6;
+    // case 7:
+    // xxxxx^jabcdexxx + iabcdyyyy -> xxxxxj^abcdyyy
+    else if (asize > 4 &&tms.size() > 4 &&
+             !strncmp(tp.c_str() + 1, tms.c_str() + 1, 4))
+        res.confidence_level = 7;
+    // case 8:
+    // xxxxx^jabcdexxx + inabcdyyyy -> xxxxxj^abcdyyy
+    else if (asize > 4 && tms.size() > 5 &&
+             !strncmp(tp.c_str() + 1, tms.c_str() + 2, 4))
+        res.confidence_level = 8;
+    // case 9:
+    // xxxxx^jkabcdxxxx + inabcdyyy -> xxxxxjk^abcdyyy
+    else if (asize > 5 && tms.size() > 5 &&
+             !strncmp(tp.c_str() + 2, tms.c_str() + 2, 4))
+        res.confidence_level = 9;
+    // case 10:
+    // xxxxx^jkabcdxxxx + iabcdyyy -> xxxxxjk^abcdyyy
+    else if (asize > 5 && tms.size() > 4 &&
+             !strncmp(tp.c_str() + 2, tms.c_str() + 1, 4))
+        res.confidence_level = 10;
+    else {
+      res.confidence_level = 11;
+      if (tms.size() < 3) {
+          return res;
+      }
+      std::string tp1;
+      for (size_t bp = 0; bp < m_code_step1_tmp.size(); bp++) {
+        tp1 += m_code_step1_tmp[bp];
+      }
+//          LOG(INFO) << "current cache: " << tp1 << "|| tm: " << tp <<" || curdecode_target: " << res.decode_res << " || head:" << m_code_step1_tmp_cur_head;
+      e_count++;
+      if (e_count > 2) {
+        res.confidence_level = 12;
+//            reset();
+      }
+    }
+
+    if (res.confidence_level != 11 && res.confidence_level != 12) {
+      e_count = 0;
+    }
+//        _log_locker.lock();
+//        std::cout  << scale << "-------------"<< res.confidence_level << std::endl;
+//        std::cout.flush();
+//        _log_locker.unlock();
+  }
+  res.decode_res = tms;
+
+  return res;
+}
+
 bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>> data) {
   auto cache = *data;
-
   float average = 0.f;
   auto sz = static_cast<int>(data->size());
   for(int i = 0; i < sz; i++) {
     average += (*data)[static_cast<size_t>(i)] / sz;
   }
-  bool status_change_tag = (*data)[0] > average;
 
   bool tg = ++_samplingIndex >= m_samplingRate;
   if (tg) _samplingIndex = 0;
+
+  std::string tp = "";
+  if (tg && m_code_step1_tmp_start_tag) {
+    for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
+      tp += m_code_step1_tmp[bp];
+    }
+    LOG(INFO) << "tp: " << tp;
+
+    float t1 = 0.997f;
+    float t2 = 1.f;
+    float t3 = 1.003f;
+
+    auto task1 = async::spawn([&, this, data]() -> S_RES {
+        return ThreadProcess(tp ,sz, tg, average, t1, data);
+    });
+
+    auto task2 = async::spawn([&, this, data]() -> S_RES {
+        return ThreadProcess(tp ,sz, tg, average, t2, data);
+    });
+
+    auto task3 = async::spawn([&, this, data]() -> S_RES {
+        return ThreadProcess(tp ,sz, tg, average, t3, data);
+    });
+
+    auto tasks_ = async::when_all(task1, task2, task3);
+
+    auto task_check_ = tasks_.then([this, tg, sz](std::tuple< async::task<S_RES>,
+                                                              async::task<S_RES>,
+                                                              async::task<S_RES>> results) -> S_RES {
+
+        if (m_code_step1_tmp_start_tag && tg) {
+          std::cout<< std::get<0>(results).get().confidence_level
+                   << " || "
+                   << std::get<1>(results).get().confidence_level
+                   << " || "
+                   << std::get<2>(results).get().confidence_level
+                   << " || "
+                   << std::endl;
+          std::cout.flush();
+        }
+        return {};
+    });
+
+    task_check_.get();
+  }
+
+  bool status_change_tag = (*data)[0] > average;
 
   std::vector<int> tm;
   for(int i = 0; i < sz; i++) {
@@ -124,7 +326,7 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
         code_step1_trust_count = 0;
       }
       m_code_step1_tmp_str = tms;
-      LOG(INFO) << tms << ".";
+//      LOG(INFO) << tms << ".";
     } else {
       // start to decode.
       std::string tms="";
@@ -314,7 +516,7 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
         e_count = 0;
       }
 
-//#define DEBUG_CAT_STR
+#define DEBUG_CAT_STR
 #ifdef DEBUG_CAT_STR
       LOG(INFO) << "case: " << case_ << "  curdecode_target: " << tms << " head: " << tp;
 #endif

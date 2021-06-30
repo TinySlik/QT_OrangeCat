@@ -18,9 +18,15 @@
 #include "manchesterdecoder.h"
 #include <deque>
 #include <string>
+#include <mutex>
 
 
 class PersonificationDecoder : public ManchesterDecoder {
+  typedef struct spawn_result {
+    std::shared_ptr<std::vector<float>> cache= nullptr;
+    std::string decode_res = "";
+    int confidence_level = 0;
+  } S_RES;
  public:
   PersonificationDecoder();
   virtual ~PersonificationDecoder() override;
@@ -30,6 +36,7 @@ class PersonificationDecoder : public ManchesterDecoder {
   virtual bool reset() override;
 
  private:
+  S_RES ThreadProcess(const std::string &tp, const int &size, const bool &tg, const float &avg, const float &scale, std::shared_ptr<std::vector<float>> data);
   int code_step1_trust_count;
   std::string m_code_step1_tmp_str;
   std::deque <unsigned char> m_code_step1_tmp;
@@ -40,6 +47,7 @@ class PersonificationDecoder : public ManchesterDecoder {
 
   size_t m_samplingRate;
   size_t _samplingIndex;
+  std::mutex _log_locker;
 };
 
 #endif // PERSONIFICATIONDECODER_H

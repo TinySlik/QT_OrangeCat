@@ -29,6 +29,7 @@
 #include "time.h"
 #include "async++.h"
 #include "personificationdecoder.h"
+#include "personificationdecoderv2.h"
 #include "highfrequencysensivitydecoder.h"
 #include "renderutil.h"
 
@@ -97,7 +98,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   PLUG_PROCESS_UNIT register_table[] = {
     {"EmptyDefault",                              std::make_shared<EmptyDefault>()                  },
     {"PersonificationDecoder",                    std::make_shared<PersonificationDecoder>()        },
-    {"HighFrequencySensivityDecoder",             std::make_shared<HighFrequencySensivityDecoder>() }
+    {"HighFrequencySensivityDecoder",             std::make_shared<HighFrequencySensivityDecoder>() },
+    {"PersonificationDecoderV2",                  std::make_shared<PersonificationDecoderV2>()      }
   };
 
   for (size_t i = 0; i < sizeof(register_table) / sizeof(PLUG_PROCESS_UNIT); ++i) {

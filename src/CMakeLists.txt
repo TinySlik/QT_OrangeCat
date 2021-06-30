@@ -43,6 +43,8 @@ set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/manchesterdecoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoderv2.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoderv2.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/time.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/highfrequencysensivitydecoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/highfrequencysensivitydecoder.cpp

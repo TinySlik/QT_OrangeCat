@@ -13,29 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef PERSONIFICATIONDECODER_H
-#define PERSONIFICATIONDECODER_H
+#ifndef PERSONIFICATIONDECODERV2_H
+#define PERSONIFICATIONDECODERV2_H
 #include "manchesterdecoder.h"
 #include <deque>
 #include <string>
 #include <mutex>
 
 
-class PersonificationDecoder : public ManchesterDecoder {
+class PersonificationDecoderV2 : public ManchesterDecoder {
   typedef struct spawn_result {
     std::shared_ptr<std::vector<float>> cache= nullptr;
     std::string decode_res = "";
     int confidence_level = 0;
   } S_RES;
  public:
-  PersonificationDecoder();
-  virtual ~PersonificationDecoder() override;
+  PersonificationDecoderV2();
+  virtual ~PersonificationDecoderV2() override;
   virtual bool decodeBeforeWait(std::shared_ptr<std::vector<float>> data) override;
   virtual bool decodeAfterWait() override;
   virtual configuru::Config defaultParams() override;
   virtual bool reset() override;
 
  private:
+  S_RES ThreadProcess(const std::string &tp, const int &size, const bool &tg, const float &avg, const float &scale, std::shared_ptr<std::vector<float>> data);
   int code_step1_trust_count;
   std::string m_code_step1_tmp_str;
   std::deque <unsigned char> m_code_step1_tmp;
@@ -49,4 +50,4 @@ class PersonificationDecoder : public ManchesterDecoder {
   std::mutex _log_locker;
 };
 
-#endif // PERSONIFICATIONDECODER_H
+#endif // PERSONIFICATIONDECODERV2_H

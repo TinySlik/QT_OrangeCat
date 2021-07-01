@@ -13,10 +13,10 @@
     "m_min_cut_filter": 24,
     "m_fft_display_scale": 0.01,
     "m_samplingSpeed": 1,
-    "m_decoder": "PersonificationDecoder",
+    "m_decoder": "PersonificationDecoderV2",
+    "m_decoder_unsigned": true,
     "front_color": "#ff0078",
     "background_color": "#00000000",
-    "m_decoder_unsigned": true,
     "transform": {
       "m_translate": {
         "x": 0,
@@ -84,7 +84,7 @@
     "m_min_cut_filter": 24,
     "m_fft_display_scale": 0.01,
     "m_samplingSpeed": 1,
-    "m_decoder": "PersonificationDecoder",
+    "m_decoder": "EmptyDefault",
     "front_color": "#00ff09",
     "background_color": "#00000000",
     "transform": {

@@ -21,7 +21,7 @@ PersonificationDecoderV2::PersonificationDecoderV2():
   code_step1_trust_count(0),
   m_code_step1_tmp_start_tag(false),
   m_decode_step2_tmp_start_tag(false),
-  m_samplingRate(20),
+  m_samplingRate(10),
   _samplingIndex(0) {}
 
 PersonificationDecoderV2::~PersonificationDecoderV2()
@@ -47,7 +47,7 @@ PersonificationDecoderV2::S_RES PersonificationDecoderV2::ThreadProcess(
   auto cache = *data;
   auto avg_fix = avg * scale;
   bool status_change_tag = (*data)[0] > avg_fix;
-  S_RES res = {nullptr, "", 0};
+  S_RES res = {nullptr, "", 15};
   std::string tms = "";
   std::vector<int> tm;
   res.decode_res = tms;
@@ -59,13 +59,10 @@ PersonificationDecoderV2::S_RES PersonificationDecoderV2::ThreadProcess(
         int res_local = 4;
         if (count_i > 150) {
           res_local = 6;
-        } else if (count_i > 15) {
+        } else {
           res_local = 5;
         }
 
-        if (res_local == 4) {
-            res.confidence_level = 13;
-        }
         if (i > 30 && i < (sz - 30)) {
           tm.push_back(res_local);
         }
@@ -78,11 +75,8 @@ PersonificationDecoderV2::S_RES PersonificationDecoderV2::ThreadProcess(
         int res_local = 1;
         if (count_i > 130) {
           res_local = 3;
-        } else if (count_i > 15) {
+        } else {
           res_local = 2;
-        }
-        if (res_local == 1) {
-            res.confidence_level = 13;
         }
         if (i > 30 && i < (sz - 30)) {
           tm.push_back(res_local);
@@ -146,11 +140,31 @@ PersonificationDecoderV2::S_RES PersonificationDecoderV2::ThreadProcess(
     else if (asize > 5 && tms.size() > 4 &&
              !strncmp(tp.c_str() + 2, tms.c_str() + 1, 4))
         res.confidence_level = 10;
-    else {
-      res.confidence_level = 11;
+    // case 12:
+    // xxxxxabcdefgxxxx + cdefgyyy -> xxxxxab^cdefgyyy
+    else if (asize > 6 && tms.size() > 4 &&
+             !strncmp(tp.c_str() + 2 , tms.c_str(), 5)) {
+      res.confidence_level = 12;
+    }
+    // case 11:
+    // xxxxx^[abcdef1]xxxx + [abcdef1]yyy -> xxxxx^abcdefyyy
+    else if (asize > 4 && tms.size() > 4) {
+      int count = 0;
+      for(size_t i = 0; i < 5; i++) {
+        if (tp.c_str()[i] == tms.c_str()[i]) {
+          count ++;
+        }
+      }
+      if (count >= 4) {
+        res.confidence_level = 11;
+      } else {
+        res.confidence_level = 15;
+      }
+    } else {
+      res.confidence_level = 15;
     }
   } else {
-    res.confidence_level = 13;
+    res.confidence_level = 16;
   }
   res.decode_res = tms;
   return res;
@@ -242,9 +256,9 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
     for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
       tp += m_code_step1_tmp[bp];
     }
-    float t1 = 1.03f;
+    float t1 = 0.99f;
     float t2 = 1.f;
-    float t3 = 0.97f;
+    float t3 = 0.985f;
 
     auto task1 = async::spawn([&, this, data]() -> S_RES {
         return ThreadProcess(tp ,sz, tg, average, t1, data);
@@ -256,7 +270,7 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
         return ThreadProcess(tp ,sz, tg, average, t3, data);
     });
     auto tasks_ = async::when_all(task1, task2, task3);
-    auto task_check_ = tasks_.then([](std::tuple< async::task<S_RES>,
+    auto task_check_ = tasks_.then([tp](std::tuple< async::task<S_RES>,
                                                   async::task<S_RES>,
                                                   async::task<S_RES>> results) -> S_RES {
         auto r1 = std::get<0>(results).get();
@@ -267,30 +281,18 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
 //                 << r2.confidence_level <<":" << r2.decode_res
 //                 << " || "
 //                 << r3.confidence_level <<":" << r3.decode_res
-//                 << " || "
 //                 << std::endl;
 //        std::cout.flush();
-        if (r2.confidence_level < 3) {
+        if (r2.confidence_level < 13) {
           return r2;
         } else {
           auto cur = r1;
-          if (r1.confidence_level > r2.confidence_level) {
-            if (r3.confidence_level > r2.confidence_level) {
-              cur = r2;
-              if (r2.confidence_level > 6)
-                  std::cout << "special case 2:" << cur.confidence_level << ":" << cur.decode_res << std::endl;
-            } else {
-              cur = r3;
-              std::cout << "special case 3:" << cur.confidence_level << ":"<< cur.decode_res << std::endl;
-            }
+          if (r1.confidence_level > r3.confidence_level) {
+            cur = r3;
+            std::cout << "special case 3:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
           } else {
-            if (r3.confidence_level > r1.confidence_level) {
-              cur = r1;
-              std::cout << "special case 1:" << cur.confidence_level << ":"<< cur.decode_res << std::endl;
-            } else {
-              cur = r3;
-              std::cout << "special case 3:" << cur.confidence_level << ":"<< cur.decode_res << std::endl;
-            }
+            cur = r1;
+            std::cout << "special case 1:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
           }
           std::cout.flush();
           return cur;
@@ -301,11 +303,10 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
     auto res = task_check_.get();
     auto tms = res.decode_res;
 
-    int a = 0 , b = 0, c = 0, d = 0;
-
     switch (res.confidence_level) {
       case 1:
       case 4:
+      case 11:
         if (tms.size() > tp.size()) {
           for (size_t i = 0; i < tms.size() - tp.size(); i++) {
             m_code_step1_tmp.push_back('0');
@@ -324,6 +325,8 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
         for (size_t n = 0; n < tms.size(); n++) {
           m_code_step1_tmp[m_code_step1_tmp_cur_head + 1 + n] = tms.c_str()[n];
         }
+        m_code_step1_tmp_cur_head++;
+        break;
       case 3:
         m_code_step1_tmp_cur_head++;
         break;
@@ -391,14 +394,17 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
         }
         m_code_step1_tmp_cur_head += 2;
         break;
+      case 12:
+        m_code_step1_tmp_cur_head += 2;
+        break;
       default:
         e_count++;
-        if (e_count > 2) {
+        if (e_count > 6) {
           reset();
         }
         return false;
     }
-    if (res.confidence_level < 11) {
+    if (res.confidence_level < 15) {
       e_count = 0;
     }
 
@@ -409,6 +415,7 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
       case 7:
       case 6:
       case 8:
+      case 12:
         if (!m_decode_step2_tmp_start_tag &&
             (m_code_step1_tmp[m_code_step1_tmp_cur_head] == '3' ||
             m_code_step1_tmp[m_code_step1_tmp_cur_head] == '6')) {
@@ -427,6 +434,8 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
               } else if (t1 == '5') {
                 _resualt->push_back('1');
                 m_decode_step2_tmp_cur_head++;
+              } else {
+                m_decode_step2_tmp_cur_head++;
               }
             } else if (t2 == '6') {
               if (t1 == '3') {
@@ -434,6 +443,8 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
                 m_decode_step2_tmp_cur_head++;
               } else if (t1 == '2') {
                 _resualt->push_back('0');
+                m_decode_step2_tmp_cur_head++;
+              } else {
                 m_decode_step2_tmp_cur_head++;
               }
             } else if (t2 == '2') {
@@ -444,6 +455,8 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
                 _resualt->push_back('0');
                 m_decode_step2_tmp_cur_head++;
                 m_decode_step2_tmp_cur_head++;
+              } else {
+                m_decode_step2_tmp_cur_head++;
               }
             } else if (t2 == '5') {
               if (t1 == '3') {
@@ -453,7 +466,11 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
                 _resualt->push_back('1');
                 m_decode_step2_tmp_cur_head++;
                 m_decode_step2_tmp_cur_head++;
+              } else {
+                m_decode_step2_tmp_cur_head++;
               }
+            } else {
+              m_decode_step2_tmp_cur_head++;
             }
 
             if (t1 == '0' || t2 == '0') {

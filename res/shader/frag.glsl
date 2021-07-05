@@ -1,17 +1,21 @@
 #version 430
 
-layout(binding = 0) uniform sampler2D src_texture;
+#ifdef GL_ES
+precision mediump float;
+#endif
 
-in vec2 tex_coord;
+uniform sampler1D srcTex;
+uniform float lineThickness;
+uniform vec4 front_color;
+uniform vec4 background_color;
+in vec2 texCoord;
 out vec4 color;
+uniform int display_switch;
 
-void main()
-{
-   float v = texture(src_texture, vec2(.25*tex_coord.x, 0.)).r;
-   float h = .1*sqrt(v);
+// glslsandbox uniforms
+uniform float time;
+vec2 resolution = vec2(1.f, 1.f);
 
-   if (tex_coord.y > h)
-       discard;
-
-    color = vec4(1., 0., 0., 1.);
+void main() {
+  color = front_color;
 }

@@ -64,7 +64,9 @@ void main() {
           f += 0.001 / pow( pow(abs(p.x + c),2.) + pow(abs(p.y + s),2.),.534+0.5*sin(-time*3.321+i/3.14159265+s*c*0.1));
         }
         color = vec4(vec3(  f*color_), 1.0);
-    } else {
+    } else if (display_switch == 6) {
+      color = front_color;
+    }  else {
       color = background_color;
     }
 }

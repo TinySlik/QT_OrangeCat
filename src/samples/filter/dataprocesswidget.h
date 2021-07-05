@@ -99,6 +99,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::string m_code_step1_tmp_str;
   static bool m_transparent;
   std::shared_ptr<MemoryMapped::File> m_fileMMap;
+  std::vector<GLfloat> verts_;
 
   QOpenGLVertexArrayObject m_Cvao;
   std::shared_ptr<QOpenGLBuffer> m_CvertexBuffer;

@@ -36,18 +36,14 @@
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
 #define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/example_f.glsl"
+
+//#define DEFAULT_VERT_SHADER_PATH ":/shader/vert.glsl"
+//#define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/frag.glsl"
+
 //#define FILE_FORMAT_LOCATION_FIX 1713
 #define FILE_FORMAT_LOCATION_FIX 0
 
 bool DataProcessWidget::m_transparent = false;
-
-static GLfloat g_vertex_buffer_data[] = {
-    -1.0f, -1.0f,
-    -1.0f, 1.0f,
-    1.0f, -1.0f,
-    1.0f, 1.0f
-};
-static GLushort g_element_buffer_data[] = { 0, 1, 2, 3 };
 
 DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
@@ -187,8 +183,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     }
     return true;
   });
-
-
 
   cfg_local["m_samplingSpeed"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
@@ -444,7 +438,10 @@ void DataProcessWidget::getData() {
 
 void DataProcessWidget::initializeGL() {
   initializeOpenGLFunctions();
-  glClearColor(0, 0, 1, 1);
+  glClearColor((float)((m_backgroundColor >> 24)&(0x000000ff)) / 255.0,
+               (float)((m_backgroundColor >> 16)&(0x000000ff)) / 255.0,
+               (float)((m_backgroundColor >> 8) &(0x000000ff)) / 255.0,
+               (float)((m_backgroundColor)      &(0x000000ff)) / 255.0);
 
   m_Cvao.create();
   if (m_Cvao.isCreated()) {
@@ -452,15 +449,17 @@ void DataProcessWidget::initializeGL() {
       LOG(INFO) << "VAO created!";
   }
 
+  for (size_t i = 0; i<= 1024; i++ ) {
+    verts_.push_back(-1.0 + i * 2.f / 1024.0);
+    verts_.push_back(-1.0);
+    verts_.push_back(-1.0 + i * 2.f / 1024.0);
+    verts_.push_back(1.0);
+  }
+
   m_CvertexBuffer->create();
   m_CvertexBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
   m_CvertexBuffer->bind();
-  m_CvertexBuffer->allocate(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
-
-  m_CindexBuffer->create();
-  m_CindexBuffer->setUsagePattern(QOpenGLBuffer::StaticDraw);
-  m_CindexBuffer->bind();
-  m_CindexBuffer->allocate(g_element_buffer_data, sizeof(g_element_buffer_data));
+  m_CvertexBuffer->allocate(verts_.data(), sizeof(GLfloat) * verts_.size());
 
   glActiveTexture(GL_TEXTURE0);
   m_Ctexture->create();
@@ -516,6 +515,10 @@ bool DataProcessWidget::resetComputeShader(int level) {
 }
 
 void DataProcessWidget::paintGL() {
+  glClearColor((float)((m_backgroundColor >> 24)&(0x000000ff)) / 255.0,
+               (float)((m_backgroundColor >> 16)&(0x000000ff)) / 255.0,
+               (float)((m_backgroundColor >> 8) &(0x000000ff)) / 255.0,
+               (float)((m_backgroundColor)      &(0x000000ff)) / 255.0);
   for (size_t i = m_samplingSpeed; i >0; i--) {
     getData();
   }
@@ -647,7 +650,8 @@ void DataProcessWidget::paintGL() {
   // Set modelview-projection matrix
   m_CrenderProgram->setUniformValue("mvp_matrix", m_proj * matrix);
 
-  glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, nullptr);
+//  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 2048);
 
   m_Cvao.release();
   m_CcomputeProgram->release();

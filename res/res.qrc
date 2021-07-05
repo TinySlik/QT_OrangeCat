@@ -2,12 +2,6 @@
     <qresource prefix="/">
         <file>qml/error.qml</file>
         <file>qml/main.qml</file>
-        <file>shader/fft-test.glsl</file>
-        <file>shader/fft.glsl</file>
-        <file>shader/frag.glsl</file>
-        <file>shader/fshader.glsl</file>
-        <file>shader/vert.glsl</file>
-        <file>shader/vshader.glsl</file>
         <file>web_root/cat.svg</file>
         <file>web_root/favicon.ico</file>
         <file>web_root/index.html</file>
@@ -23,8 +17,6 @@
         <file>shader/example_f.glsl</file>
         <file>shader/example_v.glsl</file>
         <file>shader/example_fft1024_c.glsl</file>
-        <file>shader/example_fft2048_c.glsl</file>
-        <file>shader/example_fft4096_c.glsl</file>
         <file>shader/example_c.glsl</file>
     </qresource>
 </RCC>

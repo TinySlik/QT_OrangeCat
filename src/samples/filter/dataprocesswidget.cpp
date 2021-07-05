@@ -37,9 +37,6 @@
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
 #define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/example_f.glsl"
 
-//#define DEFAULT_VERT_SHADER_PATH ":/shader/vert.glsl"
-//#define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/frag.glsl"
-
 //#define FILE_FORMAT_LOCATION_FIX 1713
 #define FILE_FORMAT_LOCATION_FIX 0
 
@@ -101,7 +98,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   for (size_t i = 0; i < sizeof(register_table) / sizeof(PLUG_PROCESS_UNIT); ++i) {
     registerDecoder(register_table[i].name, register_table[i].object);
   }
-//  _decoder_active_index = 0;
 
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();

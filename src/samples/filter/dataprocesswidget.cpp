@@ -28,9 +28,9 @@
 #include "easylogging++.h"
 #include "time.h"
 #include "async++.h"
-#include "personificationdecoder.h"
-#include "personificationdecoderv2.h"
-#include "highfrequencysensivitydecoder.h"
+#include "decoder/personificationdecoder.h"
+#include "decoder/personificationdecoderv2.h"
+#include "decoder/highfrequencysensivitydecoder.h"
 #include "renderutil.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
@@ -688,17 +688,13 @@ void DataProcessWidget::mousePressEvent(QMouseEvent *event) {
   mousePressedTag_ = true;
   mouseX_ = event->x();
   mouseY_ = event->y();
-//  LOG(INFO) << __FUNCTION__ << __LINE__ << event->x();
 }
 void DataProcessWidget::mouseReleaseEvent(QMouseEvent *event) {
   mousePressedTag_ = false;
   mouseX_ = event->x();
   mouseY_ = event->y();
-//  LOG(INFO) << __FUNCTION__ << __LINE__ << event->x();
 }
-//void DataProcessWidget::mouseDoubleClickEvent(QMouseEvent *event) {
-//  LOG(INFO) << __FUNCTION__ << __LINE__ << event->x();
-//}
+
 void DataProcessWidget::mouseMoveEvent(QMouseEvent *event) {
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();

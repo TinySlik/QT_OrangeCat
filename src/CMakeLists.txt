@@ -31,23 +31,21 @@ set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/mainwindow.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/window.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/logo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/window.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/logo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/memorymapped.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/memorymapped.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/dataprocesswidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/dataprocesswidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/manchesterdecoder.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/manchesterdecoder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoder.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoderv2.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/personificationdecoderv2.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/manchesterdecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/manchesterdecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoderv2.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoderv2.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/highfrequencysensivitydecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/highfrequencysensivitydecoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/time.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/highfrequencysensivitydecoder.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/highfrequencysensivitydecoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.cpp
     ${QT_FILTER_PLATFORM_FILES}

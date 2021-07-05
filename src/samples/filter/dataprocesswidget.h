@@ -30,9 +30,8 @@
 #include <QMatrix4x4>
 #include <QTimer>
 
-#include "logo.h"
 #include "memorymapped.h"
-#include "manchesterdecoder.h"
+#include "decoder/manchesterdecoder.h"
 #define MAX_PAINT_BUF_SIZE (32768)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)

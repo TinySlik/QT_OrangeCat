@@ -11,7 +11,6 @@ uniform mat4 mvp_matrix;
 void main() {
   if (display_switch == 6) {
     texCoord = pos*0.5f + 0.5f;
-
     vec4 v = texture(srcTex, texCoord.x);
     vec4 res = vec4(pos.x, pos.y * v.r, 0.0, 1.0);
     if (pos.y < 0) {

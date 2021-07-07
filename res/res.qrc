@@ -18,5 +18,8 @@
         <file>shader/example_v.glsl</file>
         <file>shader/example_fft1024_c.glsl</file>
         <file>shader/example_c.glsl</file>
+        <file>svg/tiger.svg</file>
+        <file>svg/method-draw-image.svg</file>
+        <file>test/testcase.json</file>
     </qresource>
 </RCC>

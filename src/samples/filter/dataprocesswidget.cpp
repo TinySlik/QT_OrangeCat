@@ -24,6 +24,7 @@
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <QBasicTimer>
+#include <QtSvg>
 #include "parameterserver.h"
 #include "easylogging++.h"
 #include "time.h"
@@ -32,6 +33,7 @@
 #include "decoder/personificationdecoderv2.h"
 #include "decoder/highfrequencysensivitydecoder.h"
 #include "renderutil.h"
+#include "adlink.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
@@ -41,6 +43,24 @@
 #define FILE_FORMAT_LOCATION_FIX 0
 
 bool DataProcessWidget::m_transparent = false;
+
+bool DataProcessWidget::initADlinkCard() {
+  auto cardIDVec = adlink::instance()->getAvailCardID();
+  if(cardIDVec.size() > 0) {
+      m_adlink_card_current_ID = cardIDVec[0];
+      adlink::instance()->openCard(m_adlink_card_current_ID);
+      return true;
+  }
+  return false;
+};
+
+bool DataProcessWidget::startADLinkAI() {
+  return false;
+}
+
+bool DataProcessWidget::stopADLinkAI() {
+  return false;
+}
 
 DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
@@ -57,6 +77,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_CcomputeProgram(std::make_shared<QOpenGLShaderProgram>()),
     m_CrenderProgram(std::make_shared<QOpenGLShaderProgram>()),
     m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
+    m_SVGRender(nullptr),
     _decoder_active_index(-1),
     m_lineThickness(0.01f),
     m_ComputeShaderSwitch(true),
@@ -78,7 +99,9 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_max_cut_filter(2.f),
     m_min_cut_filter(1.f),
     m_fft_display_scale(0.01f),
-    m_decoder_unsigned(true) {
+    m_decoder_unsigned(true),
+    m_adlink_card_current_ID(256) {
+  initADlinkCard();
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -112,6 +135,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"test_switch", m_TestSwitch},
       {"display_switch", m_DisplaySwitch},
       {"test_file_path", "empty"},
+      {"svg_background_path", "empty"},
       {"file_load_location", m_file_find_index},
       {"fft_level", m_fft_level},
       {"buffer_size", buffer_size},
@@ -121,6 +145,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_samplingSpeed", m_samplingSpeed},
       {"m_decoder", "empty"},
       {"m_decoder_unsigned", m_decoder_unsigned},
+      {"adlink_card_ID", m_adlink_card_current_ID},
+      {"adlink_card_enable", false},
       {"front_color", color_format_int_to_string(m_color).c_str()},
       {"background_color", color_format_int_to_string(m_backgroundColor).c_str()},
       {"transform", {
@@ -152,13 +178,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
   auto cfg_local = cfg[class_obj_id.c_str()];
 
-  cfg_local["front_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+  cfg_local["front_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
       if (!b.is_string()) return false;
       std::string color_string = (std::string)b;
       m_color = color_format_string_to_int(color_string);
       return true;
     });
-  cfg_local["background_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool{
+  cfg_local["background_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
       if (!b.is_string()) return false;
       std::string color_string = (std::string)b;
       m_backgroundColor = color_format_string_to_int(color_string);
@@ -251,6 +277,28 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return true;
   });
   cfg_local["file_load_location"].set_hiden(true);
+
+  cfg_local["svg_background_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_string()) return false;
+    auto tg = static_cast<std::string>(b);
+    auto ora = static_cast<std::string>(a);
+    if (!m_SVGRender) m_SVGRender = std::make_shared<QSvgRenderer>();
+
+    if (tg == "empty") {
+      if (ora != "empty" && m_SVGRender->isValid()) {
+        LOG(INFO) << "file name: " << ora << " closed";
+        m_SVGRender = nullptr;
+      }
+      return true;
+    }
+
+    if (m_SVGRender->load(QLatin1String(tg.c_str()))) {
+      LOG(INFO) << "pic name: " << tg << " load";
+      return true;
+    }
+    else return false;
+  });
+
   cfg_local["test_file_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
     auto tg = static_cast<std::string>(b);
@@ -315,6 +363,21 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_ComputeShaderSwitch = tg;
     return true;
   });
+
+  cfg_local["adlink_card_enable"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+      if (!b.is_bool()) return false;
+      auto tg = static_cast<bool>(b);
+      auto org = static_cast<bool>(a);
+      if (tg != org) {
+        if (tg) {
+          adlink::instance()->startAI(true, false, false, false, 1000 ,false);
+        } else {
+          adlink::instance()->stopAI();
+        }
+        return true;
+      }
+      return false;
+    });
 
   cfg_local["m_decoder_unsigned"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_bool()) return false;
@@ -384,6 +447,7 @@ QSize DataProcessWidget::minimumSizeHint() const {
 QSize DataProcessWidget::sizeHint() const {
   return QSize(1024, 256);
 }
+
 
 void DataProcessWidget::getData() {
   float value = 0.f;
@@ -511,6 +575,10 @@ bool DataProcessWidget::resetComputeShader(int level) {
 }
 
 void DataProcessWidget::paintGL() {
+  glEnable(GL_ALPHA_TEST);
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(true);
+
   glClearColor((float)((m_backgroundColor >> 24)&(0x000000ff)) / 255.0,
                (float)((m_backgroundColor >> 16)&(0x000000ff)) / 255.0,
                (float)((m_backgroundColor >> 8) &(0x000000ff)) / 255.0,
@@ -528,6 +596,16 @@ void DataProcessWidget::paintGL() {
   static GLint displaySwitchLoc = glGetUniformLocation(m_CrenderProgram->programId(), "display_switch");
   static GLint timeLoc = glGetUniformLocation(m_CrenderProgram->programId(), "time");
   static GLint resolutionLoc = glGetUniformLocation(m_CrenderProgram->programId(), "resolution");
+
+  if (m_SVGRender) {
+    QPainter p(this);
+    p.setRenderHint(QPainter::HighQualityAntialiasing);
+    p.save();
+    p.translate(width()/2, height()/2);
+    p.translate(-width()/2, -height()/2);
+    m_SVGRender->render(&p);
+    p.restore();
+  }
 
   if (m_reset_buf_tag) {
     resetBuf(buffer_size);
@@ -653,6 +731,8 @@ void DataProcessWidget::paintGL() {
   m_CcomputeProgram->release();
   m_CrenderProgram->release();
   m_Ctexture->release();
+  glDisable(GL_ALPHA_TEST);
+  glDisable(GL_DEPTH_TEST);
 }
 
 bool DataProcessWidget::registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj) {

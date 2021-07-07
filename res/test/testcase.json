@@ -1,22 +1,135 @@
 
 {
-  "class DataProcessWidget-927134896": {
-    "lineThickness": 0.01,
+  "fft": {
+    "lineThickness": 0.005,
     "compute1_switch": true,
-    "test_switch": 3,
+    "test_switch": 1,
     "display_switch": 2,
     "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
+    "svg_background_path": "empty",
     "file_load_location": 1713,
     "fft_level": 1024,
     "buffer_size": 1024,
     "m_max_cut_filter": 1000,
     "m_min_cut_filter": 24,
-    "m_fft_display_scale": 0.01,
+    "m_fft_display_scale": 0.05,
     "m_samplingSpeed": 1,
     "m_decoder": "PersonificationDecoderV2",
     "m_decoder_unsigned": true,
     "front_color": "#ff0078",
-    "background_color": "#00000000",
+    "background_color": "#41fd30",
+    "transform": {
+      "m_translate": {
+        "x": -0.72024786,
+        "y": -0.37505192,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 1.2250011205673217,
+        "y": 0.87500137,
+        "z": 1
+      }
+    }
+  },
+  "origin": {
+    "lineThickness": 0.005,
+    "compute1_switch": false,
+    "test_switch": 3,
+    "display_switch": 2,
+    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
+    "svg_background_path": "empty",
+    "file_load_location": 1713,
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 1000,
+    "m_min_cut_filter": 24,
+    "m_fft_display_scale": 0.05,
+    "m_samplingSpeed": 1,
+    "m_decoder": "PersonificationDecoderV2",
+    "m_decoder_unsigned": true,
+    "front_color": "#ffad00",
+    "background_color": "#303afd",
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 1
+      }
+    }
+  },
+  "fft + ifft": {
+    "lineThickness": 0.005,
+    "compute1_switch": true,
+    "test_switch": 3,
+    "display_switch": 6,
+    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
+    "svg_background_path": ":/svg/tiger.svg",
+    "file_load_location": 1713,
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 1000,
+    "m_min_cut_filter": 24,
+    "m_fft_display_scale": 0.05,
+    "m_samplingSpeed": 1,
+    "m_decoder": "EmptyDefault",
+    "m_decoder_unsigned": true,
+    "front_color": "#ff0e00",
+    "background_color": "#f7fd30",
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 1
+      }
+    }
+  },
+
+  "per v1": {
+    "lineThickness": 0.005,
+    "compute1_switch": true,
+    "test_switch": 3,
+    "display_switch": 2,
+    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
+    "svg_background_path": "empty",
+    "file_load_location": 1713,
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 1000,
+    "m_min_cut_filter": 24,
+    "m_fft_display_scale": 0.05,
+    "m_samplingSpeed": 1,
+    "m_decoder": "PersonificationDecoder",
+    "m_decoder_unsigned": true,
+    "front_color": "#00ff2a",
+    "background_color": "#fd3053",
     "transform": {
       "m_translate": {
         "x": 0,
@@ -32,76 +145,6 @@
       "m_scale": {
         "x": 0.5,
         "y": 3,
-        "z": 1
-      }
-    }
-  },
-  "class DataProcessWidget-895391936": {
-    "lineThickness": 0.01,
-    "compute1_switch": true,
-    "test_switch": 3,
-    "display_switch": 2,
-    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
-    "file_load_location": 1713,
-    "fft_level": 1024,
-    "buffer_size": 1024,
-    "m_max_cut_filter": 1000,
-    "m_min_cut_filter": 24,
-    "m_fft_display_scale": 0.01,
-    "m_samplingSpeed": 1,
-    "m_decoder": "EmptyDefault",
-    "front_color": "#fffd00",
-    "background_color": "#00000000",
-    "transform": {
-      "m_translate": {
-        "x": -0.0009803772,
-        "y": -0.5,
-        "z": -1
-      },
-      "m_rotate": {
-        "x": 0,
-        "y": 0,
-        "z": 1
-      },
-      "m_angle": 180,
-      "m_scale": {
-        "x": 0.525,
-        "y": 3,
-        "z": 1
-      }
-    }
-  },
-  "class DataProcessWidget-895383776": {
-    "lineThickness": 0.01,
-    "compute1_switch": false,
-    "test_switch": 3,
-    "display_switch": 2,
-    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
-    "file_load_location": 1713,
-    "fft_level": 1024,
-    "buffer_size": 1024,
-    "m_max_cut_filter": 1000,
-    "m_min_cut_filter": 24,
-    "m_fft_display_scale": 0.01,
-    "m_samplingSpeed": 1,
-    "m_decoder": "EmptyDefault",
-    "front_color": "#00ff09",
-    "background_color": "#00000000",
-    "transform": {
-      "m_translate": {
-        "x": 0,
-        "y": -0.00390625,
-        "z": -1
-      },
-      "m_rotate": {
-        "x": 0,
-        "y": 0,
-        "z": 1
-      },
-      "m_angle": 180,
-      "m_scale": {
-        "x": 0.49999997,
-        "y": 0.49999996423721316,
         "z": 1
       }
     }

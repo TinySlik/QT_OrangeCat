@@ -54,8 +54,10 @@ set(SOURCE_FILTER_FILES ${QRC_FILES}
 include_directories(log)
 include_directories(paramserv)
 include_directories(../3rdparty/asyncplusplus/include)
+include_directories(../3rdparty/ADlink/include)
 
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
 add_executable(sample ${SOURCE_FILTER_FILES})
 
-target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick paramserv Async++)
+target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
+

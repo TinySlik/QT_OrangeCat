@@ -29,6 +29,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
 #include <QTimer>
+#include <QtSvg>
 
 #include "memorymapped.h"
 #include "decoder/manchesterdecoder.h"
@@ -83,6 +84,9 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   bool resetComputeShader(int level);
   bool registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj);
   bool unRegisterDecoder(const std::string & name);
+  bool initADlinkCard();
+  bool startADLinkAI();
+  bool stopADLinkAI();
   QTimer timer;
 
   bool m_core;
@@ -106,6 +110,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   std::shared_ptr<QOpenGLShaderProgram> m_CcomputeProgram;
   std::shared_ptr<QOpenGLShaderProgram> m_CrenderProgram;
   std::shared_ptr<QOpenGLTexture> m_Ctexture;
+  std::shared_ptr<QSvgRenderer> m_SVGRender;
 
   int _decoder_active_index;
   std::vector<PLUG_PROCESS_UNIT> _decoders;
@@ -134,6 +139,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   float m_fft_display_scale;
   bool m_decoder_unsigned;
+  unsigned short m_adlink_card_current_ID;
 };
 
 #endif  // OIL_SRC_DATAPROCESSWIDGET_H_

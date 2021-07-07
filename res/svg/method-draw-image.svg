@@ -1,0 +1,17 @@
+<svg width="640" height="1280" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <g>
+  <title>background</title>
+  <rect fill="#000000" id="canvas_background" height="1282" width="642" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_44" y="94" x="99.5" stroke-width="0" stroke="#ffffff" fill="#000000">的字</text>
+  <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_45" y="242" x="97.5" stroke-width="0" stroke="#ffffff" fill="#000000">hasdfasdfasdf</text>
+  <path id="svg_46" d="m58.00038,372.333491l70.600004,-200.999972l282.399981,0l-70.600004,200.999972l-282.399981,0z" stroke-width="1.5" stroke="#ffffff" fill="#ffffff"/>
+  <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_48" y="235" x="157.5" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#ffffff" fill="#000000">量子感知</text>
+  <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_50" y="240" x="280.5" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#ffffff" fill="#000000">LOGO</text>
+  <line stroke-linecap="null" stroke-linejoin="null" id="svg_51" y2="40" x2="50" y1="40" x1="0" stroke-opacity="null" stroke-width="1.5" stroke="#ffffff" fill="none"/>
+  <ellipse ry="53.5" rx="36" id="svg_52" cy="538.5" cx="76.5" stroke-opacity="null" stroke-width="1.5" stroke="#ffffff" fill="#ffffff"/>
+ </g>
+</svg>

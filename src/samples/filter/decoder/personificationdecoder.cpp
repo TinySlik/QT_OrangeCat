@@ -318,7 +318,7 @@ bool PersonificationDecoder::decodeBeforeWait(std::shared_ptr<std::vector<float>
         e_count = 0;
       }
 
-#define DEBUG_CAT_STR
+//#define DEBUG_CAT_STR
 #ifdef DEBUG_CAT_STR
       LOG(INFO) << "case: " << case_ << "  curdecode_target: " << tms << " head: " << tp;
 #endif

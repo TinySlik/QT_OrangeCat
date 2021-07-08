@@ -44,24 +44,6 @@
 
 bool DataProcessWidget::m_transparent = false;
 
-bool DataProcessWidget::initADlinkCard() {
-  auto cardIDVec = adlink::instance()->getAvailCardID();
-  if(cardIDVec.size() > 0) {
-      m_adlink_card_current_ID = cardIDVec[0];
-      adlink::instance()->openCard(m_adlink_card_current_ID);
-      return true;
-  }
-  return false;
-};
-
-bool DataProcessWidget::startADLinkAI() {
-  return false;
-}
-
-bool DataProcessWidget::stopADLinkAI() {
-  return false;
-}
-
 DataProcessWidget::DataProcessWidget(QWidget *parent)
   : QOpenGLWidget(parent),
     mousePressedTag_(false),
@@ -101,7 +83,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_fft_display_scale(0.01f),
     m_decoder_unsigned(true),
     m_adlink_card_current_ID(256) {
-  initADlinkCard();
   // QSurfaceFormat::CompatibilityProfile
   m_core = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
   // --transparent causes the clear color to be transparent. Therefore, on systems that
@@ -366,13 +347,48 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
   cfg_local["adlink_card_enable"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
       if (!b.is_bool()) return false;
+      if (m_adlink_card_current_ID == 256) {
+        auto cardIDVec = adlink::instance()->getAvailCardID();
+        if(cardIDVec.size() > 0) {
+          auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+          std::string class_obj_id = typeid(*this).name();
+          class_obj_id += std::to_string(reinterpret_cast<long>(this));
+          auto cfg_local = cfg[class_obj_id.c_str()];
+          m_adlink_card_current_ID = cardIDVec[0];
+          cfg_local["adlink_card_ID"] = m_adlink_card_current_ID;
+          adlink::instance()->openCard(m_adlink_card_current_ID);
+        } else {
+          return false;
+        }
+      }
       auto tg = static_cast<bool>(b);
       auto org = static_cast<bool>(a);
       if (tg != org) {
         if (tg) {
-          adlink::instance()->startAI(true, false, false, false, 1000 ,false);
+          adlink::instance()->startAI(true, false, false, false, 8192 ,false);
+          // about 32 Hz
+          adlink::instance()->setRawDataCallback1([this](std::shared_ptr<std::vector<unsigned char>> data) {
+            static int ss = 0;
+//            std::cout << "bingo" << ss++ << "|||" <<  data->size() << std::endl;
+            std::cout.flush();
+            std::vector<float> res;
+            unsigned char * cur = data->data();
+            for (size_t i = 0; i < data->size()/3; i++) {
+              uint l1 = cur[0];
+              uint l2 = cur[1];
+              uint l3 = cur[2];
+              uint res_i = l3 | l2 << 8 | l1 << 16;
+              auto value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
+              if (value < 0.5f) value += 0.5f;
+              else value -= 0.5f;
+              res.push_back(value);
+              cur += 3;
+            }
+            getData(std::make_shared<std::vector<float>>(res));
+          });
         } else {
           adlink::instance()->stopAI();
+          m_adlink_card_current_ID = 256;
         }
         return true;
       }
@@ -449,51 +465,62 @@ QSize DataProcessWidget::sizeHint() const {
 }
 
 
-void DataProcessWidget::getData() {
-  float value = 0.f;
-  if (m_fileMMap) {
-    size_t size = m_fileMMap->size();
-    auto head = m_fileMMap->data();
-    if((m_file_find_index - _file_find_index_set_tmp) % 600 == 0) {
-      auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
-      std::string class_obj_id = typeid(*this).name();
-      class_obj_id += std::to_string(reinterpret_cast<long>(this));
-      auto cfg_local = cfg[class_obj_id.c_str()];
-      cfg_local["file_load_location"] = m_file_find_index;
+void DataProcessWidget::getData(std::shared_ptr<std::vector<float>> data) {
+  if (!data) {
+    float value = 0.f;
+    if (m_fileMMap) {
+      size_t size = m_fileMMap->size();
+      auto head = m_fileMMap->data();
+      if((m_file_find_index - _file_find_index_set_tmp) % 600 == 0) {
+        auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+        std::string class_obj_id = typeid(*this).name();
+        class_obj_id += std::to_string(reinterpret_cast<long>(this));
+        auto cfg_local = cfg[class_obj_id.c_str()];
+        cfg_local["file_load_location"] = m_file_find_index;
+      }
+
+      auto cur_index = FILE_FORMAT_LOCATION_FIX + m_file_find_index ;
+      if (cur_index > size - 6) {
+        m_file_find_index = _file_find_index_set_tmp;
+      }
+
+      uint l1 = static_cast<uint>(head[cur_index]);
+      uint l2 = static_cast<uint>(head[cur_index + 1]);
+      uint l3 = static_cast<uint>(head[cur_index + 2]);
+      if (m_decoder_unsigned) {
+        uint res_i = l3 | l2 << 8 | l1 << 16;
+        value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
+      } else {
+        uint res_i = l3 | l2 << 8 | l1 << 16;
+        value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
+        if (value < 0.5f) value += 0.5f;
+        else value -= 0.5f;
+      }
+
+      m_file_find_index += 6;
     }
 
-    auto cur_index = FILE_FORMAT_LOCATION_FIX + m_file_find_index ;
-    if (cur_index > size - 6) {
-      m_file_find_index = _file_find_index_set_tmp;
-    }
-
-    uint l1 = static_cast<uint>(head[cur_index]);
-    uint l2 = static_cast<uint>(head[cur_index + 1]);
-    uint l3 = static_cast<uint>(head[cur_index + 2]);
-    if (m_decoder_unsigned) {
-      uint res_i = l3 | l2 << 8 | l1 << 16;
-      value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
+    if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
+      m_tex_buf_render_head--;
     } else {
-      uint res_i = l3 | l2 << 8 | l1 << 16;
-      value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
-      if (value < 0.5f) value += 0.5f;
-      else value -= 0.5f;
+      m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
     }
 
-    m_file_find_index += 6;
+    *m_tex_buf_render_head = value;
+    *(m_tex_buf_render_head + MAX_PAINT_BUF_SIZE) = value;
   } else {
-//    value = static_cast<float>((rand() % 1000) / 1000.f);
-      value = 0.f;
-  }
+    for (size_t i = 0; i < data->size(); i++) {
+      float value = (*data)[i];
+      if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
+        m_tex_buf_render_head--;
+      } else {
+        m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
+      }
 
-  if (m_tex_buf_render_head - m_tex_buf.data() > 0) {
-    m_tex_buf_render_head--;
-  } else {
-    m_tex_buf_render_head = m_tex_buf.data() + MAX_PAINT_BUF_SIZE;
+      *m_tex_buf_render_head = value;
+      *(m_tex_buf_render_head + MAX_PAINT_BUF_SIZE) = value;
+    }
   }
-
-  *m_tex_buf_render_head = value;
-  *(m_tex_buf_render_head + MAX_PAINT_BUF_SIZE) = value;
 }
 
 void DataProcessWidget::initializeGL() {
@@ -583,9 +610,10 @@ void DataProcessWidget::paintGL() {
                (float)((m_backgroundColor >> 16)&(0x000000ff)) / 255.0,
                (float)((m_backgroundColor >> 8) &(0x000000ff)) / 255.0,
                (float)((m_backgroundColor)      &(0x000000ff)) / 255.0);
-  for (size_t i = m_samplingSpeed; i >0; i--) {
-    getData();
-  }
+  if (m_adlink_card_current_ID == 256)
+      for (size_t i = m_samplingSpeed; i >0; i--) {
+        getData();
+      }
   static GLint srcLoc = glGetUniformLocation(m_CrenderProgram->programId(), "srcTex");
   static GLint destLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "destTex");
   static GLint testSwitchLoc = glGetUniformLocation(m_CcomputeProgram->programId(), "test_switch");

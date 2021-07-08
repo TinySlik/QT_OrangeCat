@@ -5,20 +5,59 @@
 #include "JytekAiDataProcess.h"
 #include <map>
 #include <vector>
+#include <memory>
 
 #ifndef MAX_CHAN_2405
 #define MAX_CHAN_2405	4
 #endif
 
 #ifndef AI_SAMPLE_COUNT
-#define AI_SAMPLE_COUNT	512
+#define AI_SAMPLE_COUNT	256
 #endif
 
 class adlink;
 
 class JytekAi {
+  using callback_adlink_t = std::function<void(std::shared_ptr<std::vector<unsigned char>>)>;
+  typedef struct remote_unit {
+    bool enable;
+    callback_adlink_t callback;
+    bool isNeedCallback() {
+      return enable && callback;
+    }
+  } REMOTE_UNIT;
   explicit JytekAi();
   ~JytekAi();
+
+  bool setRawDataCallback(callback_adlink_t callback);
+  inline bool setRawDataCallback1(callback_adlink_t callback) {
+    if (m_remotes.size() == 4) {
+      m_remotes[0].callback = callback;
+      return true;
+    }
+    return false;
+  }
+  inline bool setRawDataCallback2(callback_adlink_t callback) {
+    if (m_remotes.size() == 4) {
+      m_remotes[1].callback = callback;
+      return true;
+    }
+    return false;
+  }
+  inline bool setRawDataCallback3(callback_adlink_t callback) {
+    if (m_remotes.size() == 4) {
+      m_remotes[2].callback = callback;
+      return true;
+    }
+    return false;
+  }
+  inline bool setRawDataCallback4(callback_adlink_t callback){
+    if (m_remotes.size() == 4) {
+      m_remotes[3].callback = callback;
+      return true;
+    }
+    return false;
+  }
 
   /**
    * @brief setCardId
@@ -52,6 +91,8 @@ protected:
   void run();
 
 private:
+  std::vector<REMOTE_UNIT> m_remotes;
+  callback_adlink_t raw_callback_func;
   bool m_stop;
   bool m_saveFile;
 

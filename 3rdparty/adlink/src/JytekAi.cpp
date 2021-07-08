@@ -10,33 +10,36 @@ static void callback_data(void) {
 }
 
 JytekAi::JytekAi() :
-m_task(nullptr) {
+m_task(nullptr),
+raw_callback_func(nullptr) {
   m_wChan  = std::vector<U16>(MAX_CHAN_2405);
   m_pAIBuf = std::vector<U32>(AI_SAMPLE_COUNT*MAX_CHAN_2405);
-
-//  qRegisterMetaType<U16>("U16");
-//  connect(m_dataProcess,&JytekDataProcess::readData_signal,this,&JytekDaq::readData_signal);
+  for(size_t i = 0; i< 4; i++) {
+    m_remotes.push_back({false, nullptr});
+  }
 }
 
-JytekAi::~JytekAi()
-{
+JytekAi::~JytekAi() {
   this->stopAI();
 }
 
-void JytekAi::setCardId(const I16 &id)
-{
+void JytekAi::setCardId(const I16 &id) {
   cardNum = id;
 }
 
-bool JytekAi::startAI(const bool &channel0, const bool &channel1, const bool &channel2, const bool &channel3, const double &sampleRate, const bool &saveFile)
-{
+bool JytekAi::startAI(const bool &channel0, const bool &channel1, const bool &channel2,
+                      const bool &channel3, const double &sampleRate, const bool &saveFile) {
   m_fSampleRate = sampleRate;
   m_saveFile    = saveFile;
+  m_remotes[0].enable = channel0;
+  m_remotes[1].enable = channel1;
+  m_remotes[2].enable = channel2;
+  m_remotes[3].enable = channel3;
 
-  I16 err = UD_AI_2405_Chan_Config( cardNum, ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential),
-                                             ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential),
-                                             ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential),
-                                             ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential) );
+  I16 err = UD_AI_2405_Chan_Config(cardNum, ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential),
+                                            ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential),
+                                            ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential),
+                                            ( P2405_AI_DisableIEPE | P2405_AI_Coupling_None | P2405_AI_Differential) );
 
   if( err != DaqNoError ) {
     std::cout  << "UD_AI_2405_Chan_Config() failed, error code = " << err << std::endl;;
@@ -88,27 +91,27 @@ bool JytekAi::startAI(const bool &channel0, const bool &channel1, const bool &ch
   // auto res = UD_AI_EventCallBack(cardNum, AIEnd, P1902_EVT_TYPE_EPT0, (U32)(callback_data));
   //  std::cout << "call back res." << res << std::endl;
   //  std::cout.flush();
-  m_task = std::make_shared<std::thread>([this](){
+  m_task = std::make_shared<std::thread>([this]() {
     run();
   });
-//  m_dataProcess.startProcess(m_wSelectedChans,m_wChan);
 
   return true;
 }
 
 void JytekAi::stopAI() {
-//  m_dataProcess.stopProcess();
   U32 count;
   UD_AI_AsyncClear(cardNum, &count);
-  std::cout << "hehe" << std::endl;
-  std::cout.flush();
   m_stop = true;
   m_task -> join();
-//  this->wait();
 }
 
 std::map<U16, std::vector<double> > JytekAi::getTransferDatas() {
   return m_dataProcess.getTransferDatas();
+}
+
+bool JytekAi::setRawDataCallback(callback_adlink_t callback) {
+  raw_callback_func = callback;
+  return true;
 }
 
 void JytekAi::run() {
@@ -117,16 +120,63 @@ void JytekAi::run() {
     BOOLEAN fstop;
     while (!m_stop) {
       I16 err = UD_AI_AsyncDblBufferHalfReady(cardNum, &HalfReady, &fstop);
-
-       // half-buffer ready
+      // half-buffer ready
       if( HalfReady ) {
-          static int xx = 0;
-          std::cout << xx++ << std::endl;
-          std::cout.flush();
         err = UD_AI_AsyncDblBufferTransfer32(cardNum, m_pAIBuf.data());
+        if (raw_callback_func != nullptr) {
+          std::vector<unsigned char> data;
+          for (size_t i = 0; i < m_pAIBuf.size() / 2; i++) {
+            data.push_back((m_pAIBuf[i] >> 24) & 0xFF);
+            data.push_back((m_pAIBuf[i] >> 16) & 0xFF);
+            data.push_back((m_pAIBuf[i] >> 8) & 0xFF);
+            data.push_back((m_pAIBuf[i]) & 0xFF);
+          }
+          raw_callback_func(std::make_shared<std::vector<unsigned char>>(data));
+        }
+        int enable_count = 0;
+        int ready_to_transport_count = 0;
+        std::vector<std::shared_ptr<std::vector<unsigned char>>> res;
+        for (size_t i = 0; i < m_remotes.size(); ++i) {
+          if (m_remotes[i].enable) {
+            enable_count++;
+            if (m_remotes[i].callback && m_remotes[i].enable) {
+              res.push_back(std::make_shared<std::vector<unsigned char>>());
+              ready_to_transport_count++;
+            } else {
+              res.push_back(nullptr);
+            }
+          }
+        }
+        if (ready_to_transport_count) {
+          unsigned char* cur = (unsigned char*)(m_pAIBuf.data());
+          size_t active_size = (m_pAIBuf.size() * 0.5 * (enable_count / 4.0));
+          int filter_tag = 0;
+          for (size_t i = 0; i < active_size; i++) {
+            if (filter_tag >= enable_count) filter_tag = 0;
+            if (res[filter_tag]) {
+              cur ++;
+              (*res[filter_tag]).push_back(*cur);
+              cur ++;
+              (*res[filter_tag]).push_back(*cur);
+              cur ++;
+              (*res[filter_tag]).push_back(*cur);
+              cur ++;
+            } else {
+              cur += 4;
+            }
+            filter_tag ++;
+          }
+          int cur_res_index = 0;
+          for (size_t i = 0; i < m_remotes.size(); ++i) {
+            if (m_remotes[i].enable) {
+              if (m_remotes[i].callback)
+                m_remotes[i].callback(res[cur_res_index]);
+              cur_res_index++;
+            }
+          }
+        }
         break;
       }
-
       std::this_thread::sleep_for(std::chrono::microseconds(1));
     }
   }

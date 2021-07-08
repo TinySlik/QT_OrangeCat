@@ -64,8 +64,8 @@ bool adlink::openCard(const uint16_t nCardID) {
 }
 
 bool adlink::startAI(const bool &channel0, const bool &channel1,
-                       const bool &channel2, const bool &channel3,
-                       const double &sampleRate, const bool &saveFile) {
+                     const bool &channel2, const bool &channel3,
+                     const double &sampleRate, const bool &saveFile) {
   return m_ai.startAI(channel0, channel1, channel2, channel3, sampleRate, saveFile);
 }
 
@@ -76,6 +76,32 @@ void adlink::stopAI() {
 std::map<uint16_t, std::vector<double>> adlink::getTransferDatas() {
   return m_ai.getTransferDatas();
 }
+
+bool adlink::setRawDataCallback(callback_adlink_t callback) {
+  m_ai.setRawDataCallback(callback);
+  return true;
+}
+
+bool adlink::setRawDataCallback1(callback_adlink_t callback) {
+  m_ai.setRawDataCallback1(callback);
+  return true;
+}
+
+bool adlink::setRawDataCallback2(callback_adlink_t callback) {
+  m_ai.setRawDataCallback2(callback);
+  return true;
+}
+
+bool adlink::setRawDataCallback3(callback_adlink_t callback) {
+  m_ai.setRawDataCallback3(callback);
+  return true;
+}
+
+bool adlink::setRawDataCallback4(callback_adlink_t callback) {
+  m_ai.setRawDataCallback4(callback);
+  return true;
+}
+
 
 void adlink::startDIO(const bool &channel0, const bool &channel1) {
   m_dio.startDIO(channel0, channel1);

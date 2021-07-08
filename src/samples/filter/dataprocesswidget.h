@@ -57,7 +57,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   void reset(size_t size);
 
-  void getData();
+  void getData(std::shared_ptr<std::vector<float>> data = nullptr);
 
  signals:
   void TitelChanged(const QString &title);
@@ -84,9 +84,6 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   bool resetComputeShader(int level);
   bool registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj);
   bool unRegisterDecoder(const std::string & name);
-  bool initADlinkCard();
-  bool startADLinkAI();
-  bool stopADLinkAI();
   QTimer timer;
 
   bool m_core;

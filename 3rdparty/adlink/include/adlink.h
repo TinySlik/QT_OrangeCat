@@ -29,6 +29,7 @@
 #include "JytekDIO.h"
 
 class CLASS_DECLSPEC adlink {
+  using callback_adlink_t = std::function<void(std::shared_ptr<std::vector<unsigned char>>)>;
 public:
   static adlink *instance() {
     static adlink *_this = nullptr;
@@ -37,6 +38,12 @@ public:
     }
     return _this;
   }
+
+  bool setRawDataCallback(callback_adlink_t callback);
+  bool setRawDataCallback1(callback_adlink_t callback);
+  bool setRawDataCallback2(callback_adlink_t callback);
+  bool setRawDataCallback3(callback_adlink_t callback);
+  bool setRawDataCallback4(callback_adlink_t callback);
 
   /**
    * @brief getAvailCardID  获取可用设备
@@ -77,7 +84,9 @@ public:
   void stopDIO();
 
   std::map<int, std::vector<bool>> getDioDatas();
+  void registerCallFunc();
 private:
+  callback_adlink_t raw_callback_func;
   explicit adlink();
   ~adlink();
   int16_t cardNum;

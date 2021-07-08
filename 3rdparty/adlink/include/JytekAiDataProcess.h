@@ -48,7 +48,7 @@ private:
   U16  m_wSelectedChans;
   std::vector<U16>  m_wChan;
 
-  std::queue<std::vector<U32> > m_bufs;
+  std::queue<std::vector<U32>> m_bufs;
   std::map<U16, std::vector<double>> m_transferDatas;
   friend JytekAi;
 };

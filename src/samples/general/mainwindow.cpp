@@ -13,31 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef BROWSER_H
-#define BROWSER_H
+#include "mainwindow.h"
+#include <QMenuBar>
+#include <QMenu>
+#include <QMessageBox>
+#include "window.h"
 
-#include "downloadmanagerwidget.h"
+MainWindow::MainWindow() {
+    onAddNew();
+}
 
-#include <QVector>
-#include <QWebEngineProfile>
+MainWindow::~MainWindow() {
+    //
+}
 
-class BrowserWindow;
-
-class Browser
-{
-public:
-    Browser();
-
-    QVector<BrowserWindow*> windows() { return m_windows; }
-
-    BrowserWindow *createWindow(bool offTheRecord = false);
-    BrowserWindow *createDevToolsWindow();
-
-    DownloadManagerWidget &downloadManagerWidget() { return m_downloadManagerWidget; }
-
-private:
-    QVector<BrowserWindow*> m_windows;
-    DownloadManagerWidget m_downloadManagerWidget;
-    QScopedPointer<QWebEngineProfile> m_otrProfile;
-};
-#endif // BROWSER_H
+void MainWindow::onAddNew() {
+  setCentralWidget(new Window(this));
+}

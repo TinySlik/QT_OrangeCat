@@ -13,33 +13,38 @@
  * limitations under the License.
  */
 
-#ifndef WEBPOPUPWINDOW_H
-#define WEBPOPUPWINDOW_H
+#ifndef OIL_SRC_WINDOW_H_
+#define OIL_SRC_WINDOW_H_
 
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
-class QLineEdit;
-class QWebEngineProfile;
-class QWebEngineView;
+class QSlider;
+class QPushButton;
 QT_END_NAMESPACE
 
-class WebView;
+class DisplayWidget;
+class MainWindow;
 
-class WebPopupWindow : public QWidget
-{
-    Q_OBJECT
+class Window : public QWidget {
+  Q_OBJECT
 
-public:
-    WebPopupWindow(QWebEngineProfile *profile);
-    WebView *view() const;
+ public:
+  explicit Window(MainWindow *mw);
 
-private slots:
-    void handleGeometryChangeRequested(const QRect &newGeometry);
+ protected:
+  void keyPressEvent(QKeyEvent *event) override;
 
-private:
-    QLineEdit *m_urlLineEdit;
-    QAction *m_favAction;
-    WebView *m_view;
+ private slots:
+ private:
+  QSlider *createSlider();
+
+  DisplayWidget *glWidget;
+  QSlider *xSlider;
+  QSlider *ySlider;
+  QSlider *zSlider;
+  QPushButton *dockBtn;
+  MainWindow *mainWindow;
 };
-#endif // WEBPOPUPWINDOW_H
+
+#endif  // OIL_SRC_WINDOW_H_

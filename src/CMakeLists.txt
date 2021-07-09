@@ -51,6 +51,30 @@ set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${QT_FILTER_PLATFORM_FILES}
 )
 
+if(OS_WIN)
+  set(QT_GENERAL_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/impl.win32.cpp)
+else()
+  set(QT_GENERAL_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/impl.linux.cpp)
+endif()
+
+set(SOURCE_GENERAL_FILES ${QRC_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/urldecode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/window.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/window.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/memorymapped.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/memorymapped.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/displaywidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/displaywidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/time.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/renderutil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/renderutil.cpp
+    ${QT_GENERAL_PLATFORM_FILES}
+)
+
 include_directories(log)
 include_directories(paramserv)
 include_directories(../3rdparty/asyncplusplus/include)
@@ -61,3 +85,6 @@ add_executable(sample ${SOURCE_FILTER_FILES})
 
 target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
 
+add_executable(display ${SOURCE_GENERAL_FILES})
+
+target_link_libraries(display PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv)

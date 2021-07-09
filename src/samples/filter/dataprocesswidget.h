@@ -73,7 +73,6 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   bool ctrlPressed_;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
-//  void mouseDoubleClickEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
@@ -84,6 +83,7 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   bool resetComputeShader(int level);
   bool registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj);
   bool unRegisterDecoder(const std::string & name);
+  std::string getComputeShaderContent(int level);
   QTimer timer;
 
   bool m_core;

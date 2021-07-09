@@ -16,6 +16,8 @@
     "m_samplingSpeed": 1,
     "m_decoder": "PersonificationDecoderV2",
     "m_decoder_unsigned": true,
+    "adlink_card_ID": 256,
+    "adlink_card_enable": false,
     "front_color": "#ff0078",
     "background_color": "#41fd30",
     "transform": {
@@ -53,6 +55,8 @@
     "m_samplingSpeed": 1,
     "m_decoder": "PersonificationDecoderV2",
     "m_decoder_unsigned": true,
+    "adlink_card_ID": 256,
+    "adlink_card_enable": false,
     "front_color": "#ffad00",
     "background_color": "#303afd",
     "transform": {
@@ -90,12 +94,14 @@
     "m_samplingSpeed": 1,
     "m_decoder": "EmptyDefault",
     "m_decoder_unsigned": true,
+    "adlink_card_ID": 256,
+    "adlink_card_enable": false,
     "front_color": "#ff0e00",
     "background_color": "#f7fd30",
     "transform": {
       "m_translate": {
-        "x": 0,
-        "y": 0,
+        "x": 0.0011291504,
+        "y": 0.94745058,
         "z": -1
       },
       "m_rotate": {
@@ -105,13 +111,12 @@
       },
       "m_angle": 180,
       "m_scale": {
-        "x": 0.5,
-        "y": 0.5,
+        "x": 0.49999999403953554,
+        "y": 2.5249999,
         "z": 1
       }
     }
   },
-
   "per v1": {
     "lineThickness": 0.005,
     "compute1_switch": true,
@@ -128,6 +133,8 @@
     "m_samplingSpeed": 1,
     "m_decoder": "PersonificationDecoder",
     "m_decoder_unsigned": true,
+    "adlink_card_ID": 256,
+    "adlink_card_enable": false,
     "front_color": "#00ff2a",
     "background_color": "#fd3053",
     "transform": {

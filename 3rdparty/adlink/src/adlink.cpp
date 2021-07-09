@@ -51,11 +51,11 @@ std::vector<uint16_t> adlink::getAvailCardID() {
 bool adlink::openCard(const uint16_t nCardID) {
   cardNum = UD_Register_Card(USB_2405,nCardID);
   if((cardNum < 0) || (cardNum > MAX_USB_DEVICE -1)) {
-    std::cout << "Register_Card ERROR" << cardNum;
+    std::cout << "openCard failed: " << cardNum << std::endl;
     std::cout.flush();
     return false;
   } else {
-    std::cout << "Register_Card success" << cardNum;
+    std::cout << "openCard success: " << cardNum << std::endl;
     std::cout.flush();
     m_ai.setCardId(cardNum);
     m_dio.setCardId(cardNum);

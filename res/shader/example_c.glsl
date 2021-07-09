@@ -1,7 +1,3 @@
-#version 430
-
-#define SIZE 512
-
 #define PI 3.14159265358979323844
 
 uniform int test_switch;

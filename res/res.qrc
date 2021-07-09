@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>qml/error.qml</file>
-        <file>qml/main.qml</file>
         <file>web_root/cat.svg</file>
         <file>web_root/favicon.ico</file>
         <file>web_root/index.html</file>
@@ -13,10 +11,8 @@
         <file>web_root/style.css</file>
         <file>web_root/test.txt</file>
         <file>res.qrc</file>
-        <file>shader/example_fft512_c.glsl</file>
         <file>shader/example_f.glsl</file>
         <file>shader/example_v.glsl</file>
-        <file>shader/example_fft1024_c.glsl</file>
         <file>shader/example_c.glsl</file>
         <file>svg/tiger.svg</file>
         <file>svg/method-draw-image.svg</file>

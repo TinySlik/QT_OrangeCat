@@ -39,6 +39,7 @@
 #define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
 #define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/example_f.glsl"
 
+#define DEFAULT_FFT_LEVEL 512
 //#define FILE_FORMAT_LOCATION_FIX 1713
 #define FILE_FORMAT_LOCATION_FIX 0
 
@@ -237,7 +238,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     int lev = 1 << 9;
-    while (lev < 1 << 12) {
+    while (lev < 1 << 14) {
       if (tg <= lev) {
         m_fft_level = lev;
         LOG(INFO) << "FFT level set to " << m_fft_level;
@@ -366,10 +367,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       if (tg != org) {
         if (tg) {
           adlink::instance()->startAI(true, false, false, false, 8192 ,false);
-          // about 32 Hz
+          // about 64 Hz
           adlink::instance()->setRawDataCallback1([this](std::shared_ptr<std::vector<unsigned char>> data) {
-            static int ss = 0;
-//            std::cout << "bingo" << ss++ << "|||" <<  data->size() << std::endl;
             std::cout.flush();
             std::vector<float> res;
             unsigned char * cur = data->data();
@@ -377,7 +376,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
               uint l1 = cur[0];
               uint l2 = cur[1];
               uint l3 = cur[2];
-              uint res_i = l3 | l2 << 8 | l1 << 16;
+              uint res_i = l3 | l2 << 8 | l1 << 16 ;
               auto value = (static_cast<float>(res_i)/static_cast<float>(0xffffff));
               if (value < 0.5f) value += 0.5f;
               else value -= 0.5f;
@@ -560,7 +559,7 @@ void DataProcessWidget::initializeGL() {
 
   glBindImageTexture(0, m_Ctexture->textureId(), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 
-  m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, DEFAULT_COMPUTE_SHADER_PATH);
+  m_CcomputeProgram->addShaderFromSourceCode(QOpenGLShader::Compute, getComputeShaderContent(DEFAULT_FFT_LEVEL).c_str());
   m_CcomputeProgram->link();
   m_CcomputeProgram->bind();
 
@@ -583,22 +582,32 @@ void DataProcessWidget::initializeGL() {
 
 bool DataProcessWidget::resetComputeShader(int level) {
   m_CcomputeProgram->removeAllShaders();
-
-  std::string ora = ":/shader/example_fft";
-  ora += std::to_string(level);
-  ora += "_c.glsl";
-
-  if (m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, QString(ora.c_str()))) {
+  if (m_CcomputeProgram->addShaderFromSourceCode(QOpenGLShader::Compute, getComputeShaderContent(level).c_str())) {
     m_CcomputeProgram->link();
     m_CcomputeProgram->bind();
-    LOG(INFO) << "compute shader -" << ora << " load success.";
+    LOG(INFO) << "compute shader -" << level << " load success.";
     m_CcomputeProgram->release();
     return true;
   } else {
-    LOG(INFO) << "compute shader -" << ora << " load failed, " << " back to 512 default size.";
-    m_CcomputeProgram->addShaderFromSourceFile(QOpenGLShader::Compute, DEFAULT_COMPUTE_SHADER_PATH);
+    LOG(INFO) << "compute shader -" << level << " load failed, " << " back to " << DEFAULT_FFT_LEVEL << " default size.";
+    m_CcomputeProgram->addShaderFromSourceCode(QOpenGLShader::Compute, getComputeShaderContent(DEFAULT_FFT_LEVEL).c_str());
     return false;
   }
+}
+
+std::string DataProcessWidget::getComputeShaderContent(int level) {
+  QFile file(":/shader/example_c.glsl");
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+      return "";
+  QByteArray data = file.readAll();
+  char *content = data.data();
+
+  std::string ora = "#version 430 \n\
+                     #define SIZE ";
+  ora += std::to_string(level);
+  ora += "\n";
+  ora += content;
+  return ora;
 }
 
 void DataProcessWidget::paintGL() {

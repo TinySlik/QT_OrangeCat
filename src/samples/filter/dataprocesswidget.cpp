@@ -35,9 +35,9 @@
 #include "renderutil.h"
 #include "adlink.h"
 
-#define DEFAULT_COMPUTE_SHADER_PATH ":/shader/example_fft512_c.glsl"
-#define DEFAULT_VERT_SHADER_PATH ":/shader/example_v.glsl"
-#define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/example_f.glsl"
+#define DEFAULT_COMPUTE_SHADER_PATH ":/shader/filter_c.glsl"
+#define DEFAULT_VERT_SHADER_PATH ":/shader/general_v.glsl"
+#define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/general_f.glsl"
 
 #define DEFAULT_FFT_LEVEL 512
 //#define FILE_FORMAT_LOCATION_FIX 1713
@@ -596,7 +596,7 @@ bool DataProcessWidget::resetComputeShader(int level) {
 }
 
 std::string DataProcessWidget::getComputeShaderContent(int level) {
-  QFile file(":/shader/example_c.glsl");
+  QFile file(DEFAULT_COMPUTE_SHADER_PATH);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
       return "";
   QByteArray data = file.readAll();

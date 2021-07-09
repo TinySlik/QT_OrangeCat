@@ -11,9 +11,9 @@
         <file>web_root/style.css</file>
         <file>web_root/test.txt</file>
         <file>res.qrc</file>
-        <file>shader/example_f.glsl</file>
-        <file>shader/example_v.glsl</file>
-        <file>shader/example_c.glsl</file>
+        <file>shader/general_f.glsl</file>
+        <file>shader/general_v.glsl</file>
+        <file>shader/filter_c.glsl</file>
         <file>svg/tiger.svg</file>
         <file>svg/method-draw-image.svg</file>
         <file>test/testcase.json</file>

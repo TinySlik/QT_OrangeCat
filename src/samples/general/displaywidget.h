@@ -80,7 +80,7 @@ class DisplayWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core 
   QOpenGLVertexArrayObject m_vao;
   QMatrix4x4 m_proj;
   std::vector<float> m_tex_buf;
-  float * m_tex_buf_render_head;
+  float *m_tex_buf_render_head;
   std::shared_ptr<std::vector<float>> m_tex_tmp_ptr;
   std::deque <uchar> m_code_step1_tmp;
   int code_step1_trust_count;

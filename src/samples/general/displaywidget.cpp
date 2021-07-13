@@ -33,7 +33,6 @@
 #define DEFAULT_VERT_SHADER_PATH ":/shader/general_v.glsl"
 #define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/general_f.glsl"
 
-#define DEFAULT_FFT_LEVEL 512
 #define FILE_FORMAT_LOCATION_FIX 0
 
 bool DisplayWidget::m_transparent = false;
@@ -81,9 +80,6 @@ DisplayWidget::DisplayWidget(QWidget *parent)
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(reinterpret_cast<long>(this));
   this->grabKeyboard();
-
-  connect(this, SIGNAL(TitelChanged(const QString &)), parent, SLOT(setWindowTitle(const QString &)));
-
   cfg += {{class_obj_id.c_str(), {
       {"lineThickness", m_lineThickness},
       {"test_switch", m_TestSwitch},
@@ -240,7 +236,6 @@ DisplayWidget::DisplayWidget(QWidget *parent)
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
     sz = m_fileMMap->size();
-    emit TitelChanged(QString(tg.c_str()));
     LOG(INFO) << "file name: " << tg << " open, size: " << sz;
     return true;
   });
@@ -280,6 +275,14 @@ DisplayWidget::DisplayWidget(QWidget *parent)
   format.setVersion(4, 3);
   format.setProfile(QSurfaceFormat::CoreProfile);
   setFormat(format);
+
+  QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
+  if (file_testcase.exists()) {
+
+    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["display logo default"];
+    cfg_local << cfg;
+    LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
+  }
 }
 
 void DisplayWidget::reset(size_t size) {
@@ -318,7 +321,7 @@ QSize DisplayWidget::minimumSizeHint() const {
 }
 
 QSize DisplayWidget::sizeHint() const {
-  return QSize(1024, 256);
+  return QSize(768, 512);
 }
 
 
@@ -568,7 +571,6 @@ void DisplayWidget::wheelEvent(QWheelEvent *event) {
     {"y",     (!ctrlPressed_) ? m_scale.y() : (m_scale.y() + float(event->angleDelta().ry()) * 1.0 / 4800.0)},
     {"z",     m_scale.z()}
   };
-
   cfg_local["transform"]["m_scale"] << sc;
 }
 

@@ -40,9 +40,6 @@ class Window : public QWidget {
   QSlider *createSlider();
 
   DisplayWidget *glWidget;
-  QSlider *xSlider;
-  QSlider *ySlider;
-  QSlider *zSlider;
   QPushButton *dockBtn;
   MainWindow *mainWindow;
 };

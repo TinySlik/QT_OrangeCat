@@ -155,5 +155,37 @@
         "z": 1
       }
     }
+  },
+
+  "display logo default": {
+    "lineThickness": 0.01,
+    "test_switch": 0,
+    "display_switch": 5,
+    "test_file_path": "empty",
+    "svg_background_path": "empty",
+    "file_load_location": 0,
+    "buffer_size": 512,
+    "m_samplingSpeed": 1,
+    "m_decoder_unsigned": true,
+    "front_color": "#00ff00ff",
+    "background_color": "#00000000",
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 0.85,
+        "z": 1
+      }
+    }
   }
 }

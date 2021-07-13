@@ -110,8 +110,3 @@ namespace MemoryMapped {
   }
 }
 
-//#if defined(MEMMAPPED_USING_WINDOWS)
-//    #include "impl.win32.cpp"
-//#else
-//    #include "impl.linux.cpp"
-//#endif

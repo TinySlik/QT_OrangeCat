@@ -75,6 +75,30 @@ set(SOURCE_GENERAL_FILES ${QRC_FILES}
     ${QT_GENERAL_PLATFORM_FILES}
 )
 
+if(OS_WIN)
+  set(QT_GAMMA_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/impl.win32.cpp)
+else()
+  set(QT_GAMMA_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/impl.linux.cpp)
+endif()
+
+set(SOURCE_GAMMA_FILES ${QRC_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/mainwindow.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/memorymapped.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/memorymapped.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/time.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/renderutil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/renderutil.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customplottest.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customplottest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customplottest.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot/qcustomplot.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot/qcustomplot.h
+    ${QT_GAMMA_PLATFORM_FILES}
+)
+
 include_directories(log)
 include_directories(paramserv)
 include_directories(../3rdparty/asyncplusplus/include)
@@ -87,4 +111,8 @@ target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Qui
 
 add_executable(display ${SOURCE_GENERAL_FILES})
 
-target_link_libraries(display PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv)
+target_link_libraries(display PRIVATE Qt5::Widgets Qt5::Quick Qt5::Svg paramserv)
+
+add_executable(gamma ${SOURCE_GAMMA_FILES})
+
+target_link_libraries(gamma PRIVATE Qt5::Widgets Qt5::PrintSupport paramserv)

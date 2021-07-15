@@ -278,7 +278,6 @@ DisplayWidget::DisplayWidget(QWidget *parent)
 
   QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
   if (file_testcase.exists()) {
-
     auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["display logo default"];
     cfg_local << cfg;
     LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
@@ -358,6 +357,8 @@ void DisplayWidget::getData(std::shared_ptr<std::vector<float>> data) {
       }
 
       m_file_find_index += 6;
+    } else {
+      value = (rand()%1000) / 1000.f;
     }
 
     if (m_tex_buf_render_head - m_tex_buf.data() > 0) {

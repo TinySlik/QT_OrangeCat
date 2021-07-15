@@ -63,7 +63,7 @@ endmacro()
 
 include(CMakePackageConfigHelpers)
 
-find_package(Qt5 COMPONENTS Widgets WebEngineWidgets Quick Svg REQUIRED)
+find_package(Qt5 COMPONENTS Widgets WebEngineWidgets Quick Svg PrintSupport REQUIRED)
 
 set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
 set_outdir(

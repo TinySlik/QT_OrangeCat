@@ -93,4 +93,5 @@ add_custom_command(TARGET res
  )
 add_subdirectory(3rdparty/adlink)
 add_subdirectory(3rdparty/asyncplusplus)
+add_subdirectory(3rdparty/liblas)
 add_subdirectory(src)

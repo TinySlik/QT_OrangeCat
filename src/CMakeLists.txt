@@ -96,6 +96,15 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customplottest.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot/qcustomplot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot/qcustomplot.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/BaseItem.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/BaseItem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawImageWidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawImageWidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawImageWidget.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/drawlineinfo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/drawlineinfo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawPictureHead.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawPictureHead.cpp
     ${QT_GAMMA_PLATFORM_FILES}
 )
 

@@ -1,5 +1,6 @@
 ﻿#include "customplottest.h"
 #include "ui_CustomPlotTest.h"
+#include "drawImage/DrawPictureHead.h"
 
 CustomPlotTest::CustomPlotTest(QWidget *parent) :
   QWidget(parent),
@@ -19,13 +20,40 @@ CustomPlotTest::~CustomPlotTest()
   delete ui;
 }
 
-void CustomPlotTest::initChart()
-{
-  QCustomPlot *customPlot = ui->widget_cus;
+void CustomPlotTest::initChart() {
+  QTableWidget *tableWidget= ui->tableWidget;
+  QCustomPlot *customPlot = new QCustomPlot(tableWidget);
+
+  ui->tableWidget->verticalHeader()->setVisible(false);
+  ui->tableWidget->horizontalHeader()->setVisible(false);
+  ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+//  QLineEdit *lineEdit = new QLineEdit(ui->tableWidget);
+//  lineEdit->setText("test");
+  QLineEdit *lineEdit2 = new QLineEdit(ui->tableWidget);
+  lineEdit2->setText("test");
+
+  QGraphicsView *gra = new QGraphicsView();
+  gra->setGeometry(0,0,200,300);
+  QGraphicsScene *scene = new QGraphicsScene(gra);
+  gra->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  gra->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  gra->setFrameShape(QFrame::Shape::NoFrame);
+  auto head = new DrawPictureHead();
+  head->setItemSize(0,0,256,100);
+  scene->addItem(head);
+
+  ui->tableWidget->setRowCount(3);
+  ui->tableWidget->setColumnCount(1);
+  ui->tableWidget->setCellWidget(0, 0, gra);
+  ui->tableWidget->setCellWidget(1,0,customPlot);
+  ui->tableWidget->setRowHeight(0, 768);
+  ui->tableWidget->setRowHeight(1, 768);
+
+  ui->tableWidget->setCellWidget(2,0,lineEdit2);
+
   customPlot->plotLayout()->clear();
   customPlot->plotLayout()->insertRow(0);
 //  customPlot->plotLayout()->insertRow(1);
-
 
   wideAxisRectLeft  = new QCPAxisRect(customPlot,false);
   wideAxisRectRight = new QCPAxisRect(customPlot,false);
@@ -46,7 +74,6 @@ void CustomPlotTest::initChart()
   wideAxisRectLeft->addAxes(QCPAxis::atTop | QCPAxis::atRight);
   QCPAxis *leftAxisX = wideAxisRectLeft->axis(QCPAxis::atRight);
   QCPAxis *leftAxisY = wideAxisRectLeft->axis(QCPAxis::atTop);
-
 
   leftAxisX->setBasePen(axia);
   leftAxisY->setBasePen(axia);
@@ -82,8 +109,6 @@ void CustomPlotTest::initChart()
 
   rightAxisX->setBasePen(axia);
   rightAxisY->setBasePen(axia);
-
-  //
 
 //  QCPAxisRect *wideAxisRectHead  = new QCPAxisRect(customPlot,false);
 
@@ -200,7 +225,9 @@ void CustomPlotTest::updateChartData()
 
 void CustomPlotTest::plotChart(const bool left, const PlotType type)
 {
-  QCustomPlot *customPlot = ui->widget_cus;
+  QTableWidget *table = ui->tableWidget;
+  auto customPlot= (QCustomPlot *)(table->cellWidget(1, 0));
+
   QCPAxis *axisX;
   QCPAxis *axisY;
   QCPAxis *otherAxisX;

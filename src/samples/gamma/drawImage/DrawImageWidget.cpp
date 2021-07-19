@@ -1,5 +1,6 @@
 ﻿#include "DrawImageWidget.h"
 #include "ui_drawimagewidget.h"
+#include "../customplottest.h"
 
 DrawImageWidget::DrawImageWidget(QWidget *parent) :
   QWidget(parent),
@@ -35,7 +36,13 @@ void DrawImageWidget::initGraphicsView(){
 //    backgroundImage = backgroundImage.scaled(m_width,m_height,Qt::KeepAspectRatio);
     // 图片头部
     m_pictureHead = new DrawPictureHead();
-    m_pictureHead->setItemSize(0,0,m_width,100);
+    m_pictureHead->setItemSize(0,0,1006,100);
     m_gs->addItem(m_pictureHead);
 //    m_pictureHead->setScanImage(backgroundImage);
+
+    CustomPlotTest *cp = new CustomPlotTest(this);
+    m_gs->addWidget(cp);
+    cp->move(0, 100);
+
+//    cp->setVisible(false);
 }

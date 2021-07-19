@@ -122,6 +122,8 @@ add_executable(display ${SOURCE_GENERAL_FILES})
 
 target_link_libraries(display PRIVATE Qt5::Widgets Qt5::Quick Qt5::Svg paramserv)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot)
+
 add_executable(gamma ${SOURCE_GAMMA_FILES})
 
 target_link_libraries(gamma PRIVATE Qt5::Widgets Qt5::PrintSupport paramserv)

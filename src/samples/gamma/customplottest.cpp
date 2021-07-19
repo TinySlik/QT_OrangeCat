@@ -21,39 +21,10 @@ CustomPlotTest::~CustomPlotTest()
 }
 
 void CustomPlotTest::initChart() {
-  QTableWidget *tableWidget= ui->tableWidget;
-  QCustomPlot *customPlot = new QCustomPlot(tableWidget);
-
-  ui->tableWidget->verticalHeader()->setVisible(false);
-  ui->tableWidget->horizontalHeader()->setVisible(false);
-  ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-//  QLineEdit *lineEdit = new QLineEdit(ui->tableWidget);
-//  lineEdit->setText("test");
-  QLineEdit *lineEdit2 = new QLineEdit(ui->tableWidget);
-  lineEdit2->setText("test");
-
-  QGraphicsView *gra = new QGraphicsView();
-  gra->setGeometry(0,0,200,300);
-  QGraphicsScene *scene = new QGraphicsScene(gra);
-  gra->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  gra->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  gra->setFrameShape(QFrame::Shape::NoFrame);
-  auto head = new DrawPictureHead();
-  head->setItemSize(0,0,256,100);
-  scene->addItem(head);
-
-  ui->tableWidget->setRowCount(3);
-  ui->tableWidget->setColumnCount(1);
-  ui->tableWidget->setCellWidget(0, 0, gra);
-  ui->tableWidget->setCellWidget(1,0,customPlot);
-  ui->tableWidget->setRowHeight(0, 768);
-  ui->tableWidget->setRowHeight(1, 768);
-
-  ui->tableWidget->setCellWidget(2,0,lineEdit2);
+  QCustomPlot *customPlot = ui->widget_cus;
 
   customPlot->plotLayout()->clear();
   customPlot->plotLayout()->insertRow(0);
-//  customPlot->plotLayout()->insertRow(1);
 
   wideAxisRectLeft  = new QCPAxisRect(customPlot,false);
   wideAxisRectRight = new QCPAxisRect(customPlot,false);
@@ -71,28 +42,44 @@ void CustomPlotTest::initChart() {
   axia.setWidthF(2.4);
 
   ////////左图显示 上和右坐标轴////////////////
-  wideAxisRectLeft->addAxes(QCPAxis::atTop | QCPAxis::atRight);
+  wideAxisRectLeft->addAxes(QCPAxis::atTop | QCPAxis::atRight | QCPAxis::atLeft | QCPAxis::atBottom);
   QCPAxis *leftAxisX = wideAxisRectLeft->axis(QCPAxis::atRight);
-  QCPAxis *leftAxisY = wideAxisRectLeft->axis(QCPAxis::atTop);
+  QCPAxis *leftAxisX_ = wideAxisRectLeft->axis(QCPAxis::atLeft);
+  QCPAxis *leftAxisY = wideAxisRectLeft->axis(QCPAxis::atBottom);
+  QCPAxis *leftAxisY_ = wideAxisRectLeft->axis(QCPAxis::atTop);
+  leftAxisY_->setPadding(2);
+  leftAxisY_->setBasePen(axia);
+  leftAxisY_->setTickLabels(false);
 
   leftAxisX->setBasePen(axia);
   leftAxisY->setBasePen(axia);
+  leftAxisX_->setBasePen(axia);
 
   //X轴倒显示
   leftAxisX->setRangeReversed(true);
+  leftAxisX_->setRangeReversed(true);
   //网格线
   leftAxisY->grid()->setPen(gridPenY);
   leftAxisX->grid()->setPen(gridPenX);
   leftAxisY->grid()->setVisible(true);
   leftAxisX->grid()->setVisible(true);
+  leftAxisX_->grid()->setVisible(false);
   leftAxisY->grid()->setSubGridVisible(true);
+  leftAxisX_->grid()->setSubGridVisible(false);
+  leftAxisX_->setTickLabels(false);
   leftAxisY->setTicker(ticker);
-  leftAxisY->setTickLabels(false);
+//  leftAxisY->setTickLabels(false);
 
   ////////右图显示 上和左坐标轴，并隐藏左坐标显示//////
-  wideAxisRectRight->addAxes(QCPAxis::atTop | QCPAxis::atLeft);
+  wideAxisRectRight->addAxes(QCPAxis::atTop | QCPAxis::atLeft | QCPAxis::atBottom);
   QCPAxis *rightAxisX = wideAxisRectRight->axis(QCPAxis::atLeft);
   QCPAxis *rightAxisY = wideAxisRectRight->axis(QCPAxis::atTop);
+  QCPAxis *rightAxisY_ = wideAxisRectRight->axis(QCPAxis::atBottom);
+
+  rightAxisY_->setBasePen(axia);
+//  rightAxisY_->setTickLabels(false);
+
+
   //X轴倒显示
   rightAxisX->setRangeReversed(true);
 
@@ -109,6 +96,7 @@ void CustomPlotTest::initChart() {
 
   rightAxisX->setBasePen(axia);
   rightAxisY->setBasePen(axia);
+  rightAxisY->setPadding(2);
 
 //  QCPAxisRect *wideAxisRectHead  = new QCPAxisRect(customPlot,false);
 
@@ -133,26 +121,34 @@ void CustomPlotTest::initChart() {
   ///测试第二个绘图右边再加个绘图
   QCPAxisRect *wideAxisRectOther  = new QCPAxisRect(customPlot,false);
 
-  wideAxisRectOther->addAxes(QCPAxis::atTop | QCPAxis::atLeft);
-  QCPAxis *otherAxisY = wideAxisRectOther->axis(QCPAxis::atTop);
+  wideAxisRectOther->addAxes(QCPAxis::atTop | QCPAxis::atLeft | QCPAxis::atRight | QCPAxis::atBottom);
+  QCPAxis *otherAxisY = wideAxisRectOther->axis(QCPAxis::atBottom);
   QCPAxis *otherAxisX = wideAxisRectOther->axis(QCPAxis::atLeft);
+  QCPAxis *otherAxisX_ = wideAxisRectOther->axis(QCPAxis::atRight);
+  QCPAxis *otherAxisY_ = wideAxisRectOther->axis(QCPAxis::atTop);
+
+  otherAxisY_->setPadding(2);
+  otherAxisY_->setBasePen(axia);
+  otherAxisY_->setTickLabels(false);
   //网格线
   otherAxisY->grid()->setPen(gridPenY);
   otherAxisX->grid()->setPen(gridPenX);
   otherAxisY->grid()->setVisible(true);
   otherAxisX->grid()->setVisible(false);
+  otherAxisX_->grid()->setVisible(false);
   otherAxisY->grid()->setSubGridVisible(true);
   otherAxisX->setTickLabels(false);
+  otherAxisX_->setTickLabels(false);
   otherAxisY->setTicker(ticker);
-  otherAxisY->setTickLabels(false);
+//  otherAxisY->setTickLabels(false);
 
   otherAxisY->setBasePen(axia);
 
   otherAxisX->setTickLength(0,0);
-  otherAxisX->setTickLabels(false);
   otherAxisX->setTicks(false);
   otherAxisX->setPadding(0);
   otherAxisX->setBasePen(axia);
+  otherAxisX_->setBasePen(axia);
 
 //  customPlot->plotLayout()->setRowStretchFactor(0, 0.2);
 
@@ -225,8 +221,7 @@ void CustomPlotTest::updateChartData()
 
 void CustomPlotTest::plotChart(const bool left, const PlotType type)
 {
-  QTableWidget *table = ui->tableWidget;
-  auto customPlot= (QCustomPlot *)(table->cellWidget(1, 0));
+  QCustomPlot *customPlot = ui->widget_cus;
 
   QCPAxis *axisX;
   QCPAxis *axisY;

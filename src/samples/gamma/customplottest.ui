@@ -6,16 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>970</width>
-    <height>701</height>
+    <width>820</width>
+    <height>850</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QComboBox" name="comboBox_left">
+   <item row="1" column="1">
+    <widget class="QComboBox" name="comboBox_right">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
      <item>
       <property name="text">
        <string>ax+b</string>
@@ -33,11 +36,8 @@
      </item>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="comboBox_right">
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
+   <item row="1" column="0">
+    <widget class="QComboBox" name="comboBox_left">
      <item>
       <property name="text">
        <string>ax+b</string>
@@ -62,11 +62,23 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QTableWidget" name="tableWidget"/>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCustomPlot" name="widget_cus" native="true">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

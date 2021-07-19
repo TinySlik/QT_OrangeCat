@@ -30,7 +30,7 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
   QPen pen;
   pen.setColor(QColor(0, 0, 0,255));
-  pen.setWidth(1);
+  pen.setWidthF(3.0);
   QFont fontRange;
   fontRange.setPointSize(9);
   fontRange.setFamily("宋体");
@@ -38,10 +38,6 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   QFont fontName;
   fontName.setPointSize(16);
   fontName.setFamily("宋体");
-
-  //画左右边框
-  painter->drawLine(mItemX + mItemWidth - 1,mItemY,mItemX + mItemWidth - 1,mItemY + mItemHeight);
-  painter->drawLine(mItemX,mItemY,mItemX,mItemY + mItemHeight);
 
   if(m_isDrawLine){
   //画左右范围
@@ -62,6 +58,11 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
   int unitWidth = mItemX + mItemWidth/2 - (m_lineUnit.size() + 1)*5.3;
   painter->drawText(unitWidth,mItemY + mItemHeight/2 + 15,QString("(%1)").arg(m_lineUnit));
+
+  //画左右边框
+  painter->setPen(pen);
+  painter->drawLine(mItemX + mItemWidth - 1,mItemY,mItemX + mItemWidth - 1,mItemY + mItemHeight);
+  painter->drawLine(mItemX,mItemY,mItemX,mItemY + mItemHeight);
 
 }
 

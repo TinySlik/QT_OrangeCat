@@ -19,6 +19,8 @@ private:
     DrawLineInfo *m_drawLineInfo2;//上伽马
     DrawLineInfo *m_drawLineInfo3;//下伽马
     DrawLineInfo *m_drawLineInfo4;//井深
+    DrawLineInfo *m_drawLineInfo5;//other1
+    DrawLineInfo *m_drawLineInfo6;//other2
 };
 
 #endif // DRAWPICTUREHEAD_H

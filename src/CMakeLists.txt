@@ -105,6 +105,9 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/drawlineinfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawPictureHead.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawPictureHead.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.cpp
     ${QT_GAMMA_PLATFORM_FILES}
 )
 

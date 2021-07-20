@@ -23,6 +23,11 @@ class CustomPlotTest : public QWidget
   Q_OBJECT
 
 public:
+  typedef struct paint_unit {
+    QCPAxisRect *object;
+//    std::vector<>
+  } PAINT_UNIT;
+
   explicit CustomPlotTest(QWidget *parent = nullptr);
   ~CustomPlotTest();
 
@@ -61,6 +66,8 @@ private:
   QVector<double> vecValue;
   QVector<double> vecValueSin;
   QVector< QPair<QVector<QCPGraphData>,int>> dataLog;
+
+  std::vector<PAINT_UNIT> m_paint_units;
 
   QTimer timer;
 };

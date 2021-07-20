@@ -1,27 +1,25 @@
-﻿#ifndef DRAWIMAGEWIDGET_H
-#define DRAWIMAGEWIDGET_H
+#ifndef QTEKLINECHAT_H
+#define QTEKLINECHAT_H
 
 #include <QWidget>
-
-#include "DrawPictureHead.h"
+#include "drawImage/DrawPictureHead.h"
 
 namespace Ui {
-class DrawImageWidget;
+  class QtekLineChat;
 }
 
-class DrawImageWidget : public QWidget
+class QtekLineChat : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit DrawImageWidget(QWidget *parent = nullptr);
-  ~DrawImageWidget();
+  explicit QtekLineChat(QWidget *parent = nullptr);
+  ~QtekLineChat();
 
 private:
   void initGraphicsView();
 
 private:
-  Ui::DrawImageWidget *ui;
 
   QGraphicsScene *m_gs;//主图区场景
   double m_beginX;    //起始X轴位置
@@ -30,6 +28,8 @@ private:
   double m_height;    //图像高度
   //图片头部
   DrawPictureHead *m_pictureHead;//图片头部图层
+private:
+  Ui::QtekLineChat *ui;
 };
 
-#endif // DRAWIMAGEWIDGET_H
+#endif // QTEKLINECHAT_H

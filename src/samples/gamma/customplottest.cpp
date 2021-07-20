@@ -89,7 +89,7 @@ void CustomPlotTest::initChart() {
   rightAxisY->grid()->setVisible(true);
   rightAxisX->grid()->setVisible(true);
   rightAxisY->grid()->setSubGridVisible(true);
-    rightAxisX->setTickLabels(false);
+  rightAxisX->setTickLabels(false);
   rightAxisY->setTickLabels(false);
 
   rightAxisY->setTicker(ticker);

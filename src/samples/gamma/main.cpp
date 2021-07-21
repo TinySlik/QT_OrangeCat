@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-//#include "drawImage/DrawImageWidget.h"
+#include "drawImage/DrawImageWidget.h"
 #include "qteklinechat.h"
 #include <QApplication>
 

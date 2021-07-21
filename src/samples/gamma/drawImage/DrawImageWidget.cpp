@@ -4,11 +4,7 @@
 
 DrawImageWidget::DrawImageWidget(QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::DrawImageWidget),
-  m_beginX(0),
-  m_beginY(0),
-  m_width(800),
-  m_height(850)
+  ui(new Ui::DrawImageWidget)
 {
   ui->setupUi(this);
   //初始化图层
@@ -23,7 +19,7 @@ DrawImageWidget::~DrawImageWidget()
 
 void DrawImageWidget::initGraphicsView(){
     m_gs = new QGraphicsScene(ui->imageView);
-    m_gs->setSceneRect(m_beginX,m_beginY,m_width,m_height);
+    m_gs->setSceneRect(this->rect());
 
     ui->imageView->setScene(m_gs);
     // 禁止滚动条
@@ -36,7 +32,7 @@ void DrawImageWidget::initGraphicsView(){
 //    backgroundImage = backgroundImage.scaled(m_width,m_height,Qt::KeepAspectRatio);
     // 图片头部
     m_pictureHead = new DrawPictureHead();
-    m_pictureHead->setItemSize(0,0,1006,100);
+    m_pictureHead->setItemSize(0,0,1080,100);
     m_gs->addItem(m_pictureHead);
 //    m_pictureHead->setScanImage(backgroundImage);
 

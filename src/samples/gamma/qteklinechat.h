@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "drawImage/DrawPictureHead.h"
+#include "customplottest.h"
 
 namespace Ui {
   class QtekLineChat;
@@ -11,15 +12,14 @@ namespace Ui {
 class QtekLineChat : public QWidget
 {
   Q_OBJECT
-
 public:
   explicit QtekLineChat(QWidget *parent = nullptr);
   ~QtekLineChat();
+protected:
+  virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
   void initGraphicsView();
-
-private:
 
   QGraphicsScene *m_gs;//主图区场景
   double m_beginX;    //起始X轴位置
@@ -28,6 +28,7 @@ private:
   double m_height;    //图像高度
   //图片头部
   DrawPictureHead *m_pictureHead;//图片头部图层
+  CustomPlotTest *m_customPlot;
 private:
   Ui::QtekLineChat *ui;
 };

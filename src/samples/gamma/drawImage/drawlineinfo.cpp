@@ -6,7 +6,7 @@ DrawLineInfo::DrawLineInfo() : BaseItem()
 {
   m_linePen.setColor(QColor(0, 0, 0,255));
   m_linePen.setWidth(1);
-  m_lineName = QObject::tr("平均伽玛");
+  m_lineName = QObject::tr("empty");
   m_lineUnit = QObject::tr("API");
   m_lineMin = 0;
   m_lineMax = 300;
@@ -31,13 +31,21 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   QPen pen;
   pen.setColor(QColor(0, 0, 0,255));
   pen.setWidthF(3.0);
+
+  if ( m_lineName == "empty") {
+    painter->setPen(pen);
+    painter->drawLine(mItemX + mItemWidth - 1,mItemY,mItemX + mItemWidth - 1,mItemY + mItemHeight);
+    painter->drawLine(mItemX,mItemY,mItemX,mItemY + mItemHeight);
+    return;
+  }
+
   QFont fontRange;
-  fontRange.setPointSize(9);
-  fontRange.setFamily("宋体");
+  fontRange.setPointSize(7);
+  fontRange.setFamily("Arial");
 
   QFont fontName;
-  fontName.setPointSize(16);
-  fontName.setFamily("宋体");
+  fontName.setPointSize(10);
+  fontName.setFamily("Arial");
 
   if(m_isDrawLine){
   //画左右范围
@@ -45,10 +53,11 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->setFont(fontRange);
     painter->drawText(mItemX + 5,mItemY + 40,QString::number(m_lineMin));
     painter->drawText(mItemX + mItemWidth - 20,mItemY + 40,QString::number(m_lineMax));
+
+    //画线
+    painter->setPen(m_linePen);
+    painter->drawLine(mItemX,mItemY + mItemHeight - 5,mItemX + mItemWidth - 1,mItemY + mItemHeight - 5);
   }
-  //画线
-  painter->setPen(m_linePen);
-  painter->drawLine(mItemX,mItemY + mItemHeight - 5,mItemX + mItemWidth - 1,mItemY + mItemHeight - 5);
 
   //画单位和线名
   painter->setPen(pen);
@@ -63,7 +72,6 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   painter->setPen(pen);
   painter->drawLine(mItemX + mItemWidth - 1,mItemY,mItemX + mItemWidth - 1,mItemY + mItemHeight);
   painter->drawLine(mItemX,mItemY,mItemX,mItemY + mItemHeight);
-
 }
 
 

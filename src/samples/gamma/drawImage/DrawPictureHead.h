@@ -6,21 +6,18 @@
 #include  "BaseItem.h"
 #include "DrawLineInfo.h"
 
-class DrawPictureHead : public BaseItem
-{  
-public:
+class DrawPictureHead : public BaseItem {
+ public:
   DrawPictureHead();
+  void addLine(size_t colum, QPen pen, QString lineName = QObject::tr("empty"),QString lineUnit = QObject::tr("API"),
+               double min = 0,double max = 300);
+ protected:
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
-
-private:
-    DrawLineInfo *m_drawLineInfo1;//平均伽马
-    DrawLineInfo *m_drawLineInfo2;//上伽马
-    DrawLineInfo *m_drawLineInfo3;//下伽马
-    DrawLineInfo *m_drawLineInfo4;//井深
-    DrawLineInfo *m_drawLineInfo5;//other1
-    DrawLineInfo *m_drawLineInfo6;//other2
+ private:
+  DrawLineInfo *m_drawLineInfoRule;//井深
+  std::vector<std::vector<DrawLineInfo *>> units;
+  void refreashSize();
 };
 
 #endif // DRAWPICTUREHEAD_H

@@ -1,77 +1,89 @@
 ﻿#include "DrawPictureHead.h"
 #include <QDebug>
+#include <iostream>
 #pragma execution_character_set("utf-8")
 
 DrawPictureHead::DrawPictureHead() : BaseItem()
 {
-  m_drawLineInfo1 = new DrawLineInfo();
-  m_drawLineInfo1->setParentItem(this);
-  m_drawLineInfo1->setItemSize(4,0,232,100);
-  QPen pen1;
-  pen1.setColor(QColor(155, 155, 155,255));
-  pen1.setWidth(3);
-  m_drawLineInfo1->setLineInfo(pen1,QObject::tr("WIREA.GA_1"),QObject::tr("API"),0,200);
+  struct default_config_unit {
+    QColor color;
+    int    width;
+    size_t colum;
+    QString name;
+    QString unit;
+    double min;
+    double max;
+  };
 
-  m_drawLineInfo2 = new DrawLineInfo();
-  m_drawLineInfo2->setParentItem(this);
-  m_drawLineInfo2->setItemSize(270, 0, 263, 50);
-  QPen pen2;
-  pen2.setColor(QColor(255, 0, 0,255));
-  pen2.setWidth(1);
-  m_drawLineInfo2->setLineInfo(pen2,QObject::tr("WIREA.GA_U_1"),QObject::tr("API"),0,200);
+  struct default_config_unit config[] = {
+    {QColor(155, 155, 155,255), 3, 0, QObject::tr("GA_1"),      QObject::tr("API"),0,200 },
+    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_U_1"),    QObject::tr("API"),0,200 },
+    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_D_1"),    QObject::tr("API"),0,200 },
+    {QColor(0, 255, 255,255),   2, 2, QObject::tr("GA_O_1"),    QObject::tr("API"),0,200 },
+    {QColor(255, 0, 255,255),   2, 2, QObject::tr("GA_O_2"),    QObject::tr("API"),0,200 },
+    {QColor(255, 100, 255,255), 2, 2, QObject::tr("GA_O_3"),    QObject::tr("API"),0,400 },
+  };
 
-  m_drawLineInfo3 = new DrawLineInfo();
-  m_drawLineInfo3->setParentItem(this);
-  m_drawLineInfo3->setItemSize(270, 50, 263, 50);
-  QPen pen3;
-  pen3.setColor(QColor(0, 0, 255,255));
-  pen3.setWidth(1);
-  m_drawLineInfo3->setLineInfo(pen3,QObject::tr("WIREA.GA_D_1"),QObject::tr("API"),0,200);
+  QPen pen;
+  for (size_t i = 0; i< sizeof(config) / sizeof (struct default_config_unit) ; ++i) {
+    pen.setColor(config[i].color);
+    pen.setWidth(config[i].width);
+    addLine(config[i].colum, pen, config[i].name, config[i].unit,config[i].min,config[i].max);
+  }
 
-  m_drawLineInfo4 = new DrawLineInfo();
-  m_drawLineInfo4->setParentItem(this);
-  m_drawLineInfo4->setItemSize(235,0,36,100);
-  m_drawLineInfo4->setIsDrawLine(false);
-  QPen pen4;
-  pen4.setColor(QColor(0, 0, 0,255));
-  pen4.setWidth(1);
-  m_drawLineInfo4->setLineInfo(pen4,QObject::tr("DEPTH"),QObject::tr("m"),0,200);
+  m_drawLineInfoRule = new DrawLineInfo();
+  m_drawLineInfoRule->setParentItem(this);
+  m_drawLineInfoRule->setIsDrawLine(false);
+  pen.setColor(QColor(0, 0, 0,255));
+  pen.setWidth(1);
+  m_drawLineInfoRule->setLineInfo(pen,QObject::tr("DEPTH"),QObject::tr("m"),0,200);
 
-  m_drawLineInfo5 = new DrawLineInfo();
-  m_drawLineInfo5->setParentItem(this);
-  m_drawLineInfo5->setItemSize(532, 0, 263, 50);
-  QPen pen5;
-  pen5.setColor(QColor(0, 255, 255,255));
-  pen5.setWidth(2);
-  m_drawLineInfo5->setLineInfo(pen5,QObject::tr("WIREA.GA_O_1"),QObject::tr("API"),0,200);
+  refreashSize();
+}
 
+void DrawPictureHead::addLine(size_t colum, QPen pen, QString lineName, QString lineUnit,
+                              double min, double max) {
+  while (colum >= units.size()) {
+    units.push_back({});
+  }
+  auto line = new DrawLineInfo();
+  line -> setParentItem(this);
+  line -> setLineInfo(pen, lineName, lineUnit, min, max);
+  units[colum].push_back(line);
+}
 
-  m_drawLineInfo6 = new DrawLineInfo();
-  m_drawLineInfo6->setParentItem(this);
-  m_drawLineInfo6->setItemSize(532, 50, 263, 50);
-  QPen pen6;
-  pen6.setColor(QColor(255, 0, 255,255));
-  pen6.setWidth(2);
-  m_drawLineInfo6->setLineInfo(pen6,QObject::tr("WIREA.GA_O_2"),QObject::tr("API"),0,200);
-
-
-//  m_drawLineInfo4 = new DrawLineInfo();
-//  m_drawLineInfo4->setParentItem(this);
-//  m_drawLineInfo4->setItemSize(235,0,36,100);
-//  m_drawLineInfo4->setIsDrawLine(false);
-//  QPen pen5;
-//  pen5.setColor(QColor(0, 0, 0,255));
-//  pen5.setWidth(1);
-//  m_drawLineInfo4->setLineInfo(pen4,QObject::tr("WIREA.test_1"),QObject::tr("m"),0,200);
-
-//  m_drawLineInfo4 = new DrawLineInfo();
-//  m_drawLineInfo4->setParentItem(this);
-//  m_drawLineInfo4->setItemSize(349,0,102,100);
-//  m_drawLineInfo4->setIsDrawLine(false);
-//  QPen pen6;
-//  pen6.setColor(QColor(0, 0, 0,255));
-//  pen6.setWidth(1);
-//  m_drawLineInfo4->setLineInfo(pen4,QObject::tr("WIREA.test_2"),QObject::tr("m"),0,200);
+void DrawPictureHead::refreashSize() {
+  auto columSize = units.size();
+  if (mItemWidth < 36 || columSize < 2) {
+    return;
+  }
+  size_t max_row = 0;
+  for (size_t i = 0; i < columSize; i++) {
+    auto col = units[i];
+    if (units[i].size() > max_row) {
+      max_row = units[i].size();
+    }
+  }
+  size_t unitWidth = 0;
+  size_t unitHeight = 0;
+  if (columSize)
+      unitWidth = (mItemWidth - 36) / columSize;
+  if (max_row)
+      unitHeight = mItemHeight / max_row;
+  for (size_t i = 0; i < columSize; i++) {
+    for (size_t j = 0; j < max_row; j++) {
+      if (j >= units[i].size()) {
+        // todo
+      } else {
+          int res_w = unitWidth * i;
+          if (i > 0) {
+            res_w += 36;
+          }
+        units[i][j]->setItemSize(res_w, mItemHeight - ((j+1) * unitHeight),  unitWidth + 1, unitHeight);
+      }
+    }
+  }
+  m_drawLineInfoRule->setItemSize(unitWidth, 0, 36 + 1 ,mItemHeight);
 }
 
 void DrawPictureHead::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -79,15 +91,15 @@ void DrawPictureHead::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
   Q_UNUSED(option)
   Q_UNUSED(widget)
 
+  refreashSize();
 
   QPen pen;
   pen.setColor(QColor(0, 0, 0,255));
-  pen.setWidth(1);
+  pen.setWidth(2);
   painter->setPen(pen);
   // 画线
-  painter->drawLine(mItemX,mItemY,mItemX + mItemWidth,mItemY);
-  painter->drawLine(mItemX + mItemWidth - 1,mItemY,mItemX + mItemWidth - 1,mItemY + mItemHeight);
+  painter->drawLine(mItemX,mItemY + 1,mItemX + mItemWidth,mItemY + 1);
+  painter->drawLine(mItemX + mItemWidth - 2,mItemY,mItemX + mItemWidth - 2,mItemY + mItemHeight);
   painter->drawLine(mItemX,mItemY + mItemHeight,mItemX + mItemWidth,mItemY + mItemHeight);
-  painter->drawLine(mItemX,mItemY,mItemX,mItemY + mItemHeight);
-
+  painter->drawLine(mItemX + 1,mItemY,mItemX + 1,mItemY + mItemHeight);
 }

@@ -10,7 +10,7 @@ class DrawLineInfo : public BaseItem
 public:
   DrawLineInfo();
 
-  void setLineInfo(QPen pen,QString lineName = QObject::tr("平均伽玛"),QString lineUnit = QObject::tr("API"),
+  void setLineInfo(QPen pen,QString lineName = QObject::tr("empty"),QString lineUnit = QObject::tr("API"),
                    double min = 0,double max = 300);
 
   QPen linePen() const;

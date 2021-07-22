@@ -14,54 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="1">
-    <widget class="QComboBox" name="comboBox_right">
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
-     <item>
-      <property name="text">
-       <string>ax+b</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>log</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>sin</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QComboBox" name="comboBox_left">
-     <item>
-      <property name="text">
-       <string>ax+b</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>log</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>sin</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QCheckBox" name="checkBox">
-     <property name="text">
-      <string>自动刷新</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QCustomPlot" name="widget_cus" native="true">
      <property name="enabled">

@@ -39,6 +39,8 @@ public:
   void updateChartData();
   void plotChart(const bool left, const PlotType type);
 
+  int getFirstChartWidth() {if (wideAxisRectLeft) return wideAxisRectLeft->rect().width(); else return -1;}
+
 private slots:
   void updateIndex();
   void on_comboBox_left_currentIndexChanged(int index);

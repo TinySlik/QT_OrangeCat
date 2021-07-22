@@ -68,7 +68,7 @@ void CustomPlotTest::initChart() {
   leftAxisX_->grid()->setSubGridVisible(false);
   leftAxisX_->setTickLabels(false);
   leftAxisY->setTicker(ticker);
-//  leftAxisY->setTickLabels(false);
+  leftAxisY->setTickLabels(false);
 
   ////////右图显示 上和左坐标轴，并隐藏左坐标显示//////
   wideAxisRectRight->addAxes(QCPAxis::atTop | QCPAxis::atLeft | QCPAxis::atBottom);
@@ -77,8 +77,7 @@ void CustomPlotTest::initChart() {
   QCPAxis *rightAxisY_ = wideAxisRectRight->axis(QCPAxis::atBottom);
 
   rightAxisY_->setBasePen(axia);
-//  rightAxisY_->setTickLabels(false);
-
+  rightAxisY_->setTickLabels(false);
 
   //X轴倒显示
   rightAxisX->setRangeReversed(true);
@@ -140,7 +139,7 @@ void CustomPlotTest::initChart() {
   otherAxisX->setTickLabels(false);
   otherAxisX_->setTickLabels(false);
   otherAxisY->setTicker(ticker);
-//  otherAxisY->setTickLabels(false);
+  otherAxisY->setTickLabels(false);
 
   otherAxisY->setBasePen(axia);
 
@@ -149,8 +148,6 @@ void CustomPlotTest::initChart() {
   otherAxisX->setPadding(0);
   otherAxisX->setBasePen(axia);
   otherAxisX_->setBasePen(axia);
-
-//  customPlot->plotLayout()->setRowStretchFactor(0, 0.2);
 
   customPlot->plotLayout()->addElement(0, 0, wideAxisRectLeft);
   customPlot->plotLayout()->addElement(0, 1, wideAxisRectRight);
@@ -318,12 +315,12 @@ void CustomPlotTest::updateIndex()
 
   static int count = 0;
 
-  if(++count >= 10){
-    count = 0;
+//  if(++count >= 10){
+//    count = 0;
 
-    plotChart(true,static_cast<PlotType>(ui->comboBox_left->currentIndex()));
-    plotChart(false,static_cast<PlotType>(ui->comboBox_right->currentIndex()));
-  }
+//    plotChart(true,static_cast<PlotType>(ui->comboBox_left->currentIndex()));
+//    plotChart(false,static_cast<PlotType>(ui->comboBox_right->currentIndex()));
+//  }
 }
 
 void CustomPlotTest::on_comboBox_left_currentIndexChanged(int index)

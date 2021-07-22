@@ -24,7 +24,6 @@ private:
   Ui::DrawImageWidget *ui;
 
   QGraphicsScene *m_gs;//主图区场景
-  //图片头部
   DrawPictureHead *m_pictureHead;//图片头部图层
 };
 

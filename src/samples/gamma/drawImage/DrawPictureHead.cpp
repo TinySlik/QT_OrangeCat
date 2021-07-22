@@ -3,7 +3,7 @@
 #include <iostream>
 #pragma execution_character_set("utf-8")
 
-DrawPictureHead::DrawPictureHead() : BaseItem()
+DrawPictureHead::DrawPictureHead() : BaseItem(), firstChartWidth(0)
 {
   struct default_config_unit {
     QColor color;
@@ -75,15 +75,16 @@ void DrawPictureHead::refreashSize() {
       if (j >= units[i].size()) {
         // todo
       } else {
-          int res_w = unitWidth * i;
-          if (i > 0) {
-            res_w += 36;
-          }
-        units[i][j]->setItemSize(res_w, mItemHeight - ((j+1) * unitHeight),  unitWidth + 1, unitHeight);
+        if (i == 0) {
+          units[i][j]->setItemSize(0, mItemHeight - ((j+1) * unitHeight),  firstChartWidth + 1, unitHeight);
+        } else {
+          int resetUnitWidth = ( mItemWidth - (firstChartWidth) - 36) / (columSize - 1);
+          units[i][j]->setItemSize(firstChartWidth + (i-1) * resetUnitWidth + 35, mItemHeight - ((j+1) * unitHeight),  resetUnitWidth + 1, unitHeight);
+        }
       }
     }
   }
-  m_drawLineInfoRule->setItemSize(unitWidth, 0, 36 + 1 ,mItemHeight);
+  m_drawLineInfoRule->setItemSize(firstChartWidth, 0, 36, mItemHeight);
 }
 
 void DrawPictureHead::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

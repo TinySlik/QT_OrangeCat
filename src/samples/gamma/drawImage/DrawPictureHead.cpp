@@ -22,6 +22,8 @@ DrawPictureHead::DrawPictureHead() : BaseItem(), firstChartWidth(0)
 //    pen.setWidth(config[i].width);
 //    addLine(config[i].colum, pen, config[i].name, config[i].unit,config[i].min,config[i].max);
 //  }
+  units.push_back({});
+  units.push_back({});
 
   m_drawLineInfoRule = new DrawLineInfo();
   m_drawLineInfoRule->setParentItem(this);

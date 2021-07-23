@@ -240,28 +240,27 @@ void CustomPlotTest::plotChart(const int &index, const PlotType type) {
     case PlotNormal:{
       axisY->setScaleType(QCPAxis::stLinear);
       axisY->setTicker(ticker);
-
-      QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
-      subGraph->setData(vecKey,vecValue,true);
-      subGraph->setLineStyle(QCPGraph::lsLine);
-      subGraph->setPen(QPen(QColor("#FFA100"), 1.5));
-      subGraph->rescaleAxes();
-
-      graphList->append(subGraph);
-
+      for (size_t i = 0; i < m_paint_units[index].base.size(); ++i) {
+        QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
+        subGraph->setData(vecKey,vecValue,true);
+        subGraph->setLineStyle(QCPGraph::lsLine);
+        subGraph->setPen(QPen(m_paint_units[index].base[i].color, m_paint_units[index].base[i].width));
+        subGraph->rescaleAxes();
+        graphList->append(subGraph);
+      }
       break;
     }
     case PlotSin: {
       axisY->setScaleType(QCPAxis::stLinear);
       axisY->setTicker(ticker);
-
-      QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
-      subGraph->setData(vecKey,vecValueSin,true);
-      subGraph->setLineStyle(QCPGraph::lsLine);
-      subGraph->setPen(QPen(QColor("#FFA100"), 1.5));
-      subGraph->rescaleAxes();
-
-      graphList->append(subGraph);
+      for (size_t i = 0; i < m_paint_units[index].base.size(); ++i) {
+        QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
+        subGraph->setData(vecKey,vecValue,true);
+        subGraph->setLineStyle(QCPGraph::lsLine);
+        subGraph->setPen(QPen(m_paint_units[index].base[i].color, m_paint_units[index].base[i].width));
+        subGraph->rescaleAxes();
+        graphList->append(subGraph);
+      }
       break;
     }
     case PlotLog:{
@@ -269,17 +268,17 @@ void CustomPlotTest::plotChart(const int &index, const PlotType type) {
       axisY->setTicker(logTicker);
 
       for (int i = 0; i < dataLog.size(); ++i) {
-        QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
-        subGraph->data()->set(dataLog[i].first,true);
-        subGraph->setLineStyle(QCPGraph::lsLine);
-        subGraph->setPen(QPen(QColor("#FFA100"), (dataLog[i].second+1)*1.5));
-
-        graphList->append(subGraph);
+        for (size_t i = 0; i < m_paint_units[index].base.size(); ++i) {
+          QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
+          subGraph->setData(vecKey,vecValue,true);
+          subGraph->setLineStyle(QCPGraph::lsLine);
+          subGraph->setPen(QPen(m_paint_units[index].base[i].color, m_paint_units[index].base[i].width));
+          graphList->append(subGraph);
+        }
       }
 
       axisY->setRange(1,300);
       //    axisX->setRange((vecKey.first()+vecKey.last())/2 ,vecKey.last() - vecKey.first(),Qt::AlignCenter);
-
       break;
     }
   }

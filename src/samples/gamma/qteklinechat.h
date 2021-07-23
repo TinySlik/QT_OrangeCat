@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "drawImage/DrawPictureHead.h"
 #include "customplottest.h"
+#include "type.h"
 
 namespace Ui {
   class QtekLineChat;
@@ -14,7 +15,10 @@ class QtekLineChat : public QWidget
   Q_OBJECT
 public:
   explicit QtekLineChat(QWidget *parent = nullptr);
-  ~QtekLineChat();
+  ~QtekLineChat() override;
+  void addLine(PAINT_LINE_UNIT);
+  void clearLine();
+  void activeLines();
 protected:
   virtual void resizeEvent(QResizeEvent *event) override;
 
@@ -29,6 +33,7 @@ private:
   //图片头部
   DrawPictureHead *m_pictureHead;//图片头部图层
   CustomPlotTest *m_customPlot;
+  std::vector<PAINT_LINE_UNIT> lines;
 private:
   Ui::QtekLineChat *ui;
 };

@@ -32,10 +32,32 @@ void QtekLineChat::initGraphicsView(){
 
   m_pictureHead = new DrawPictureHead();
   m_pictureHead->setFirstChartWidth(m_customPlot->getFirstChartWidth());
-  m_pictureHead->setItemSize(this->rect().x(),this->rect().y(),this->rect().width(),this->rect().height() / 5);
   m_gs->addItem(m_pictureHead);
 
   this->resize(this->rect().width(), this->rect().height());
+
+  lines = {
+    {QColor(155, 155, 155,255), 3, 0, QObject::tr("GA_1"),      QObject::tr("API"),0,200 , nullptr},
+    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_U_1"),    QObject::tr("API"),0,200 , nullptr},
+    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_D_1"),    QObject::tr("API"),0,200 , nullptr},
+    {QColor(0, 255, 255,255),   2, 2, QObject::tr("GA_O_1"),    QObject::tr("API"),0,200 , nullptr},
+    {QColor(255, 0, 255,255),   2, 2, QObject::tr("GA_O_2"),    QObject::tr("API"),0,200 , nullptr},
+    {QColor(255, 100, 255,255), 2, 2, QObject::tr("GA_O_3"),    QObject::tr("API"),0,400 , nullptr},
+    {QColor(255, 100, 255,255), 2, 3, QObject::tr("GA_O_3"),    QObject::tr("API"),0,400 , nullptr},
+  };
+
+  activeLines();
+}
+
+void QtekLineChat::addLine(PAINT_LINE_UNIT unit) {
+  lines.push_back(unit);
+}
+void QtekLineChat::clearLine() {
+  lines.clear();
+}
+void QtekLineChat::activeLines() {
+  m_pictureHead->refresh(lines);
+  m_customPlot->refresh(lines);
 }
 
 void QtekLineChat::resizeEvent(QResizeEvent *event) {

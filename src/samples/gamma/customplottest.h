@@ -2,6 +2,7 @@
 #define CUSTOMPLOTTEST_H
 
 #include <QWidget>
+#include "type.h"
 
 #include "qcustomplot/qcustomplot.h"
 
@@ -24,8 +25,9 @@ class CustomPlotTest : public QWidget
 
 public:
   typedef struct paint_unit {
+    std::vector<PAINT_LINE_UNIT> base;
     QCPAxisRect *object;
-//    std::vector<>
+    QList<QCPGraph *> list;
   } PAINT_UNIT;
 
   explicit CustomPlotTest(QWidget *parent = nullptr);
@@ -33,19 +35,19 @@ public:
 
   void initChart();
   void initChartData();
+  void refresh(std::vector<PAINT_LINE_UNIT> &in);
 
   //根据index数据,生成模拟其他数据
   void appendIndexData(const int value);
   void updateChartData();
   void plotChart(const bool left, const PlotType type);
+  void plotChart(const int &index, const PlotType type);
 
   int getFirstChartWidth() {if (wideAxisRectLeft) return wideAxisRectLeft->rect().width(); else return -1;}
+  void addColum(const PAINT_LINE_UNIT & unit);
 
 private slots:
   void updateIndex();
-  void on_comboBox_left_currentIndexChanged(int index);
-  void on_comboBox_right_currentIndexChanged(int index);
-  void on_checkBox_stateChanged(int arg1);
 
 private:
   Ui::CustomPlotTest *ui;
@@ -70,6 +72,7 @@ private:
   QVector< QPair<QVector<QCPGraphData>,int>> dataLog;
 
   std::vector<PAINT_UNIT> m_paint_units;
+  void addBaseUnit(PAINT_LINE_UNIT);
 
   QTimer timer;
 };

@@ -372,7 +372,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
             std::cout.flush();
             std::vector<float> res;
             unsigned char * cur = data->data();
-            for (size_t i = 0; i < data->size()/3; i++) {
+            for (size_t i = 0; i < data->size() / 4; i++) {
               uint l1 = cur[0];
               uint l2 = cur[1];
               uint l3 = cur[2];
@@ -381,7 +381,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
               if (value < 0.5f) value += 0.5f;
               else value -= 0.5f;
               res.push_back(value);
-              cur += 3;
+              cur += 4;
             }
             getData(std::make_shared<std::vector<float>>(res));
           });

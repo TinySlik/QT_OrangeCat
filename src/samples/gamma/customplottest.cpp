@@ -7,12 +7,9 @@ CustomPlotTest::CustomPlotTest(QWidget *parent) :
   ui(new Ui::CustomPlotTest)
 {
   ui->setupUi(this);
-
   initChart();
   initChartData();
   updateChartData();
-  plotChart(true,PlotNormal);
-  plotChart(false,PlotLog);
 }
 
 CustomPlotTest::~CustomPlotTest()
@@ -69,6 +66,13 @@ void CustomPlotTest::initChart() {
   leftAxisX_->setTickLabels(false);
   leftAxisY->setTicker(ticker);
   leftAxisY->setTickLabels(false);
+  leftAxisX->setPadding(16);
+
+  customPlot->plotLayout()->addElement(0, 0, wideAxisRectLeft);
+  wideAxisRectLeft->setMinimumMargins(QMargins(0, 0, 0, 0));
+
+
+  m_paint_units.push_back({{}, wideAxisRectLeft, {}});
 
   ////////右图显示 上和左坐标轴，并隐藏左坐标显示//////
   wideAxisRectRight->addAxes(QCPAxis::atTop | QCPAxis::atLeft | QCPAxis::atBottom);
@@ -96,69 +100,60 @@ void CustomPlotTest::initChart() {
   rightAxisX->setBasePen(axia);
   rightAxisY->setBasePen(axia);
   rightAxisY->setPadding(2);
-
-//  QCPAxisRect *wideAxisRectHead  = new QCPAxisRect(customPlot,false);
-
-
-//  wideAxisRectHead->addAxes(QCPAxis::atTop | QCPAxis::atLeft);
-//  QCPAxis *headAxisY = wideAxisRectHead->axis(QCPAxis::atTop);
-//  QCPAxis *headAxisX = wideAxisRectHead->axis(QCPAxis::atLeft);
-//  //网格线
-//  headAxisY->grid()->setPen(gridPenY);
-//  headAxisX->grid()->setPen(gridPenX);
-//  headAxisY->grid()->setVisible(true);
-//  headAxisX->grid()->setVisible(false);
-//  headAxisY->grid()->setSubGridVisible(true);
-//  headAxisX->setTickLabels(false);
-//  headAxisY->setTicker(ticker);
-
-
-//  headAxisY->setBasePen(axia);
-
-//  wideAxisRectHead->setMinimumMargins(QMargins(0, 0, 0, 0));
-
-  ///测试第二个绘图右边再加个绘图
-  QCPAxisRect *wideAxisRectOther  = new QCPAxisRect(customPlot,false);
-
-  wideAxisRectOther->addAxes(QCPAxis::atTop | QCPAxis::atLeft | QCPAxis::atRight | QCPAxis::atBottom);
-  QCPAxis *otherAxisY = wideAxisRectOther->axis(QCPAxis::atBottom);
-  QCPAxis *otherAxisX = wideAxisRectOther->axis(QCPAxis::atLeft);
-  QCPAxis *otherAxisX_ = wideAxisRectOther->axis(QCPAxis::atRight);
-  QCPAxis *otherAxisY_ = wideAxisRectOther->axis(QCPAxis::atTop);
-
-  otherAxisY_->setPadding(2);
-  otherAxisY_->setBasePen(axia);
-  otherAxisY_->setTickLabels(false);
-  //网格线
-  otherAxisY->grid()->setPen(gridPenY);
-  otherAxisX->grid()->setPen(gridPenX);
-  otherAxisY->grid()->setVisible(true);
-  otherAxisX->grid()->setVisible(false);
-  otherAxisX_->grid()->setVisible(false);
-  otherAxisY->grid()->setSubGridVisible(true);
-  otherAxisX->setTickLabels(false);
-  otherAxisX_->setTickLabels(false);
-  otherAxisY->setTicker(ticker);
-  otherAxisY->setTickLabels(false);
-
-  otherAxisY->setBasePen(axia);
-
-  otherAxisX->setTickLength(0,0);
-  otherAxisX->setTicks(false);
-  otherAxisX->setPadding(0);
-  otherAxisX->setBasePen(axia);
-  otherAxisX_->setBasePen(axia);
-
-  customPlot->plotLayout()->addElement(0, 0, wideAxisRectLeft);
   customPlot->plotLayout()->addElement(0, 1, wideAxisRectRight);
-  customPlot->plotLayout()->addElement(0, 2, wideAxisRectOther);
-//  customPlot->plotLayout()->addElementWholeRow(0, wideAxisRectHead);
-
-  wideAxisRectLeft->setMinimumMargins(QMargins(0, 0, 0, 0));
   wideAxisRectRight->setMinimumMargins(QMargins(0, 0, 0, 0));
-  wideAxisRectOther->setMinimumMargins(QMargins(0, 0, 0, 0));
+  m_paint_units.push_back({{}, wideAxisRectRight, {}});
 
   customPlot->plotLayout()->setColumnSpacing(0);
+}
+
+void CustomPlotTest::addColum(const PAINT_LINE_UNIT &unit) {
+  while (unit.colum >= m_paint_units.size()) {
+    //网格线颜色
+    QPen gridPenX;
+    gridPenX.setColor(QColor(0,255,0,150));
+    QPen gridPenY;
+    gridPenY.setColor(QColor(0,0,0,150));
+    QPen axia;
+    axia.setColor(QColor(0,0,0,255));
+    axia.setWidthF(2.4);
+    QCustomPlot *customPlot = ui->widget_cus;
+    QCPAxisRect *wideAxisRectNew  = new QCPAxisRect(customPlot,false);
+    wideAxisRectNew->addAxes(QCPAxis::atTop | QCPAxis::atLeft | QCPAxis::atRight | QCPAxis::atBottom);
+    QCPAxis *otherAxisY = wideAxisRectNew->axis(QCPAxis::atBottom);
+    QCPAxis *otherAxisX = wideAxisRectNew->axis(QCPAxis::atLeft);
+    QCPAxis *otherAxisX_ = wideAxisRectNew->axis(QCPAxis::atRight);
+    QCPAxis *otherAxisY_ = wideAxisRectNew->axis(QCPAxis::atTop);
+
+    otherAxisY_->setPadding(2);
+    otherAxisY_->setBasePen(axia);
+    otherAxisY_->setTickLabels(false);
+    //网格线
+    otherAxisY->grid()->setPen(gridPenY);
+    otherAxisX->grid()->setPen(gridPenX);
+    otherAxisY->grid()->setVisible(true);
+    otherAxisX->grid()->setVisible(true);
+    otherAxisX_->grid()->setVisible(false);
+    otherAxisY->grid()->setSubGridVisible(true);
+    otherAxisX->setTickLabels(false);
+    otherAxisX_->setTickLabels(false);
+    otherAxisX_->setPadding(0);
+    otherAxisY->setTicker(ticker);
+    otherAxisY->setTickLabels(false);
+
+    otherAxisY->setBasePen(axia);
+
+    otherAxisX->setTickLength(0,0);
+    otherAxisX->setTicks(false);
+    otherAxisX->setPadding(0);
+    otherAxisX->setBasePen(axia);
+    otherAxisX_->setBasePen(axia);
+    m_paint_units.push_back({{}, wideAxisRectNew, {}});
+
+    customPlot->plotLayout()->addElement(0, m_paint_units.size() - 1, wideAxisRectNew);
+    wideAxisRectNew->setMinimumMargins(QMargins(0, 0, 0, 0));
+  }
+  (m_paint_units[unit.colum].base).push_back(unit);
 }
 
 void CustomPlotTest::initChartData()
@@ -214,10 +209,104 @@ void CustomPlotTest::updateChartData()
     QCPGraphData onceValue(vecIndex[i+vecHead],tempValue);
     dataLog.last().first.append(onceValue);
   }
+
+  plotChart(0, PlotNormal);
+  plotChart(1, PlotLog);
+  for (int i = 2 ; i< m_paint_units.size(); i++) {
+     plotChart(i, PlotNormal);
+  }
 }
 
-void CustomPlotTest::plotChart(const bool left, const PlotType type)
-{
+void CustomPlotTest::plotChart(const int &index, const PlotType type) {
+  QCustomPlot *customPlot = ui->widget_cus;
+
+  QCPAxis *axisX;
+  QCPAxis *axisY;
+  QCPAxis *otherAxisX;
+  QList<QCPGraph *> *graphList;
+  auto target = m_paint_units[index].object;
+  axisX = target->axis(QCPAxis::atLeft);
+  axisY = target->axis(QCPAxis::atTop);
+  graphList = &m_paint_units[index].list;
+
+  otherAxisX = wideAxisRectLeft->axis(QCPAxis::atRight);
+
+  foreach (QCPGraph * var, *graphList) {
+    customPlot->removeGraph(var);
+  }
+  graphList->clear();
+
+  switch (type) {
+    case PlotNormal:{
+      axisY->setScaleType(QCPAxis::stLinear);
+      axisY->setTicker(ticker);
+
+      QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
+      subGraph->setData(vecKey,vecValue,true);
+      subGraph->setLineStyle(QCPGraph::lsLine);
+      subGraph->setPen(QPen(QColor("#FFA100"), 1.5));
+      subGraph->rescaleAxes();
+
+      graphList->append(subGraph);
+
+      break;
+    }
+    case PlotSin: {
+      axisY->setScaleType(QCPAxis::stLinear);
+      axisY->setTicker(ticker);
+
+      QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
+      subGraph->setData(vecKey,vecValueSin,true);
+      subGraph->setLineStyle(QCPGraph::lsLine);
+      subGraph->setPen(QPen(QColor("#FFA100"), 1.5));
+      subGraph->rescaleAxes();
+
+      graphList->append(subGraph);
+      break;
+    }
+    case PlotLog:{
+      axisY->setScaleType(QCPAxis::stLogarithmic);
+      axisY->setTicker(logTicker);
+
+      for (int i = 0; i < dataLog.size(); ++i) {
+        QCPGraph *subGraph = customPlot->addGraph(axisX, axisY);
+        subGraph->data()->set(dataLog[i].first,true);
+        subGraph->setLineStyle(QCPGraph::lsLine);
+        subGraph->setPen(QPen(QColor("#FFA100"), (dataLog[i].second+1)*1.5));
+
+        graphList->append(subGraph);
+      }
+
+      axisY->setRange(1,300);
+      //    axisX->setRange((vecKey.first()+vecKey.last())/2 ,vecKey.last() - vecKey.first(),Qt::AlignCenter);
+
+      break;
+    }
+  }
+  double rangMin = qMax(vecKey.first(),otherAxisX->range().lower);
+  double rangMax = qMax(vecKey.last(),otherAxisX->range().upper);
+  axisX->setRange(rangMin,rangMax);
+
+  //  qDebug() << "left:" << left << "vecKey:" << vecKey.first() << vecKey.last()
+  //           << "other:" << otherAxisX->range().lower << otherAxisX->range().upper
+  //           << "result:" << rangMin << rangMax;
+
+  customPlot->replot();
+}
+
+void CustomPlotTest::refresh(std::vector<PAINT_LINE_UNIT> &in) {
+  for (int i = 0; i < in.size(); ++i) {
+//    auto cfg = in[i];
+    addBaseUnit(in[i]);
+  }
+  updateChartData();
+}
+
+void CustomPlotTest::addBaseUnit(PAINT_LINE_UNIT unit) {
+  addColum(unit);
+}
+
+void CustomPlotTest::plotChart(const bool left, const PlotType type) {
   QCustomPlot *customPlot = ui->widget_cus;
 
   QCPAxis *axisX;
@@ -286,17 +375,13 @@ void CustomPlotTest::plotChart(const bool left, const PlotType type)
       }
 
       axisY->setRange(1,300);
-      //    axisX->setRange((vecKey.first()+vecKey.last())/2 ,vecKey.last() - vecKey.first(),Qt::AlignCenter);
-
+      //  axisX->setRange((vecKey.first()+vecKey.last())/2 ,vecKey.last() - vecKey.first(),Qt::AlignCenter);
       break;
     }
   }
-
-
   double rangMin = qMax(vecKey.first(),otherAxisX->range().lower);
   double rangMax = qMax(vecKey.last(),otherAxisX->range().upper);
   axisX->setRange(rangMin,rangMax);
-
 
   //  qDebug() << "left:" << left << "vecKey:" << vecKey.first() << vecKey.last()
   //           << "other:" << otherAxisX->range().lower << otherAxisX->range().upper
@@ -323,21 +408,21 @@ void CustomPlotTest::updateIndex()
 //  }
 }
 
-void CustomPlotTest::on_comboBox_left_currentIndexChanged(int index)
-{
-  plotChart(true,static_cast<PlotType>(index));
-}
+//void CustomPlotTest::on_comboBox_left_currentIndexChanged(int index)
+//{
+//  plotChart(true,static_cast<PlotType>(index));
+//}
 
-void CustomPlotTest::on_comboBox_right_currentIndexChanged(int index)
-{
-  plotChart(false,static_cast<PlotType>(index));
-}
+//void CustomPlotTest::on_comboBox_right_currentIndexChanged(int index)
+//{
+//  plotChart(false,static_cast<PlotType>(index));
+//}
 
-void CustomPlotTest::on_checkBox_stateChanged(int arg1)
-{
-  if(arg1){
-    timer.start(100);
-  } else {
-    timer.stop();
-  }
-}
+//void CustomPlotTest::on_checkBox_stateChanged(int arg1)
+//{
+//  if(arg1){
+//    timer.start(100);
+//  } else {
+//    timer.stop();
+//  }
+//}

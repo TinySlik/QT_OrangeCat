@@ -82,9 +82,6 @@ else()
 endif()
 
 set(SOURCE_GAMMA_FILES ${QRC_FILES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/mainwindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/mainwindow.ui
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/memorymapped.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/memorymapped.cpp
@@ -98,9 +95,6 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot/qcustomplot.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/BaseItem.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/BaseItem.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawImageWidget.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawImageWidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawImageWidget.ui
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/drawlineinfo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/drawlineinfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/drawImage/DrawPictureHead.h
@@ -108,6 +102,7 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.ui
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/type.h
     ${QT_GAMMA_PLATFORM_FILES}
 )
 

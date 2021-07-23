@@ -2,34 +2,26 @@
 #include <QDebug>
 #include <iostream>
 #pragma execution_character_set("utf-8")
+#include "../type.h"
 
 DrawPictureHead::DrawPictureHead() : BaseItem(), firstChartWidth(0)
 {
-  struct default_config_unit {
-    QColor color;
-    int    width;
-    size_t colum;
-    QString name;
-    QString unit;
-    double min;
-    double max;
-  };
-
-  struct default_config_unit config[] = {
-    {QColor(155, 155, 155,255), 3, 0, QObject::tr("GA_1"),      QObject::tr("API"),0,200 },
-    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_U_1"),    QObject::tr("API"),0,200 },
-    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_D_1"),    QObject::tr("API"),0,200 },
-    {QColor(0, 255, 255,255),   2, 2, QObject::tr("GA_O_1"),    QObject::tr("API"),0,200 },
-    {QColor(255, 0, 255,255),   2, 2, QObject::tr("GA_O_2"),    QObject::tr("API"),0,200 },
-    {QColor(255, 100, 255,255), 2, 2, QObject::tr("GA_O_3"),    QObject::tr("API"),0,400 },
-  };
+//  PAINT_LINE_UNIT config[] = {
+//    {QColor(155, 155, 155,255), 3, 0, QObject::tr("GA_1"),      QObject::tr("API"),0,200 },
+//    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_U_1"),    QObject::tr("API"),0,200 },
+//    {QColor(255, 0, 0,255),     1, 1, QObject::tr("GA_D_1"),    QObject::tr("API"),0,200 },
+//    {QColor(0, 255, 255,255),   2, 2, QObject::tr("GA_O_1"),    QObject::tr("API"),0,200 },
+//    {QColor(255, 0, 255,255),   2, 2, QObject::tr("GA_O_2"),    QObject::tr("API"),0,200 },
+//    {QColor(255, 100, 255,255), 2, 2, QObject::tr("GA_O_3"),    QObject::tr("API"),0,400 },
+//    {QColor(255, 100, 255,255), 2, 3, QObject::tr("GA_O_3"),    QObject::tr("API"),0,400 },
+//  };
 
   QPen pen;
-  for (size_t i = 0; i< sizeof(config) / sizeof (struct default_config_unit) ; ++i) {
-    pen.setColor(config[i].color);
-    pen.setWidth(config[i].width);
-    addLine(config[i].colum, pen, config[i].name, config[i].unit,config[i].min,config[i].max);
-  }
+//  for (size_t i = 0; i< sizeof(config) / sizeof (struct default_config_unit) ; ++i) {
+//    pen.setColor(config[i].color);
+//    pen.setWidth(config[i].width);
+//    addLine(config[i].colum, pen, config[i].name, config[i].unit,config[i].min,config[i].max);
+//  }
 
   m_drawLineInfoRule = new DrawLineInfo();
   m_drawLineInfoRule->setParentItem(this);
@@ -39,6 +31,16 @@ DrawPictureHead::DrawPictureHead() : BaseItem(), firstChartWidth(0)
   m_drawLineInfoRule->setLineInfo(pen,QObject::tr("DEPTH"),QObject::tr("m"),0,200);
 
   refreashSize();
+}
+
+void DrawPictureHead::refresh(std::vector<PAINT_LINE_UNIT> &in) {
+  lines = in;
+  QPen pen;
+  for (size_t i = 0; i< lines.size() ; ++i) {
+    pen.setColor(lines[i].color);
+    pen.setWidth(lines[i].width);
+    addLine(lines[i].colum, pen, lines[i].name, lines[i].unit,lines[i].min,lines[i].max);
+  }
 }
 
 void DrawPictureHead::addLine(size_t colum, QPen pen, QString lineName, QString lineUnit,

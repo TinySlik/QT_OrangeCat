@@ -27,7 +27,6 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   Q_UNUSED(option)
   Q_UNUSED(widget)
 
-
   QPen pen;
   pen.setColor(QColor(0, 0, 0,255));
   pen.setWidthF(3.0);

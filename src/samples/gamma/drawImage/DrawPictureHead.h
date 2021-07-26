@@ -15,6 +15,8 @@ class DrawPictureHead : public BaseItem {
                double min = 0,double max = 300);
   void setFirstChartWidth(int width) {firstChartWidth = width;}
   void refresh(std::vector<PAINT_LINE_UNIT> &in);
+  void setAxialSpread(float width) {axialSpread = width;}
+
  protected:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
@@ -24,6 +26,7 @@ class DrawPictureHead : public BaseItem {
   void refreashSize();
   int firstChartWidth;
   std::vector<PAINT_LINE_UNIT> lines;
+  float axialSpread;
 };
 
 #endif // DRAWPICTUREHEAD_H

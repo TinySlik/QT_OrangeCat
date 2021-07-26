@@ -13,6 +13,9 @@ public:
   void setLineInfo(QPen pen,QString lineName = QObject::tr("empty"),QString lineUnit = QObject::tr("API"),
                    double min = 0,double max = 300);
 
+  void setAxialLineInfo(QPen pen,QString lineName = QObject::tr("empty"),QString lineUnit = QObject::tr("API"),
+                   double min = 0,double max = 300);
+
   QPen linePen() const;
   void setLinePen(const QPen &linePen);
 
@@ -42,6 +45,7 @@ private:
   double m_lineMax;//最大值
 
   bool m_isDrawLine;//是否画线和范围
+  bool m_isAxial;
 };
 
 #endif // DRAWLINEINFO_H

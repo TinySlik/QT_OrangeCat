@@ -48,6 +48,7 @@ public:
 
 private slots:
   void updateIndex();
+  void scroll(int index);
 
 private:
   Ui::CustomPlotTest *ui;

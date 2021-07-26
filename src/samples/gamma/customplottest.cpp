@@ -58,7 +58,7 @@ void CustomPlotTest::initChart() {
   leftAxisX->setRangeReversed(true);
   leftAxisX_->setRangeReversed(true);
 
-  leftAxisX->setTickLabels(true);
+  leftAxisX->setTickLabels(false);
 
   //网格线
   leftAxisY->grid()->setPen(gridPenY);
@@ -71,7 +71,7 @@ void CustomPlotTest::initChart() {
   leftAxisX_->setTickLabels(false);
   leftAxisY->setTicker(ticker);
   leftAxisY->setTickLabels(false);
-  leftAxisX->setPadding(32);
+  leftAxisX->setPadding(46);
 
   customPlot->plotLayout()->addElement(0, 0, wideAxisRectLeft);
   wideAxisRectLeft->setMinimumMargins(QMargins(0, 0, 0, 0));
@@ -163,6 +163,10 @@ void CustomPlotTest::addColum(const PAINT_LINE_UNIT &unit) {
     otherAxisX->setPadding(0);
     otherAxisX->setBasePen(axia);
     otherAxisX_->setBasePen(axia);
+
+    otherAxisX->setRangeReversed(true);
+    otherAxisX_->setRangeReversed(true);
+
     m_paint_units.push_back({{}, wideAxisRectNew, {}});
 
     customPlot->plotLayout()->addElement(0, m_paint_units.size() - 1, wideAxisRectNew);
@@ -172,14 +176,19 @@ void CustomPlotTest::addColum(const PAINT_LINE_UNIT &unit) {
 }
 
 void CustomPlotTest::scroll(int index) {
-  QCPAxis *leftAxisX = wideAxisRectRight->axis(QCPAxis::atRight);
-  QCPAxis *leftAxisX_ = wideAxisRectRight->axis(QCPAxis::atLeft);
-  leftAxisX_->setRange(index * 100 , (index +1) * 100);
-
+  QCPAxis *leftAxisX = wideAxisRectLeft->axis(QCPAxis::atRight);
+  QCPAxis *leftAxisX_ = wideAxisRectLeft->axis(QCPAxis::atLeft);
+  leftAxisX->setRange(index * 100 , (index +1) * 100);
+  double rangeMin = index * 10.0;
+  double rangeMax = (index + 90) * 10.0;
   for (size_t i = 0; i< m_paint_units.size(); ++i) {
-//    m_paint_units[i].object->setRangeDrag();
+    auto a = m_paint_units[i].object->axis(QCPAxis::atRight);
+    auto b = m_paint_units[i].object->axis(QCPAxis::atLeft);
+    a->setRange(rangeMin, rangeMax);
+    b->setRange(rangeMin, rangeMax);
   }
-  plotChart(0, PlotNormal);
+  QCustomPlot *customPlot = ui->widget_cus;
+  customPlot->replot();
 }
 
 void CustomPlotTest::initChartData()

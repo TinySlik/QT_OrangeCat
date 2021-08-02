@@ -14,7 +14,7 @@ class QtekLineChat : public QWidget
 {
   Q_OBJECT
 public:
-  explicit QtekLineChat(QWidget *parent = nullptr);
+  explicit QtekLineChat(std::vector<PAINT_LINE_UNIT> &lines, QWidget *parent = nullptr);
   ~QtekLineChat() override;
   void addLine(PAINT_LINE_UNIT);
   void clearLine();

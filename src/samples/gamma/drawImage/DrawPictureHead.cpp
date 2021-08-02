@@ -21,6 +21,14 @@ DrawPictureHead::DrawPictureHead() : BaseItem(), firstChartWidth(0), axialSpread
 }
 
 void DrawPictureHead::refresh(std::vector<PAINT_LINE_UNIT> &in) {
+  for (size_t i = 0;i < units.size() ; ++i) {
+    for (size_t j = 0;j < units[i].size() ; ++j) {
+      units[i][j]->setParentItem(nullptr);
+      delete units[i][j];
+    }
+  }
+  units.clear();
+  lines.clear();
   lines = in;
   QPen pen;
   for (size_t i = 0; i< lines.size() ; ++i) {

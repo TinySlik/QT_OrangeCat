@@ -180,7 +180,7 @@ void CustomPlotTest::scroll(int index) {
   QCPAxis *leftAxisX_ = wideAxisRectLeft->axis(QCPAxis::atLeft);
   leftAxisX->setRange(index * 100 , (index +1) * 100);
   double rangeMin = index * 10.0;
-  double rangeMax = (index + 90) * 10.0;
+  double rangeMax = (index + 10) * 10.0;
   for (size_t i = 0; i< m_paint_units.size(); ++i) {
     auto a = m_paint_units[i].object->axis(QCPAxis::atRight);
     auto b = m_paint_units[i].object->axis(QCPAxis::atLeft);

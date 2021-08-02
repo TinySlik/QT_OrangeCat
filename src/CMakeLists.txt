@@ -103,6 +103,8 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qteklinechat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/type.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customwidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customwidget.cpp
     ${QT_GAMMA_PLATFORM_FILES}
 )
 

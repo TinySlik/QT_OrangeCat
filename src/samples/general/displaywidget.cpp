@@ -247,7 +247,6 @@ DisplayWidget::DisplayWidget(QWidget *parent)
     return true;
   });
 
-
   cfg_local["m_decoder_unsigned"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_bool()) return false;
     auto tg = static_cast<bool>(b);

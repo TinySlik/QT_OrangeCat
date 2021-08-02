@@ -30,7 +30,6 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
     }}
   };
 
-
   auto createNewLines = [](const configuru::Config &config) -> std::vector<PAINT_LINE_UNIT> {
     if (!config.is_array()) return{};
     auto arry = config.as_array();

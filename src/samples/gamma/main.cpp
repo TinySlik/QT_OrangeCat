@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
                                                   }}
                                                 });
   ParameterServer::instance()->SetCurrentRoot("base");
-
   CustomWidget bW;
   bW.NewQtekLineChat();
   bW.show();

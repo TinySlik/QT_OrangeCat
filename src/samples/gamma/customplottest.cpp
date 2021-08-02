@@ -349,30 +349,5 @@ void CustomPlotTest::updateIndex()
   updateChartData();
 
   static int count = 0;
-
-//  if(++count >= 10){
-//    count = 0;
-
-//    plotChart(true,static_cast<PlotType>(ui->comboBox_left->currentIndex()));
-//    plotChart(false,static_cast<PlotType>(ui->comboBox_right->currentIndex()));
-//  }
 }
 
-//void CustomPlotTest::on_comboBox_left_currentIndexChanged(int index)
-//{
-//  plotChart(true,static_cast<PlotType>(index));
-//}
-
-//void CustomPlotTest::on_comboBox_right_currentIndexChanged(int index)
-//{
-//  plotChart(false,static_cast<PlotType>(index));
-//}
-
-//void CustomPlotTest::on_checkBox_stateChanged(int arg1)
-//{
-//  if(arg1){
-//    timer.start(100);
-//  } else {
-//    timer.stop();
-//  }
-//}

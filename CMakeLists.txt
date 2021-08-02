@@ -91,7 +91,9 @@ add_custom_command(TARGET res
   POST_BUILD
   COMMAND echo "executing a res command"
  )
-add_subdirectory(3rdparty/adlink)
+if(ADLINK_32)
+  add_subdirectory(3rdparty/adlink)
+endif()
 add_subdirectory(3rdparty/asyncplusplus)
 add_subdirectory(3rdparty/liblas)
 add_subdirectory(src)

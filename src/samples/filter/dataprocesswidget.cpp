@@ -33,7 +33,10 @@
 #include "decoder/personificationdecoderv2.h"
 #include "decoder/highfrequencysensivitydecoder.h"
 #include "renderutil.h"
+
+#ifdef ADLINK_32
 #include "adlink.h"
+#endif
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/filter_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/general_v.glsl"
@@ -127,8 +130,10 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_samplingSpeed", m_samplingSpeed},
       {"m_decoder", "empty"},
       {"m_decoder_unsigned", m_decoder_unsigned},
+#ifdef ADLINK_32
       {"adlink_card_ID", m_adlink_card_current_ID},
       {"adlink_card_enable", false},
+#endif
       {"front_color", color_format_int_to_string(m_color).c_str()},
       {"background_color", color_format_int_to_string(m_backgroundColor).c_str()},
       {"transform", {
@@ -345,7 +350,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_ComputeShaderSwitch = tg;
     return true;
   });
-
+#ifdef ADLINK_32
   cfg_local["adlink_card_enable"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
       if (!b.is_bool()) return false;
       if (m_adlink_card_current_ID == 256) {
@@ -393,7 +398,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       }
       return false;
     });
-
+#endif
   cfg_local["m_decoder_unsigned"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_bool()) return false;
     auto tg = static_cast<bool>(b);

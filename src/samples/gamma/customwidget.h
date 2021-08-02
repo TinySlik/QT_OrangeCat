@@ -21,6 +21,8 @@ public:
  void NewQtekLineChat(std::vector<PAINT_LINE_UNIT> lines);
  QtekLineChat * chart;
  std::vector<PAINT_LINE_UNIT> m_lines;
+ int _lineChatWidth;
+ int _lineChatHeight;
 };
 
 #endif // CUSTOMWIDGET_H

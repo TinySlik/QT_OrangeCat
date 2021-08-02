@@ -15,7 +15,6 @@
 #include <string>
 #include <QColor>
 
-
 int str_to_hex(char *string, unsigned char *cbuf, int len);
 void hex_to_str(char *ptr,unsigned char *buf,int len);
 std::string color_format_int_to_string(const uint32_t &color);

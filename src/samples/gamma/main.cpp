@@ -1,6 +1,7 @@
+#define CONFIGURU_IMPLEMENTATION 1
 #include "qteklinechat.h"
 #include <QApplication>
-#define CONFIGURU_IMPLEMENTATION 1
+
 #include "parameterserver.h"
 
 #include "easylogging++.h"

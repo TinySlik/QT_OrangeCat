@@ -1,6 +1,7 @@
 #include "customwidget.h"
 #include "parameterserver.h"
 #include "renderutil.h"
+#include "easylogging++.h"
 
 #include <QMetaType>
 
@@ -14,19 +15,20 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
   cfg += {{class_obj_id.c_str(), {
       {"lines", {configuru::Config::array(
         {
-          {{"line_color", "#00CD00FF"},    {"line_width", 3}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
-          {{"line_color", "#EE4000FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_2"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
+          {{"line_color", "#00CD00FF"},    {"line_width", 1}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
+          {{"line_color", "#EE4000FF"},    {"line_width", 2}, {"line_colum", 1}},
           {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
-          {{"line_color", "#98F5FFFF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_4"}, {"min", 0}, {"max", 200} , {"call_back", nullptr}},
+          {{"line_color", "#98F5FFFF"},    {"line_width", 1}, {"line_colum", 2}, {"title", "GA_4"}, {"min", 0}, {"max", 200} , {"call_back", nullptr}},
           {{"line_color", "#A020F0FF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_5"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
-          {{"line_color", "#7FFF00FF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_6"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
+          {{"line_color", "#7FFF00FF"},    {"line_width", 2}, {"line_colum", 2}, {"title", "GA_6"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
           {{"line_color", "#CDCDB4FF"},    {"line_width", 3}, {"line_colum", 3}, {"title", "GA_7"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
         })
       }},
       {"size", {
         {"width", _lineChatWidth},
         {"height", _lineChatHeight}
-      }}
+      }},
+      {"snap_status", false}
     }}
   };
 
@@ -80,9 +82,21 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
       emit NewQtekLineChatSIG();
       return true;
     });
+  cfg_local["snap_status"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_bool()) return false;
+//    this->slotGrabWidgetScreen();
+    emit CaptureSIG();
+    return false;
+  });
 
   m_lines = createNewLines(cfg_local["lines"]);
   connect(this, SIGNAL(NewQtekLineChatSIG()), this, SLOT(NewQtekLineChat()));
+  connect(this, SIGNAL(CaptureSIG()), this, SLOT(Capture()));
+}
+
+CustomWidget::~CustomWidget() {
+  disconnect(this, SIGNAL(NewQtekLineChatSIG()), this, SLOT(NewQtekLineChat()));
+  disconnect(this, SIGNAL(CaptureSIG()), this, SLOT(Capture()));
 }
 
 void CustomWidget::NewQtekLineChat(std::vector<PAINT_LINE_UNIT> lines) {
@@ -98,4 +112,13 @@ void CustomWidget::NewQtekLineChat() {
   chart = new QtekLineChat(m_lines, this);
   chart->show();
   chart->resize(_lineChatWidth, _lineChatHeight);
+}
+
+void CustomWidget::Capture() {
+  slotGrabWidgetScreen();
+}
+
+void CustomWidget::slotGrabWidgetScreen() {
+  if (chart)
+    chart->capture();
 }

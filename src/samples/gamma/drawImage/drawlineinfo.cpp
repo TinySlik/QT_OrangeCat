@@ -35,6 +35,7 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 {
   Q_UNUSED(option)
   Q_UNUSED(widget)
+//  painter->save();
 
   QPen pen;
   pen.setColor(QColor(0, 0, 0,255));
@@ -91,15 +92,16 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     font.setPointSize(8);
     font.setFamily("Arial");
     painter->setFont(font);
-    painter->drawText(unitWidth,mItemY + mItemHeight/2 + 15,QString("(%1)").arg(m_lineUnit));
+    painter->drawText(unitWidth * 1.01,mItemY + mItemHeight/2 + 15,QString("(%1)").arg(m_lineUnit));
   }
-
-
 
   //画左右边框
   painter->setPen(pen);
   painter->drawLine(mItemX + mItemWidth - 1,mItemY,mItemX + mItemWidth - 1, mItemY + mItemHeight);
   painter->drawLine(mItemX, mItemY, mItemX, mItemY + mItemHeight);
+  painter->endNativePainting();
+
+//  painter->end();
 }
 
 

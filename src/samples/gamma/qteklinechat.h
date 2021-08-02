@@ -19,6 +19,8 @@ public:
   void addLine(PAINT_LINE_UNIT);
   void clearLine();
   void activeLines();
+  QRect getSnapRect();
+  void capture();
 protected:
   virtual void resizeEvent(QResizeEvent *event) override;
 
@@ -36,6 +38,8 @@ private:
   std::vector<PAINT_LINE_UNIT> lines;
 private:
   Ui::QtekLineChat *ui;
+  int bar_width;
+  int head_height;
 };
 
 #endif // QTEKLINECHAT_H

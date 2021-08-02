@@ -46,7 +46,7 @@ public:
   int getFirstChartWidth() {if (wideAxisRectLeft) return wideAxisRectLeft->rect().width(); else return -1;}
   void addColum(const PAINT_LINE_UNIT & unit);
 
-private slots:
+public slots:
   void updateIndex();
   void scroll(int index);
 

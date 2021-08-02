@@ -8,7 +8,9 @@
 
 QtekLineChat::QtekLineChat(std::vector<PAINT_LINE_UNIT> &lines_,QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::QtekLineChat) {
+  ui(new Ui::QtekLineChat),
+  bar_width(20),
+  head_height(140) {
   ui->setupUi(this);
   lines = lines_;
   initGraphicsView();
@@ -17,6 +19,10 @@ QtekLineChat::QtekLineChat(std::vector<PAINT_LINE_UNIT> &lines_,QWidget *parent)
 QtekLineChat::~QtekLineChat()
 {
   delete ui;
+}
+
+QRect QtekLineChat::getSnapRect() {
+  return QRect(this->rect().x(), this->rect().y(), this->rect().width()- bar_width, this->rect().height());
 }
 
 void QtekLineChat::initGraphicsView(){
@@ -58,8 +64,6 @@ void QtekLineChat::activeLines() {
 }
 
 void QtekLineChat::resizeEvent(QResizeEvent *) {
-  int bar_width = 20;
-  int head_height = 140;
   auto targetRect = QRect(this->rect().x(), this->rect().y(), this->rect().width()- bar_width, this->rect().height());
   auto targetRectBar = QRect(this->rect().width() - bar_width + 1, targetRect.y() + head_height, bar_width - 1, targetRect.height() - head_height);
   ui->graphicsView->setGeometry(this->rect());
@@ -70,4 +74,34 @@ void QtekLineChat::resizeEvent(QResizeEvent *) {
   m_customPlot->setGeometry(targetRect.x() - PADDING, targetRect.y() + head_height  - PADDING + 3, targetRect.width() + PADDING * 2 - 3, targetRect.height() - head_height + PADDING * 2);
   m_pictureHead->setFirstChartWidth(m_customPlot->getFirstChartWidth());
   m_pictureHead->setItemSize(targetRect.x(),targetRect.y(),targetRect.width() + 2, head_height);
+}
+
+void QtekLineChat::capture() {
+  QRect rect = getSnapRect();
+  QRect rect_raw = QRect(rect.x(), rect.y() + head_height, rect.width(), rect.height() - head_height);
+
+  std::vector<QPixmap> array;
+  QPixmap total_pixmap(QSize(rect.width(), rect_raw.height() * 11 + head_height));
+  QPainter painter(&total_pixmap);
+  for (size_t i =0; i<= 10; ++i) {
+    m_customPlot->scroll(i * 10);
+    if (i == 0) {
+      QPixmap p = this->grab(rect);
+      array.push_back(p);
+      painter.drawPixmap(rect, p);
+    } else {
+      QPixmap p = this->grab(rect_raw);
+      array.push_back(p);
+      painter.drawPixmap(QRect(rect_raw.x(), rect_raw.height() * i + head_height, rect.width(), rect_raw.height()), p);
+    }
+  }
+
+  QString filePathName = "ChartSnap";
+  filePathName += QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss-zzz");
+  filePathName += ".png";
+  if(!total_pixmap.save(filePathName,"png")) {
+    LOG(INFO) <<"save widget screen failed";
+  } else {
+    LOG(INFO) << filePathName.toLatin1().data() << " saved.";
+  }
 }

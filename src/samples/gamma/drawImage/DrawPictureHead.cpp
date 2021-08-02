@@ -3,6 +3,7 @@
 #include <iostream>
 #pragma execution_character_set("utf-8")
 #include "../type.h"
+#include "easylogging++.h"
 
 DrawPictureHead::DrawPictureHead() : BaseItem(), firstChartWidth(0), axialSpread(36)
 {
@@ -61,10 +62,7 @@ void DrawPictureHead::refreashSize() {
       max_row = units[i].size();
     }
   }
-  size_t unitWidth = 0;
   size_t unitHeight = 0;
-  if (columSize)
-      unitWidth = (mItemWidth - axialSpread) / columSize;
   if (max_row)
       unitHeight = mItemHeight / max_row;
   for (size_t i = 0; i < columSize; i++) {
@@ -93,11 +91,19 @@ void DrawPictureHead::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
   QPen pen;
   pen.setColor(QColor(0, 0, 0,255));
-  pen.setWidth(2);
+  pen.setWidth(4);
   painter->setPen(pen);
   // 画线
   painter->drawLine(mItemX,mItemY + 1,mItemX + mItemWidth,mItemY + 1);
   painter->drawLine(mItemX + mItemWidth - 2,mItemY,mItemX + mItemWidth - 2,mItemY + mItemHeight);
   painter->drawLine(mItemX,mItemY + mItemHeight,mItemX + mItemWidth,mItemY + mItemHeight);
   painter->drawLine(mItemX + 1,mItemY,mItemX + 1,mItemY + mItemHeight);
+
+  auto columSize = units.size();
+  int resetUnitWidth = ( mItemWidth - (firstChartWidth) - axialSpread) / (columSize - 1);
+  for (size_t i = 0; i < columSize; i++) {
+    painter->drawLine(firstChartWidth + (i-1) * resetUnitWidth + axialSpread + 1, mItemY,firstChartWidth + (i-1) * resetUnitWidth + axialSpread + 1,mItemY + mItemHeight);
+  }
+  static int a = 0;
+  a++;
 }

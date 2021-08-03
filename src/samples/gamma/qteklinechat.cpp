@@ -4,6 +4,7 @@
 #include "parameterserver.h"
 #include "easylogging++.h"
 #include "renderutil.h"
+#include "rangeslider.h"
 #define PADDING 14
 
 QtekLineChat::QtekLineChat(std::vector<PAINT_LINE_UNIT> &lines_,QWidget *parent) :
@@ -18,6 +19,9 @@ QtekLineChat::QtekLineChat(std::vector<PAINT_LINE_UNIT> &lines_,QWidget *parent)
 
 QtekLineChat::~QtekLineChat()
 {
+  disconnect(slider, SIGNAL(lowerValueChanged(int)), m_customPlot, SLOT(onRangeChangedLow(int)));
+  disconnect(slider, SIGNAL(upperValueChanged(int)), m_customPlot, SLOT(onRangeChangedUpper(int)));
+//  disconnect(slider, SIGNAL(rangeChanged(int, int)), m_customPlot, SLOT(onRangeChanged(int, int)));
   delete ui;
 }
 
@@ -48,7 +52,10 @@ void QtekLineChat::initGraphicsView(){
   this->resize(this->rect().width(), this->rect().height());
 
   activeLines();
-  connect(ui->QTekVerticalScrollBar, SIGNAL(valueChanged(int)), m_customPlot, SLOT(scroll(int)));
+  slider = new RangeSlider(Qt::Vertical, RangeSlider::Option::DoubleHandles, this);
+  connect(slider, SIGNAL(lowerValueChanged(int)), m_customPlot, SLOT(onRangeChangedLow(int)));
+  connect(slider, SIGNAL(upperValueChanged(int)), m_customPlot, SLOT(onRangeChangedUpper(int)));
+//  connect(slider, SIGNAL(rangeChanged(int, int)), m_customPlot, SLOT(onRangeChanged(int, int)));
 }
 
 void QtekLineChat::addLine(PAINT_LINE_UNIT unit) {
@@ -67,10 +74,10 @@ void QtekLineChat::resizeEvent(QResizeEvent *) {
   auto targetRect = QRect(this->rect().x(), this->rect().y(), this->rect().width()- bar_width, this->rect().height());
   auto targetRectBar = QRect(this->rect().width() - bar_width + 1, targetRect.y() + head_height, bar_width - 1, targetRect.height() - head_height);
   ui->graphicsView->setGeometry(this->rect());
-  ui->QTekVerticalScrollBar->setGeometry(targetRectBar);
+  slider->setGeometry(targetRectBar);
   ui->comboBox ->setGeometry(QRect(this->rect().width() - bar_width + 1, targetRect.y(), bar_width - 1, head_height));
 //  m_customPlot->resize(this->width(),this->height());
-  m_customPlot->stackUnder(ui->QTekVerticalScrollBar);
+  m_customPlot->stackUnder(slider);
   m_customPlot->setGeometry(targetRect.x() - PADDING, targetRect.y() + head_height  - PADDING + 3, targetRect.width() + PADDING * 2 - 3, targetRect.height() - head_height + PADDING * 2);
   m_pictureHead->setFirstChartWidth(m_customPlot->getFirstChartWidth());
   m_pictureHead->setItemSize(targetRect.x(),targetRect.y(),targetRect.width() + 2, head_height);
@@ -96,7 +103,7 @@ void QtekLineChat::capture() {
     }
   }
 
-  QString filePathName = "ChartSnap";
+  QString filePathName = "Snap";
   filePathName += QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss-zzz");
   filePathName += ".png";
   if(!total_pixmap.save(filePathName,"png")) {

@@ -5,6 +5,7 @@
 #include "drawImage/DrawPictureHead.h"
 #include "customplottest.h"
 #include "type.h"
+#include "rangeslider.h"
 
 namespace Ui {
   class QtekLineChat;
@@ -40,6 +41,7 @@ private:
   Ui::QtekLineChat *ui;
   int bar_width;
   int head_height;
+  RangeSlider *slider;
 };
 
 #endif // QTEKLINECHAT_H

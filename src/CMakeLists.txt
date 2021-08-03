@@ -81,6 +81,8 @@ else()
   set(QT_GAMMA_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/impl.linux.cpp)
 endif()
 
+include_directories(gamma)
+
 set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/memorymapped.h
@@ -105,6 +107,8 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/type.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customwidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customwidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/rangeslider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/rangeslider.h
     ${QT_GAMMA_PLATFORM_FILES}
 )
 

@@ -1,11 +1,15 @@
 ﻿#include "customplottest.h"
 #include "ui_CustomPlotTest.h"
 #include "drawImage/DrawPictureHead.h"
+#include "easylogging++.h"
 
 CustomPlotTest::CustomPlotTest(QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::CustomPlotTest)
-{
+  ui(new Ui::CustomPlotTest),
+  baseRangeMin(0),
+  baseRangeMax(1000),
+  rangeMin(0),
+  rangeMax(200) {
   ui->setupUi(this);
   initChart();
   initChartData();
@@ -177,10 +181,9 @@ void CustomPlotTest::addColum(const PAINT_LINE_UNIT &unit) {
 
 void CustomPlotTest::scroll(int index) {
   QCPAxis *leftAxisX = wideAxisRectLeft->axis(QCPAxis::atRight);
-  QCPAxis *leftAxisX_ = wideAxisRectLeft->axis(QCPAxis::atLeft);
   leftAxisX->setRange(index * 100 , (index +1) * 100);
-  double rangeMin = index * 10.0;
-  double rangeMax = (index + 10) * 10.0;
+  double rangeMin = index * 1.0;
+  double rangeMax = (index + 10) * 1.0;
   for (size_t i = 0; i< m_paint_units.size(); ++i) {
     auto a = m_paint_units[i].object->axis(QCPAxis::atRight);
     auto b = m_paint_units[i].object->axis(QCPAxis::atLeft);
@@ -189,6 +192,36 @@ void CustomPlotTest::scroll(int index) {
   }
   QCustomPlot *customPlot = ui->widget_cus;
   customPlot->replot();
+}
+
+
+void CustomPlotTest::rangeUpdate(int min, int max) {
+  QCPAxis *leftAxisX = wideAxisRectLeft->axis(QCPAxis::atRight);
+  leftAxisX->setRange(min , max);
+  double rangeMin = min;
+  double rangeMax = max;
+  for (size_t i = 0; i< m_paint_units.size(); ++i) {
+    auto a = m_paint_units[i].object->axis(QCPAxis::atRight);
+    auto b = m_paint_units[i].object->axis(QCPAxis::atLeft);
+    a->setRange(rangeMin, rangeMax);
+    b->setRange(rangeMin, rangeMax);
+  }
+  QCustomPlot *customPlot = ui->widget_cus;
+  customPlot->replot();
+}
+
+void CustomPlotTest::onRangeChangedLow(int aMin) {
+  rangeMin = aMin;
+  rangeUpdate(rangeMin, rangeMax);
+}
+void CustomPlotTest::onRangeChangedUpper(int aMax) {
+  rangeMax = aMax;
+  rangeUpdate(rangeMin, rangeMax);
+}
+
+void CustomPlotTest::onBaseRangeChanged(int aMin, int aMax) {
+  baseRangeMin = aMin;
+  baseRangeMax = aMax;
 }
 
 void CustomPlotTest::initChartData()

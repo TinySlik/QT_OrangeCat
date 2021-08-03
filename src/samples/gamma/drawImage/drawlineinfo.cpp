@@ -65,7 +65,9 @@ void DrawLineInfo::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
     //画线
     painter->setPen(m_linePen);
-    painter->drawLine(mItemX,mItemY + mItemHeight * 0.55, mItemX + mItemWidth - 1, mItemY + mItemHeight * 0.55);
+    painter->drawLine(mItemX, mItemY + mItemHeight * 0.55, mItemX + mItemWidth - 1, mItemY + mItemHeight * 0.55);
+//    painter->drawLine(mItemX + 10, mItemY + mItemHeight * 0.55 - 3, mItemX + 10, mItemY + mItemHeight * 0.55 + 3);
+//    painter->drawLine(mItemX + mItemWidth - 1 - 10, mItemY + mItemHeight * 0.55 - 3, mItemX + mItemWidth - 1 - 10, mItemY + mItemHeight * 0.55 + 3);
   }
 
   //画单位和线名

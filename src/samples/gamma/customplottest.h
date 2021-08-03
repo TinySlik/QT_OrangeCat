@@ -45,10 +45,15 @@ public:
 
   int getFirstChartWidth() {if (wideAxisRectLeft) return wideAxisRectLeft->rect().width(); else return -1;}
   void addColum(const PAINT_LINE_UNIT & unit);
+  void rangeUpdate(int min, int max);
+
 
 public slots:
   void updateIndex();
   void scroll(int index);
+  void onRangeChangedLow(int aMin);
+  void onRangeChangedUpper(int aMax);
+  void onBaseRangeChanged(int aMin, int zMax);
 
 private:
   Ui::CustomPlotTest *ui;
@@ -76,6 +81,11 @@ private:
   void addBaseUnit(PAINT_LINE_UNIT);
 
   QTimer timer;
+
+  int baseRangeMin;
+  int baseRangeMax;
+  int rangeMin;
+  int rangeMax;
 };
 
 #endif // CUSTOMPLOTTEST_H

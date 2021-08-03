@@ -108,6 +108,20 @@ QRectF RangeSlider::secondHandleRect() const
     return handleRect(percentage * validLength() + scLeftRightMargin + (type.testFlag(LeftHandle) ? scHandleSideLength : 0));
 }
 
+QRectF RangeSlider::mainSliderHandleRect() const {
+  float percentage1 = (mLowerValue - mMinimum) * 1.0 / mInterval;
+  float percentage2 = (mUpperValue - mMinimum) * 1.0 / mInterval;
+  return mainSliderRect(percentage1 * validLength() + scLeftRightMargin, percentage2* validLength() + scLeftRightMargin + (type.testFlag(LeftHandle) ? scHandleSideLength : 0));
+}
+
+QRectF RangeSlider::mainSliderRect(int aValue, int aValue2) const {
+    if(orientation == Qt::Horizontal)
+        return QRect(aValue + scHandleSideLength, (height()-scHandleSideLength) / 2, aValue2 - aValue - scHandleSideLength, scHandleSideLength);
+    else
+        return QRect((width()-scHandleSideLength) / 2, aValue + scHandleSideLength, scHandleSideLength, aValue2 - aValue - scHandleSideLength);
+}
+
+
 QRectF RangeSlider::handleRect(int aValue) const
 {
     if(orientation == Qt::Horizontal)
@@ -126,9 +140,10 @@ void RangeSlider::mousePressEvent(QMouseEvent* aEvent)
         posValue = (orientation == Qt::Horizontal) ? aEvent->pos().x() : aEvent->pos().y();
         firstHandleRectPosValue = (orientation == Qt::Horizontal) ? firstHandleRect().x() : firstHandleRect().y();
         secondHandleRectPosValue = (orientation == Qt::Horizontal) ? secondHandleRect().x() : secondHandleRect().y();
+        mMainSliderHandlePressed = mainSliderHandleRect().contains(aEvent->pos());
+        mSecondHandlePressed = !mMainSliderHandlePressed && secondHandleRect().contains(aEvent->pos());
+        mFirstHandlePressed = !mMainSliderHandlePressed && !mSecondHandlePressed && firstHandleRect().contains(aEvent->pos());
 
-        mSecondHandlePressed = secondHandleRect().contains(aEvent->pos());
-        mFirstHandlePressed = !mSecondHandlePressed && firstHandleRect().contains(aEvent->pos());
         if(mFirstHandlePressed)
         {
             mDelta = posValue - (firstHandleRectPosValue + scHandleSideLength / 2);
@@ -136,9 +151,11 @@ void RangeSlider::mousePressEvent(QMouseEvent* aEvent)
         else if(mSecondHandlePressed)
         {
             mDelta = posValue - (secondHandleRectPosValue + scHandleSideLength / 2);
+        } else if(mMainSliderHandlePressed) {
+            mDeltaMainMove = posValue - (firstHandleRectPosValue + scHandleSideLength / 2);
         }
 
-        if(posCheck >= 2
+        if(!mMainSliderHandlePressed && posCheck >= 2
            && posCheck <= posMax - 2)
         {
             int step = mInterval / 10 < 1 ? 1 : mInterval / 10;
@@ -172,6 +189,7 @@ void RangeSlider::mouseMoveEvent(QMouseEvent* aEvent)
         posValue = (orientation == Qt::Horizontal) ? aEvent->pos().x() : aEvent->pos().y();
         firstHandleRectPosValue = (orientation == Qt::Horizontal) ? firstHandleRect().x() : firstHandleRect().y();
         secondHandleRectPosValue = (orientation == Qt::Horizontal) ? secondHandleRect().x() : secondHandleRect().y();
+        auto mainRg = secondHandleRectPosValue - firstHandleRectPosValue;
 
         if(mFirstHandlePressed && type.testFlag(LeftHandle))
         {
@@ -188,11 +206,29 @@ void RangeSlider::mouseMoveEvent(QMouseEvent* aEvent)
         {
             if(firstHandleRectPosValue + scHandleSideLength * (type.testFlag(DoubleHandles) ? 1.5 : 0.5) <= posValue - mDelta)
             {
-                setUpperValue((posValue - mDelta - scLeftRightMargin - scHandleSideLength / 2 - (type.testFlag(DoubleHandles) ? scHandleSideLength : 0)) * 1.0 / validLength() * mInterval + mMinimum);
+                setUpperValue((posValue - mDelta - scLeftRightMargin - scHandleSideLength / 2 -
+                               (type.testFlag(DoubleHandles) ? scHandleSideLength : 0))
+                              * 1.0 / validLength() * mInterval + mMinimum);
             }
             else
             {
                 setUpperValue(mLowerValue);
+            }
+        } else if(mMainSliderHandlePressed && type.testFlag(DoubleHandles)) {
+            if(posValue  <  mainRg / 2 + scHandleSideLength)
+            {
+                setUpperValue(mUpperValue);
+                setLowerValue(mLowerValue);
+            }
+            else if(posValue / validLength() * mInterval  > validLength() - ((mainRg / 2) / validLength() * mInterval  + scHandleSideLength))
+            {
+                setUpperValue(mUpperValue);
+                setLowerValue(mLowerValue);
+            } else {
+                setUpperValue((posValue - mDeltaMainMove + mainRg/2 - scLeftRightMargin - scHandleSideLength / 2 -
+                               (type.testFlag(DoubleHandles) ? scHandleSideLength : 0))
+                              * 1.0 / validLength() * mInterval + mMinimum);
+                setLowerValue((posValue - mDeltaMainMove - mainRg/2 - scLeftRightMargin - scHandleSideLength / 2) * 1.0 / validLength() * mInterval + mMinimum);
             }
         }
     }

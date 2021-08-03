@@ -46,6 +46,8 @@ protected:
 
     QRectF firstHandleRect() const;
     QRectF secondHandleRect() const;
+    QRectF mainSliderHandleRect() const;
+    QRectF mainSliderRect(int aValue, int aValue2) const;
     QRectF handleRect(int aValue) const;
 
 signals:
@@ -70,8 +72,10 @@ private:
     int mUpperValue;
     bool mFirstHandlePressed;
     bool mSecondHandlePressed;
+    bool mMainSliderHandlePressed;
     int mInterval;
     int mDelta;
+    int mDeltaMainMove;
     QColor mBackgroudColorEnabled;
     QColor mBackgroudColorDisabled;
     QColor mBackgroudColor;

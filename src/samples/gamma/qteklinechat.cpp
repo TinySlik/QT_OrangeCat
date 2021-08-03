@@ -53,6 +53,7 @@ void QtekLineChat::initGraphicsView(){
 
   activeLines();
   slider = new RangeSlider(Qt::Vertical, RangeSlider::Option::DoubleHandles, this);
+  slider->SetRange(0, 1000);
   connect(slider, SIGNAL(lowerValueChanged(int)), m_customPlot, SLOT(onRangeChangedLow(int)));
   connect(slider, SIGNAL(upperValueChanged(int)), m_customPlot, SLOT(onRangeChangedUpper(int)));
 //  connect(slider, SIGNAL(rangeChanged(int, int)), m_customPlot, SLOT(onRangeChanged(int, int)));

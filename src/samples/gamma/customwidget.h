@@ -19,6 +19,8 @@ signals:
 public slots:
   void NewQtekLineChat();
   void Capture();
+protected:
+  virtual void resizeEvent(QResizeEvent *event) override;
 public:
  void NewQtekLineChat(std::vector<PAINT_LINE_UNIT> lines);
  QtekLineChat * chart;

@@ -9,7 +9,7 @@ CustomPlotTest::CustomPlotTest(QWidget *parent) :
   baseRangeMin(0),
   baseRangeMax(1000),
   rangeMin(0),
-  rangeMax(200) {
+  rangeMax(1000) {
   ui->setupUi(this);
   initChart();
   initChartData();

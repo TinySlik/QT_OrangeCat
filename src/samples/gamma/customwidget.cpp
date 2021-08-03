@@ -13,21 +13,22 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = "main";
   cfg += {{class_obj_id.c_str(), {
+      {"dynamic_mode", 0},
       {"lines", {configuru::Config::array(
         {
-          {{"line_color", "#00CD00FF"},    {"line_width", 1}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
+          {{"line_color", "#00CD00FF"},    {"line_width", 1}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
           {{"line_color", "#EE4000FF"},    {"line_width", 2}, {"line_colum", 1}},
-          {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
-          {{"line_color", "#98F5FFFF"},    {"line_width", 1}, {"line_colum", 2}, {"title", "GA_4"}, {"min", 0}, {"max", 200} , {"call_back", nullptr}},
-          {{"line_color", "#A020F0FF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_5"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
-          {{"line_color", "#7FFF00FF"},    {"line_width", 2}, {"line_colum", 2}, {"title", "GA_6"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
-          {{"line_color", "#CDCDB4FF"},    {"line_width", 3}, {"line_colum", 3}, {"title", "GA_7"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"call_back", nullptr}},
+          {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
         })
       }},
       {"size", {
         {"width", _lineChatWidth},
         {"height", _lineChatHeight}
       }},
+      {"max_page_count", 10},
+      {"normal_unit_perpage", 10},
+      {"min_unit_count_perpage", 5},
+      {"max_axial_label_count", 5},
       {"snap_status", false}
     }}
   };
@@ -121,4 +122,16 @@ void CustomWidget::Capture() {
 void CustomWidget::slotGrabWidgetScreen() {
   if (chart)
     chart->capture();
+}
+
+void CustomWidget::resizeEvent(QResizeEvent *event) {
+  auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+  std::string class_obj_id = "main";
+  auto cfg_local = cfg[class_obj_id.c_str()];
+  _lineChatWidth = this->width();
+  _lineChatHeight = this->height();
+  cfg_local["size"]["width"] = _lineChatWidth;
+  cfg_local["size"]["height"] = _lineChatHeight;
+  if (chart)
+    chart->resize(_lineChatWidth, _lineChatHeight);
 }

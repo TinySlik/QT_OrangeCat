@@ -24,6 +24,6 @@ int main(int argc, char *argv[])
   CustomWidget bW;
   bW.NewQtekLineChat();
   bW.show();
-  bW.chart->resize(512, 756);
+  bW.resize(512, 756);
   return a.exec();
 }

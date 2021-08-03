@@ -17,11 +17,9 @@ QtekLineChat::QtekLineChat(std::vector<PAINT_LINE_UNIT> &lines_,QWidget *parent)
   initGraphicsView();
 }
 
-QtekLineChat::~QtekLineChat()
-{
+QtekLineChat::~QtekLineChat() {
   disconnect(slider, SIGNAL(lowerValueChanged(int)), m_customPlot, SLOT(onRangeChangedLow(int)));
   disconnect(slider, SIGNAL(upperValueChanged(int)), m_customPlot, SLOT(onRangeChangedUpper(int)));
-//  disconnect(slider, SIGNAL(rangeChanged(int, int)), m_customPlot, SLOT(onRangeChanged(int, int)));
   delete ui;
 }
 
@@ -54,20 +52,24 @@ void QtekLineChat::initGraphicsView(){
   activeLines();
   slider = new RangeSlider(Qt::Vertical, RangeSlider::Option::DoubleHandles, this);
   slider->SetRange(0, 1000);
+  m_customPlot->setSlider(slider);
   connect(slider, SIGNAL(lowerValueChanged(int)), m_customPlot, SLOT(onRangeChangedLow(int)));
   connect(slider, SIGNAL(upperValueChanged(int)), m_customPlot, SLOT(onRangeChangedUpper(int)));
-//  connect(slider, SIGNAL(rangeChanged(int, int)), m_customPlot, SLOT(onRangeChanged(int, int)));
+  slider->update();
+  slider->setLowerValue(0);
+  slider->setUpperValue(200);
 }
 
 void QtekLineChat::addLine(PAINT_LINE_UNIT unit) {
   lines.push_back(unit);
 }
+
 void QtekLineChat::clearLine() {
   lines.clear();
 }
+
 void QtekLineChat::activeLines() {
   m_pictureHead->refresh(lines);
-//  LOG(INFO) << __FUNCTION__ << __LINE__;
   m_customPlot->refresh(lines);
 }
 
@@ -77,7 +79,6 @@ void QtekLineChat::resizeEvent(QResizeEvent *) {
   ui->graphicsView->setGeometry(this->rect());
   slider->setGeometry(targetRectBar);
   ui->comboBox ->setGeometry(QRect(this->rect().width() - bar_width + 1, targetRect.y(), bar_width - 1, head_height));
-//  m_customPlot->resize(this->width(),this->height());
   m_customPlot->stackUnder(slider);
   m_customPlot->setGeometry(targetRect.x() - PADDING, targetRect.y() + head_height  - PADDING + 3, targetRect.width() + PADDING * 2 - 3, targetRect.height() - head_height + PADDING * 2);
   m_pictureHead->setFirstChartWidth(m_customPlot->getFirstChartWidth());
@@ -89,10 +90,11 @@ void QtekLineChat::capture() {
   QRect rect_raw = QRect(rect.x(), rect.y() + head_height, rect.width(), rect.height() - head_height);
 
   std::vector<QPixmap> array;
-  QPixmap total_pixmap(QSize(rect.width(), rect_raw.height() * 11 + head_height));
+  QPixmap total_pixmap(QSize(rect.width(), rect_raw.height() * 10 + head_height));
   QPainter painter(&total_pixmap);
-  for (size_t i =0; i<= 10; ++i) {
-    m_customPlot->scroll(i * 10);
+  for (size_t i =0; i < 10; ++i) {
+    slider->SetLowerValue(i * 100);
+    slider->SetUpperValue(i * 100 + 100);
     if (i == 0) {
       QPixmap p = this->grab(rect);
       array.push_back(p);

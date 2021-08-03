@@ -5,6 +5,7 @@
 #include "type.h"
 
 #include "qcustomplot/qcustomplot.h"
+#include "rangeslider.h"
 
 #define LOG_MAX 100
 #define VEC_TEST_SIZE 500
@@ -46,6 +47,7 @@ public:
   int getFirstChartWidth() {if (wideAxisRectLeft) return wideAxisRectLeft->rect().width(); else return -1;}
   void addColum(const PAINT_LINE_UNIT & unit);
   void rangeUpdate(int min, int max);
+  void setSlider(RangeSlider *slider_) {slider = slider_;}
 
 
 public slots:
@@ -86,6 +88,7 @@ private:
   int baseRangeMax;
   int rangeMin;
   int rangeMax;
+  RangeSlider *slider;
 };
 
 #endif // CUSTOMPLOTTEST_H

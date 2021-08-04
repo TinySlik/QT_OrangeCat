@@ -22,6 +22,7 @@ public:
   void activeLines();
   QRect getSnapRect();
   void capture();
+  QRect getColumRect(int index);
 protected:
   virtual void resizeEvent(QResizeEvent *event) override;
 
@@ -33,7 +34,6 @@ private:
   double m_beginY;    //起始Y轴位置
   double m_width;     //图像宽度
   double m_height;    //图像高度
-  //图片头部
   DrawPictureHead *m_pictureHead;//图片头部图层
   CustomPlotTest *m_customPlot;
   std::vector<PAINT_LINE_UNIT> lines;

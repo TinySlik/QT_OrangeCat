@@ -73,6 +73,26 @@ void QtekLineChat::activeLines() {
   m_customPlot->refresh(lines);
 }
 
+QRect QtekLineChat::getColumRect(int index) {
+  int maxColum = 1;
+  for (size_t i = 0; i< lines.size(); ++i) {
+    if (lines[i].colum > maxColum) {
+      maxColum = lines[i].colum;
+    }
+  }
+  QRect rect = getSnapRect();
+  QRect rect_raw = QRect(rect.x(), rect.y() + head_height, rect.width(), rect.height() - head_height);
+  auto firstChartWidth = m_customPlot->getFirstChartWidth();
+  int axSp = 50;
+  int xx = firstChartWidth + axSp;
+  auto unit = (rect_raw.width() - xx) / maxColum + 2;
+  if (index == 0)
+      return {};
+  else {
+    return {xx + (index - 1) * unit + 1, rect.y() + head_height, unit, rect.height() - head_height};
+  }
+}
+
 void QtekLineChat::resizeEvent(QResizeEvent *) {
   auto targetRect = QRect(this->rect().x(), this->rect().y(), this->rect().width()- bar_width, this->rect().height());
   auto targetRectBar = QRect(this->rect().width() - bar_width + 1, targetRect.y() + head_height, bar_width - 1, targetRect.height() - head_height);

@@ -109,6 +109,8 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/customwidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/rangeslider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/rangeslider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/glchartwidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/glchartwidget.h
     ${QT_GAMMA_PLATFORM_FILES}
 )
 
@@ -134,4 +136,4 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot)
 
 add_executable(gamma ${SOURCE_GAMMA_FILES})
 
-target_link_libraries(gamma PRIVATE Qt5::Widgets Qt5::PrintSupport paramserv)
+target_link_libraries(gamma PRIVATE Qt5::Widgets Qt5::PrintSupport Qt5::Svg paramserv)

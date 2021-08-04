@@ -80,7 +80,6 @@ void CustomPlotTest::initChart() {
   customPlot->plotLayout()->addElement(0, 0, wideAxisRectLeft);
   wideAxisRectLeft->setMinimumMargins(QMargins(0, 0, 0, 0));
 
-
   m_paint_units.push_back({{}, wideAxisRectLeft, {}});
 
   ////////右图显示 上和左坐标轴，并隐藏左坐标显示//////

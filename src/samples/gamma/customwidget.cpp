@@ -3,10 +3,7 @@
 #include "renderutil.h"
 #include "easylogging++.h"
 
-#include <QMetaType>
-
-CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
-{
+CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr) {
   qRegisterMetaType<std::shared_ptr<std::vector<PAINT_LINE_UNIT>>>("paint_units");
   _lineChatWidth = this->width();
   _lineChatHeight = this->height();
@@ -17,8 +14,9 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
       {"lines", {configuru::Config::array(
         {
           {{"line_color", "#00CD00FF"},    {"line_width", 1}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
-          {{"line_color", "#EE4000FF"},    {"line_width", 2}, {"line_colum", 1}},
-          {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
+          {{"window_type", "glwidget"},    {"line_colum", 1}, {"object", {{"line_color", "#EE4000FF"},    {"line_width", 2}, {"line_colum", 1}}}},
+          {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
+          {{"line_color", "#CDCDCDFF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
         })
       }},
       {"size", {
@@ -26,14 +24,19 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
         {"height", _lineChatHeight}
       }},
       {"max_page_count", 10},
+      {"normal_data_count_perpage", 100},
       {"normal_unit_perpage", 10},
       {"min_unit_count_perpage", 5},
       {"max_axial_label_count", 5},
+      {"min_bar_value", 0},
+      {"max_bar_value", 200},
+      {"min_range_value", 0},
+      {"max_range_value", 1000},
       {"snap_status", false}
     }}
   };
 
-  auto createNewLines = [](const configuru::Config &config) -> std::vector<PAINT_LINE_UNIT> {
+  auto createNewLines = [this](const configuru::Config &config) -> std::vector<PAINT_LINE_UNIT> {
     if (!config.is_array()) return{};
     auto arry = config.as_array();
     auto res = std::vector<PAINT_LINE_UNIT>();
@@ -47,22 +50,35 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
       if(arry[i].has_key("line_color")) {
         tmp.color = color_format_string_to_qcolor(static_cast<std::string>(arry[i]["line_color"]));
       }
-      if(arry[i].has_key("line_width")) {
-        tmp.width = static_cast<int>(arry[i]["line_width"]);
+      std::string line_window_type = "chart";
+      if(arry[i].has_key("window_type")) {
+        line_window_type = static_cast<std::string>(arry[i]["window_type"]);
       }
-      if(arry[i].has_key("title")) {
-        tmp.name = static_cast<std::string>(arry[i]["title"]).c_str();
+      if (line_window_type == "chart") {
+        if(arry[i].has_key("line_width")) {
+          tmp.width = static_cast<int>(arry[i]["line_width"]);
+        }
+        if(arry[i].has_key("title")) {
+          tmp.name = static_cast<std::string>(arry[i]["title"]).c_str();
+        }
+        if(arry[i].has_key("unit")) {
+          tmp.unit = static_cast<std::string>(arry[i]["unit"]).c_str();
+        }
+        if(arry[i].has_key("min")) {
+          tmp.min = static_cast<int>(arry[i]["min"]);
+        }
+        if(arry[i].has_key("max")) {
+          tmp.max = static_cast<int>(arry[i]["max"]);
+        }
+        res.push_back(tmp);
+      } else if (line_window_type == "glwidget") {
+        auto widget = new DisplayWidget(this);
+//        chart->stackUnder(widget);
+        SPEC_UNIT a;
+        a.colum = tmp.colum;
+        a.object = widget;
+        m_special_widget.push_back(a);
       }
-      if(arry[i].has_key("unit")) {
-        tmp.unit = static_cast<std::string>(arry[i]["unit"]).c_str();
-      }
-      if(arry[i].has_key("min")) {
-        tmp.min = static_cast<int>(arry[i]["min"]);
-      }
-      if(arry[i].has_key("max")) {
-        tmp.max = static_cast<int>(arry[i]["max"]);
-      }
-      res.push_back(tmp);
     }
     return res;
   };
@@ -75,14 +91,14 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr)
     return true;
   });
   cfg_local["size"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
-      if (!b.is_object()) return false;
-      if(b.has_key("width"))
-      _lineChatWidth = (int)(b["width"]);
-      if(b.has_key("height"))
-      _lineChatHeight = (int)(b["height"]);
-      emit NewQtekLineChatSIG();
-      return true;
-    });
+    if (!b.is_object()) return false;
+    if(b.has_key("width"))
+    _lineChatWidth = (int)(b["width"]);
+    if(b.has_key("height"))
+    _lineChatHeight = (int)(b["height"]);
+    emit NewQtekLineChatSIG();
+    return true;
+  });
   cfg_local["snap_status"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_bool()) return false;
 //    this->slotGrabWidgetScreen();
@@ -132,6 +148,12 @@ void CustomWidget::resizeEvent(QResizeEvent *event) {
   _lineChatHeight = this->height();
   cfg_local["size"]["width"] = _lineChatWidth;
   cfg_local["size"]["height"] = _lineChatHeight;
-  if (chart)
+  if (chart) {
     chart->resize(_lineChatWidth, _lineChatHeight);
+    for (size_t i = 0; i < m_special_widget.size(); ++i) {
+      auto rect = chart->getColumRect(m_special_widget[i].colum);
+      m_special_widget[i].object->setGeometry(chart->getColumRect(m_special_widget[i].colum));
+      chart->stackUnder(m_special_widget[i].object);
+    }
+  }
 }

@@ -37,6 +37,12 @@
 
 bool DisplayWidget::m_transparent = false;
 
+std::string DisplayWidget::getParamIndexStr() {
+  std::string class_obj_id = typeid(*this).name();
+  class_obj_id += std::to_string(reinterpret_cast<long>(this));
+  return class_obj_id;
+}
+
 DisplayWidget::DisplayWidget(QWidget *parent)
   : QOpenGLWidget(parent),
     mousePressedTag_(false),
@@ -277,7 +283,7 @@ DisplayWidget::DisplayWidget(QWidget *parent)
 
   QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
   if (file_testcase.exists()) {
-    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["display logo default"];
+    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["gamma_test"];
     cfg_local << cfg;
     LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
   }

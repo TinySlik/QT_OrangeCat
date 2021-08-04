@@ -7,13 +7,11 @@
 #include <QObject>
 #include <QWidget>
 #include "glchartwidget.h"
+#include "parameterserver.h"
 
 class CustomWidget : public QWidget
 {
-  typedef struct special_unit {
-    QWidget * object;
-    int colum;
-  } SPEC_UNIT;
+
   Q_OBJECT
 public:
   explicit CustomWidget(QWidget *parent = nullptr);

@@ -52,6 +52,7 @@ class DisplayWidget :public QOpenGLWidget ,protected QOpenGLFunctions_4_3_Core {
   void reset(size_t size);
 
   void getData(std::shared_ptr<std::vector<float>> data = nullptr);
+  std::string getParamIndexStr();
 
  signals:
   void TitelChanged(const QString &title);

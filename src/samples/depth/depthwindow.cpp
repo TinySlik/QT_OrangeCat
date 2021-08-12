@@ -4,6 +4,8 @@
 #include "qdebug.h"
 #include "dialogdepthconfiguration.h"
 #include "dialogactivatysettings.h"
+#include "dialogdepthcalibration.h"
+#include "dialogdepthctrl.h"
 #include <QToolBar>
 
 DepthWindow::DepthWindow(QWidget *parent) :
@@ -29,6 +31,16 @@ void DepthWindow::CreateDepthConfigDialog() {
   dg->show();
 }
 
+void DepthWindow::CreateDepthCalibrationDialog() {
+  auto dg = new DialogDepthCalibration(this);
+  dg->show();
+}
+
+void DepthWindow::CreateDepthCtrlDialog() {
+  auto dg = new DialogDepthCtrl(this);
+  dg->show();
+}
+
 void DepthWindow::CreateMainMenu() {
   QMenu *fileMenu = ui->menubar->addMenu(tr("File"));
 //  fileMenu->addSeparator();
@@ -48,12 +60,14 @@ void DepthWindow::CreateMainMenu() {
 //  editToolBar->addAction(cutAct);
 
   QAction *calibrationAct = new QAction(tr("Calibration..."), this);
+  connect(calibrationAct, &QAction::triggered, this, &DepthWindow::CreateDepthCalibrationDialog);
   calibrationAct->setStatusTip(tr("Calibrate the depth system"));
 //  connect(copyAct, &QAction::triggered, textEdit, &QPlainTextEdit::copy);
   depthMenu->addAction(calibrationAct);
 //  editToolBar->addAction(copyAct);
 
   QAction *ctrlAct = new QAction(tr("Control"), this);
+  connect(ctrlAct, &QAction::triggered, this, &DepthWindow::CreateDepthCtrlDialog);
   ctrlAct->setStatusTip(tr("Control the depth system"));
 //  connect(pasteAct, &QAction::triggered, textEdit, &QPlainTextEdit::paste);
   depthMenu->addAction(ctrlAct);

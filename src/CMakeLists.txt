@@ -145,6 +145,18 @@ set(SOURCE_DEPTH_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogactivatysettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogactivatysettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogactivatysettings.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcalibration.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcalibration.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcalibration.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthctrl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthctrl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthctrl.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogsetupdrawworks.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogsetupdrawworks.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogsetupdrawworks.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogcalibrationworksheet.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogcalibrationworksheet.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogcalibrationworksheet.ui
     ${QT_DEPTH_PLATFORM_FILES}
 )
 

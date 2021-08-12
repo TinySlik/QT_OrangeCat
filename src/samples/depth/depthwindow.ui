@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Depth Monitor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label_bottom_status">

@@ -36,6 +36,8 @@ public:
 public Q_SLOTS:
   void CreateDepthConfigDialog();
   void CreateActivatyDialog();
+  void CreateDepthCalibrationDialog();
+  void CreateDepthCtrlDialog();
 
 private:
   Ui::DepthWindow *ui;

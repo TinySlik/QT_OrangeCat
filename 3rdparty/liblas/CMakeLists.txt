@@ -21,6 +21,19 @@
 cmake_minimum_required(VERSION 3.1)
 project(las C CXX)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(NOT CMAKE_DEBUG_POSTFIX)
+  set(CMAKE_DEBUG_POSTFIX d)
+endif()
+
 add_definitions(-D_WIN_EXPORTING)
 
 if(OS_WIN)
@@ -30,11 +43,14 @@ else()
 endif()
 
 set(ADLINK_SRC
-    ${PROJECT_SOURCE_DIR}/src/LasHandle.cpp
     ${PROJECT_SOURCE_DIR}/include/LasHandle.h
-    ${PROJECT_SOURCE_DIR}/src/memorymapped.cpp
     ${PROJECT_SOURCE_DIR}/include/memorymapped.h
     ${PROJECT_SOURCE_DIR}/include/windllsupport.h
+    ${PROJECT_SOURCE_DIR}/include/LasParser.h
+    ${PROJECT_SOURCE_DIR}/include/LasDefine.h
+    ${PROJECT_SOURCE_DIR}/src/LasHandle.cpp
+    ${PROJECT_SOURCE_DIR}/src/memorymapped.cpp
+    ${PROJECT_SOURCE_DIR}/src/LasParser.cpp
     ${QT_LAS_PLATFORM_FILES}
 )
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -44,7 +60,7 @@ add_library(${PROJECT_NAME} SHARED ${ADLINK_SRC})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads  PRIVATE Qt5::Widgets)
 
 
 

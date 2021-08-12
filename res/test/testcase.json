@@ -193,7 +193,7 @@
     "test_switch": 3,
     "display_switch": 6,
     "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
-    "svg_background_path": ":/svg/tiger.svg",
+    "svg_background_path": "empty",
     "file_load_location": 1713,
     "buffer_size": 1024,
     "m_samplingSpeed": 1,

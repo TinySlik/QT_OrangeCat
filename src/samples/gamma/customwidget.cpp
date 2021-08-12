@@ -2,6 +2,8 @@
 #include "parameterserver.h"
 #include "renderutil.h"
 #include "easylogging++.h"
+#include "LasParser.h"
+#include "time.h"
 
 CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr) {
   qRegisterMetaType<std::shared_ptr<std::vector<PAINT_LINE_UNIT>>>("paint_units");
@@ -9,24 +11,25 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr) {
   _lineChatHeight = this->height();
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = "main";
+
   cfg += {{class_obj_id.c_str(), {
       {"dynamic_mode", 0},
       {"lines", {configuru::Config::array(
         {
-          {{"line_color", "#00CD00FF"},    {"line_width", 1}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
-//          {{"window_type", "glwidget"},    {"line_colum", 2}, {"object",
-//                                                                {
-////                                                                  {"lineThickness", 0.005},
-////                                                                  {"front_color", "#EEEE00FF"},
-//                                                                  {"background_color", "#CDCDCD"}
-////                                                                  {"display_switch", 6},
-////                                                                  {"svg_background_path", ":/svg/tiger.svg"},
-//                                                                }
-//           }
-//          },
-          {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
-          {{"line_color", "#CDCDCDFF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_4"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
-          {{"line_color", "#ff0e00FF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_5"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} , {"data", nullptr}},
+          {{"line_color", "#00CD00FF"},    {"line_width", 1}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} ,
+           {"data", ":/test/20210705-123650_wave.las"}},
+          {{"window_type", "glwidget"},    {"line_colum", 2}, {"object",
+                                                                {
+                                                                  {"background_color", "#CDCDCD"}
+                                                                }
+           }
+          },
+          {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} ,
+           {"data", nullptr}},
+          {{"line_color", "#CDCDCDFF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_4"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} ,
+           {"data", nullptr}},
+          {{"line_color", "#ff0e00FF"},    {"line_width", 3}, {"line_colum", 2}, {"title", "GA_5"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} ,
+           {"data", nullptr}},
         })
       }},
       {"size", {
@@ -50,10 +53,6 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr) {
     if (!config.is_array()) return{};
     auto arry = config.as_array();
     auto res = std::vector<PAINT_LINE_UNIT>();
-//    for (size_t k = 0;k < m_special_widget.size(); k++) {
-//      m_special_widget[k].object->deleteLater();
-//    }
-//    m_special_widget.clear();
     int special_count = 0;
     for (size_t i = 0; i < arry.size(); i++) {
       PAINT_LINE_UNIT tmp = {QColor(155, 155, 155, 255), 3, 0, QObject::tr("DEFAULT"), QObject::tr("DEFAULT"), 0, 200, nullptr};
@@ -85,19 +84,36 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr) {
         if(arry[i].has_key("max")) {
           tmp.max = static_cast<int>(arry[i]["max"]);
         }
+        if(arry[i].has_key("data")) {
+          if (arry[i]["data"].is_string()) {
+//            uint64_t time = get_micro_second();
+            QFile file(static_cast<std::string>(arry[i]["data"]).c_str());
+            if(!file.open(QFile::ReadOnly)) {
+              LOG(INFO) << "no file named " << static_cast<std::string>(arry[i]["data"]).c_str() << "exeist.";
+            } else {
+              QString fileStr = file.readAll();
+              LasParser a;
+              a.importString(fileStr);
+//              qDebug() << get_micro_second() - time;
+//              LOG(INFO) << a.toString().toLatin1().data();
+              file.close();
+            }
+          }
+//        tmp.max = static_cast<int>(arry[i]["max"]);
+        }
         res.push_back(tmp);
       } else if (line_window_type == "glwidget" && arry[i].has_key("object") && arry[i]["object"].is_object()) {
         special_count ++;
         if (m_special_widget.size() == 0) {
-            SPEC_UNIT a = {nullptr , (int)(tmp.colum), arry[i]["object"]};
-            auto widget = new DisplayWidget(this);
-            arry[i]["object"]["link"] = widget -> getParamIndexStr();
-            auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
-            cfg[widget -> getParamIndexStr().c_str()] << arry[i]["object"];
-            a.object = widget;
-            m_special_widget.push_back(a);
-            if (chart)
-              chart->stackUnder(widget);
+          SPEC_UNIT a = {nullptr , (int)(tmp.colum), arry[i]["object"]};
+          auto widget = new DisplayWidget(this);
+          arry[i]["object"]["link"] = widget -> getParamIndexStr();
+          auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+          cfg[widget -> getParamIndexStr().c_str()] << arry[i]["object"];
+          a.object = widget;
+          m_special_widget.push_back(a);
+          if (chart)
+            chart->stackUnder(widget);
         }
       }
       if (special_count == 0) {

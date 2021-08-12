@@ -49,7 +49,6 @@ public:
   void rangeUpdate(int min, int max);
   void setSlider(RangeSlider *slider_) {slider = slider_;}
 
-
 public slots:
   void updateIndex();
   void scroll(int index);

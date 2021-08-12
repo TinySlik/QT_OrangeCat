@@ -75,6 +75,8 @@ class File : public std::enable_shared_from_this<File>{
     WholeFile = 0,
   };
 
+  inline std::string file_name() {return m_filename;}
+
  protected:
   /// file name
   std::string m_filename;

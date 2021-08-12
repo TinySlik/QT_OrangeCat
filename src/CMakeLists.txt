@@ -111,13 +111,49 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/rangeslider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/glchartwidget.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/glchartwidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/time.cpp
     ${QT_GAMMA_PLATFORM_FILES}
 )
+
+if(OS_WIN)
+  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/impl.win32.cpp)
+else()
+  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/impl.linux.cpp)
+endif()
+
+set(SOURCE_DEPTH_FILES ${QRC_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/urldecode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/window.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/window.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/memorymapped.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/memorymapped.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/displaywidget.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/displaywidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/time.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/renderutil.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/renderutil.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/depthwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/depthwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/depthwindow.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthconfiguration.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthconfiguration.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthconfiguration.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogactivatysettings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogactivatysettings.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogactivatysettings.ui
+    ${QT_DEPTH_PLATFORM_FILES}
+)
+
 
 include_directories(log)
 include_directories(paramserv)
 include_directories(../3rdparty/asyncplusplus/include)
 include_directories(../3rdparty/ADlink/include)
+include_directories(../3rdparty/liblas/include)
 
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
 add_executable(sample ${SOURCE_FILTER_FILES})
@@ -136,4 +172,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/samples/gamma/qcustomplot)
 
 add_executable(gamma ${SOURCE_GAMMA_FILES})
 
-target_link_libraries(gamma PRIVATE Qt5::Widgets Qt5::PrintSupport Qt5::Svg paramserv)
+target_link_libraries(gamma PRIVATE Qt5::Widgets Qt5::PrintSupport Qt5::Svg paramserv las)
+
+add_executable(depth ${SOURCE_DEPTH_FILES})
+
+target_link_libraries(depth PRIVATE Qt5::Widgets Qt5::Quick Qt5::Svg paramserv)

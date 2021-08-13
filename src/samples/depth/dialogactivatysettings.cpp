@@ -6,6 +6,8 @@ DialogActivatySettings::DialogActivatySettings(QWidget *parent) :
   ui(new Ui::DialogActivatySettings)
 {
   ui->setupUi(this);
+  setMaximumSize(this->size());
+  setMinimumSize(this->size());
 }
 
 DialogActivatySettings::~DialogActivatySettings()

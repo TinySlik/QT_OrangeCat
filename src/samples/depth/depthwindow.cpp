@@ -130,7 +130,7 @@ void DepthWindow::InitStatus(const SLIP_STATUS slip, const BOTTOM_STATUS bottom,
   QPalette label_palette;
   //label_palette.setColor(QPalette::Background, QColor(0, 0, 0));
   //label_palette.setColor(QPalette::Background,Qt::black);
-  label_palette.setColor(QPalette::Background, QColor("blue"));
+  label_palette.setColor(QPalette::Background, QColor("green"));
   slip_status->setAutoFillBackground(true);
   slip_status->setPalette(label_palette);
 

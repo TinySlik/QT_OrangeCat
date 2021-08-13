@@ -15,6 +15,11 @@ public:
   explicit DialogCalibrationWorksheet(QWidget *parent = nullptr);
   ~DialogCalibrationWorksheet();
 
+private slots:
+  void on_pushButton_clicked();
+
+  void on_pushButton_2_clicked();
+
 private:
   Ui::DialogCalibrationWorksheet *ui;
 };

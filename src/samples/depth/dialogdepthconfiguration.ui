@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>530</width>
+    <width>541</width>
     <height>571</height>
    </rect>
   </property>
@@ -84,7 +84,7 @@
    <widget class="QRadioButton" name="radioButton">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>8</x>
       <y>90</y>
       <width>89</width>
       <height>16</height>
@@ -100,7 +100,7 @@
    <widget class="QRadioButton" name="radioButton_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>8</x>
       <y>120</y>
       <width>141</width>
       <height>16</height>
@@ -113,9 +113,9 @@
    <widget class="QRadioButton" name="radioButton_3">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>8</x>
       <y>150</y>
-      <width>131</width>
+      <width>141</width>
       <height>16</height>
      </rect>
     </property>
@@ -126,7 +126,7 @@
    <widget class="QRadioButton" name="radioButton_4">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>8</x>
       <y>180</y>
       <width>89</width>
       <height>16</height>
@@ -173,7 +173,7 @@
       <x>10</x>
       <y>20</y>
       <width>89</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -189,7 +189,7 @@
       <x>10</x>
       <y>50</y>
       <width>89</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -808,8 +808,8 @@
     <rect>
      <x>390</x>
      <y>10</y>
-     <width>131</width>
-     <height>511</height>
+     <width>141</width>
+     <height>371</height>
     </rect>
    </property>
    <property name="verticalScrollBarPolicy">
@@ -843,6 +843,46 @@
      <string>Depth Analog5</string>
     </property>
    </item>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_11">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>400</y>
+     <width>141</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>121</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Drag the item from the list and drop them on the desired field.</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

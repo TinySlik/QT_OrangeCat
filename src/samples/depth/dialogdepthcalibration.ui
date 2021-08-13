@@ -112,6 +112,9 @@
     </property>
    </widget>
    <widget class="QLabel" name="label_read1_6">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -137,6 +140,9 @@
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -147,6 +153,9 @@
     </property>
    </widget>
    <widget class="QLabel" name="label">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>200</x>
@@ -159,7 +168,7 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>0</string>
+     <string>s</string>
     </property>
    </widget>
   </widget>
@@ -244,7 +253,7 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>0</string>
+     <string>s</string>
     </property>
    </widget>
   </widget>
@@ -329,7 +338,7 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>0</string>
+     <string>s</string>
     </property>
    </widget>
   </widget>
@@ -414,7 +423,7 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>0</string>
+     <string>s</string>
     </property>
    </widget>
   </widget>

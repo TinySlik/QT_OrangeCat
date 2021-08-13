@@ -116,9 +116,9 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
 )
 
 if(OS_WIN)
-  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/impl.win32.cpp)
+  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/impl.win32.cpp)
 else()
-  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/general/impl.linux.cpp)
+  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/impl.linux.cpp)
 endif()
 
 set(SOURCE_DEPTH_FILES ${QRC_FILES}

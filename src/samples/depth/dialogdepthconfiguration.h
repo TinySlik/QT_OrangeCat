@@ -41,10 +41,11 @@ private slots:
 
   void itemPressed(QListWidgetItem *item);
 
+  void on_pushButton_4_clicked();
+
 private:
   std::vector<DROP_UNIT> m_dropUnits;
   Ui::DialogDepthConfiguration *ui;
-
 };
 
 #endif // DIALOGDEPTHCONFIGURATION_H

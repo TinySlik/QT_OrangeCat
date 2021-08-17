@@ -7,6 +7,7 @@
 #include <QTextEdit>
 #include <QDebug>
 #include <QDrag>
+#include "dialogdepthcardconfigration.h"
 
 DialogDepthConfiguration::DialogDepthConfiguration(QWidget *parent) :
   QDialog(parent),
@@ -93,4 +94,9 @@ void DialogDepthConfiguration::dropEvent(QDropEvent *event) {
       return;
     }
   }
+}
+
+void DialogDepthConfiguration::on_pushButton_4_clicked() {
+  auto dc = new DialogDepthCardConfigration();
+  dc->show();
 }

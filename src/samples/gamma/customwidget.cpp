@@ -18,12 +18,12 @@ CustomWidget::CustomWidget(QWidget *parent) : QWidget(parent), chart(nullptr) {
         {
           {{"line_color", "#00CD00FF"},    {"line_width", 1}, {"line_colum", 0}, {"title", "GA_1"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} ,
            {"data", ":/test/20210705-123650_wave.las"}},
-          {{"window_type", "glwidget"},    {"line_colum", 2}, {"object",
-                                                                {
-                                                                  {"background_color", "#CDCDCD"}
-                                                                }
-           }
-          },
+//          {{"window_type", "glwidget"},    {"line_colum", 2}, {"object",
+//                                                                {
+//                                                                  {"background_color", "#CDCDCD"}
+//                                                                }
+//           }
+//          },
           {{"line_color", "#EEEE00FF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_3"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} ,
            {"data", nullptr}},
           {{"line_color", "#CDCDCDFF"},    {"line_width", 3}, {"line_colum", 1}, {"title", "GA_4"}, {"unit", "GAPI"}, {"min", 0},{"max", 200} ,

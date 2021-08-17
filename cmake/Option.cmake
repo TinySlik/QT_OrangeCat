@@ -17,9 +17,8 @@ cmake_include_guard()
 
 include(${CMAKE_CURRENT_LIST_DIR}/Utils.cmake)
 
-option(ADLINK_32 "option for adlink lib" OFF)
+option(ADLINK_32 "option for adlink lib" ON)
 
 if (ADLINK_32)
-add_definitions(-DADLINK_32)
+  add_definitions(-DADLINK_32)
 endif()
-

@@ -157,6 +157,9 @@ set(SOURCE_DEPTH_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogcalibrationworksheet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogcalibrationworksheet.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogcalibrationworksheet.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcardconfigration.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcardconfigration.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcardconfigration.h
     ${QT_DEPTH_PLATFORM_FILES}
 )
 
@@ -169,12 +172,12 @@ include_directories(../3rdparty/liblas/include)
 
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
 add_executable(sample ${SOURCE_FILTER_FILES})
+#target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
 if (ADLINK_32)
   target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
 else()
   target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++)
 endif()
-
 
 add_executable(display ${SOURCE_GENERAL_FILES})
 

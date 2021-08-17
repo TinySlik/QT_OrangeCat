@@ -82,6 +82,9 @@
     </property>
    </widget>
    <widget class="QRadioButton" name="radioButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -94,10 +97,13 @@
      <string>DataScan</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="radioButton_2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -111,6 +117,9 @@
     </property>
    </widget>
    <widget class="QRadioButton" name="radioButton_3">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -124,6 +133,9 @@
     </property>
    </widget>
    <widget class="QRadioButton" name="radioButton_4">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -134,6 +146,9 @@
     </property>
     <property name="text">
      <string>Depth Card</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_4">

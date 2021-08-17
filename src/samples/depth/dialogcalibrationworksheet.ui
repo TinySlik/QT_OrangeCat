@@ -51,7 +51,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>0.</string>
+     <string>0</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_10">
@@ -231,7 +234,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="lineEdit_bp1">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -241,10 +244,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="lineEdit_bp2">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -254,10 +260,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
+   <widget class="QLineEdit" name="lineEdit_bp3">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -267,10 +276,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_4">
+   <widget class="QLineEdit" name="lineEdit_bp4">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -280,10 +292,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_5">
+   <widget class="QLineEdit" name="lineEdit_bp6">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -293,10 +308,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_6">
+   <widget class="QLineEdit" name="lineEdit_bp5">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -306,10 +324,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0.0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_7">
+   <widget class="QLineEdit" name="lineEdit_c1">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -319,10 +340,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_8">
+   <widget class="QLineEdit" name="lineEdit_c2">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -332,10 +356,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_9">
+   <widget class="QLineEdit" name="lineEdit_c3">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -345,10 +372,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_10">
+   <widget class="QLineEdit" name="lineEdit_c4">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -358,10 +388,13 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_11">
+   <widget class="QLineEdit" name="lineEdit_c5">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -371,7 +404,10 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_4">
@@ -439,7 +475,7 @@
      <string>&lt;&lt;</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_12">
+   <widget class="QLineEdit" name="lineEdit_c6">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -449,7 +485,10 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_9">

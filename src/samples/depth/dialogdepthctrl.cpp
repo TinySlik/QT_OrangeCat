@@ -14,3 +14,13 @@ DialogDepthCtrl::~DialogDepthCtrl()
 {
   delete ui;
 }
+
+void DialogDepthCtrl::on_pushButton_2_clicked()
+{
+    this->accept();
+}
+
+void DialogDepthCtrl::on_pushButton_3_clicked()
+{
+    this->reject();
+}

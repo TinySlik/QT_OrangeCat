@@ -20,5 +20,10 @@
         <file>test/time-gamma.las</file>
         <file>test/test.las</file>
         <file>test/20210705-123650_wave.las</file>
+        <file>svg/status.svg</file>
+        <file>svg/right.svg</file>
+        <file>svg/wait.svg</file>
+        <file>svg/what.svg</file>
+        <file>svg/wrong.svg</file>
     </qresource>
 </RCC>

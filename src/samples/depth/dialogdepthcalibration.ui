@@ -153,9 +153,6 @@
     </property>
    </widget>
    <widget class="QLabel" name="label">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
     <property name="geometry">
      <rect>
       <x>200</x>
@@ -168,7 +165,13 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>s</string>
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../res/res.qrc">:/svg/right.svg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -253,7 +256,13 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>s</string>
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../res/res.qrc">:/svg/right.svg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -338,7 +347,13 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>s</string>
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../res/res.qrc">:/svg/right.svg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -423,11 +438,20 @@
      <bool>true</bool>
     </property>
     <property name="text">
-     <string>s</string>
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../../../res/res.qrc">:/svg/right.svg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../res/res.qrc"/>
+  <include location="../../../res/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

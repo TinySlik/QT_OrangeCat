@@ -22,7 +22,7 @@ ABMDaoLib::~ABMDaoLib()
 
 ABMDaoLib::ABMDaoLib()
 {
-  m_sqlUtils = QSharedPointer<SqlUtils>(new SqlUtils("abm100","root","123456"));
+  m_sqlUtils = QSharedPointer<SqlUtils>(new SqlUtils("abm100","root","123456", "192.168.1.132"));
   m_sqlUtils->connectDatabase();
 }
 
@@ -42,6 +42,14 @@ QSharedPointer<SqlUtils> ABMDaoLib::getSqlUtils() const
 void ABMDaoLib::setSqlUtils(const QSharedPointer<SqlUtils> &sqlUtils)
 {
   m_sqlUtils = sqlUtils;
+}
+
+std::shared_ptr<WellDao> ABMDaoLib::getJsonInterface()
+{
+  if(!m_JsonDaoInterface){
+    m_JsonDaoInterface = std::make_shared<WellDao>();
+  }
+  return m_JsonDaoInterface;
 }
 
 

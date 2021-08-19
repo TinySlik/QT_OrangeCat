@@ -6,6 +6,8 @@
 #include "dialogactivatysettings.h"
 #include "dialogdepthcalibration.h"
 #include "dialogdepthctrl.h"
+#include "abmdaolib.h"
+#include "parameterserver.h"
 #include <QToolBar>
 
 DepthWindow::DepthWindow(QWidget *parent) :
@@ -42,6 +44,27 @@ void DepthWindow::CreateDepthCtrlDialog() {
 }
 
 void DepthWindow::CreateMainMenu() {
+  auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
+  //初始化井信息
+//  QString wellId = ABMDaoLib::getInstance()->getConfig()->getSystemWellId();
+
+//  configuru::Config cfg = {{"target_table", {
+//    {"name", "u_well_depth_status"},
+//    {"block", 0.00}
+//  }}
+//};
+
+//  auto js = jsonInterface->find(cfg.c_str());
+
+
+  ABMDaoLib *abmDaoLib = ABMDaoLib::getInstance();
+  //初始化井信息
+  QString wellId = abmDaoLib->getConfig()->getSystemWellId();
+  QSharedPointer<WellInfoGeneral> wellGeneral = abmDaoLib->getWellInfoGeneralDao()->findByWellId(wellId);
+  QVector<SqlCondition> conditions;
+  conditions.append(SqlCondition(SqlEqual,"is_del",0));
+  QList<QSharedPointer<WellInfoGeneral>> wellList = abmDaoLib->getWellInfoGeneralDao()->findList(conditions);
+
   QMenu *fileMenu = ui->menubar->addMenu(tr("File"));
 //  fileMenu->addSeparator();
   QAction *exitAct = fileMenu->addAction(tr("Exit"), this, &QWidget::close);

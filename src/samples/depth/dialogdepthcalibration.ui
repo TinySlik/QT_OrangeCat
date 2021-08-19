@@ -190,7 +190,7 @@
     </font>
    </property>
    <property name="title">
-    <string>Block Position</string>
+    <string>Heave Compensator</string>
    </property>
    <widget class="QLabel" name="label_read1_7">
     <property name="geometry">
@@ -281,7 +281,7 @@
     </font>
    </property>
    <property name="title">
-    <string>Block Position</string>
+    <string>Riser Position</string>
    </property>
    <widget class="QLabel" name="label_read1_8">
     <property name="geometry">
@@ -372,7 +372,7 @@
     </font>
    </property>
    <property name="title">
-    <string>Block Position</string>
+    <string>Air Retriever</string>
    </property>
    <widget class="QLabel" name="label_read1_9">
     <property name="geometry">

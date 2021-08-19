@@ -15,6 +15,7 @@
 #include "well/dao/wellinfopersonneldao.h"
 #include "well/dao/wellinfoformationdao.h"
 #include "well/dao/wellinfomatchedsystemstrackingdao.h"
+#include "well/dao/welldao.h"
 
 #include "runinfo/dao/runinfogeneraldao.h"
 #include "runinfo/dao/runinforeliabilitydao.h"
@@ -24,12 +25,15 @@
 #include "runinfo/dao/runinfomatchedsystemstrackingdao.h"
 #include "runinfo/dao/runinfodesdao.h"
 
+
 #include "toolParam/dao/toolparametersdao.h"
 #include "toolParam/dao/abidao.h"
 #include "toolParam/dao/dgrdao.h"
 #include "toolParam/dao/hcimdao.h"
 #include "toolParam/dao/pcddao.h"
 #include "toolParam/dao/pospulserdao.h"
+
+#include <memory>
 
 class ABMDAOLIB_EXPORT ABMDaoLib
 {
@@ -45,6 +49,8 @@ public:
   void setSqlUtils(const QSharedPointer<SqlUtils> &sqlUtils);
   //配置：当前数据
   QSharedPointer<CurrentDataDao> getCurrentDataDao();
+  //**json 读写接口**/
+  std::shared_ptr<WellDao> getJsonInterface();
 
   //*****************************井信息******************************
 
@@ -96,6 +102,7 @@ private:
 
   QSharedPointer<SqlUtils> m_sqlUtils;//数据库工具类
   //数据库交互类
+  std::shared_ptr<WellDao> m_JsonDaoInterface;
   //配置 当前数据
   QSharedPointer<CurrentDataDao> m_currentDataDao;
   //井信息

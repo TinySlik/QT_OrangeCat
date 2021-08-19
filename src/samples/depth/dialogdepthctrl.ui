@@ -707,7 +707,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Hole Depth</string>
+     <string>Drilling</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -732,7 +732,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Bit Depth</string>
+     <string>Tripping</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

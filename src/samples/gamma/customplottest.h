@@ -76,7 +76,7 @@ private:
   QVector<double> vecKey;
   QVector<double> vecValue;
   QVector<double> vecValueSin;
-  QVector< QPair<QVector<QCPGraphData>,int>> dataLog;
+  QVector<QPair<QVector<QCPGraphData>,int>> dataLog;
 
   std::vector<PAINT_UNIT> m_paint_units;
   void addBaseUnit(PAINT_LINE_UNIT);

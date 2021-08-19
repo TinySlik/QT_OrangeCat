@@ -269,6 +269,12 @@ set(SOURCE_ABMDAO_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfomatchedsystemstracking.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfopersonnel.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfosurveyinfo.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/configuru.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/welldao.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/welldao.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/jsoninterface.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodepthstatus.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodepthstatus.h
 )
 
 include_directories(log)
@@ -301,6 +307,6 @@ add_executable(gamma ${SOURCE_GAMMA_FILES})
 
 target_link_libraries(gamma PRIVATE Qt5::Widgets Qt5::PrintSupport Qt5::Svg paramserv las)
 
-add_executable(depth ${SOURCE_DEPTH_FILES} ABMDaoLib)
+add_executable(depth ${SOURCE_DEPTH_FILES})
 
-target_link_libraries(depth PRIVATE Qt5::Widgets Qt5::Quick Qt5::Svg paramserv)
+target_link_libraries(depth PRIVATE Qt5::Widgets Qt5::Quick Qt5::Svg Qt5::Sql paramserv ABMDaoLib)

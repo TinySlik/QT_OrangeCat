@@ -1,6 +1,7 @@
 ﻿#ifndef SQLUTILS_H
 #define SQLUTILS_H
 
+#include "../../ABMDaoLib_global.h"
 #include <QObject>
 #include <QVector>
 #include <QMap>
@@ -53,7 +54,7 @@ enum SqlLikeType{
 Q_DECLARE_METATYPE(SqlLikeType)
 
 
-struct SqlCondition{
+struct ABMDAOLIB_EXPORT SqlCondition{
   SqlOperator sqlOperator;  //操作符
   QString     key;          //字段名
   QVariant    value;        //值

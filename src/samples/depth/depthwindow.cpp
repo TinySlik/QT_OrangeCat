@@ -8,6 +8,8 @@
 #include "dialogdepthctrl.h"
 #include "abmdaolib.h"
 #include "parameterserver.h"
+#include "easylogging++.h"
+#include <QSql>
 #include <QToolBar>
 
 DepthWindow::DepthWindow(QWidget *parent) :
@@ -45,25 +47,18 @@ void DepthWindow::CreateDepthCtrlDialog() {
 
 void DepthWindow::CreateMainMenu() {
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
+//  WellDao dao;
+
   //初始化井信息
 //  QString wellId = ABMDaoLib::getInstance()->getConfig()->getSystemWellId();
 
-//  configuru::Config cfg = {{"target_table", {
-//    {"name", "u_well_depth_status"},
-//    {"block", 0.00}
-//  }}
-//};
-
-//  auto js = jsonInterface->find(cfg.c_str());
-
-
-  ABMDaoLib *abmDaoLib = ABMDaoLib::getInstance();
-  //初始化井信息
-  QString wellId = abmDaoLib->getConfig()->getSystemWellId();
-  QSharedPointer<WellInfoGeneral> wellGeneral = abmDaoLib->getWellInfoGeneralDao()->findByWellId(wellId);
-  QVector<SqlCondition> conditions;
-  conditions.append(SqlCondition(SqlEqual,"is_del",0));
-  QList<QSharedPointer<WellInfoGeneral>> wellList = abmDaoLib->getWellInfoGeneralDao()->findList(conditions);
+  configuru::Config cfg = {{"target_table", {
+      {"name", "u_well_depth_status"},
+      {"wellId", "001"}
+    }}
+  };
+//  LOG(INFO) << jsonInterface;
+  auto js = jsonInterface->find(dump_string(cfg, configuru::JSON).c_str());
 
   QMenu *fileMenu = ui->menubar->addMenu(tr("File"));
 //  fileMenu->addSeparator();

@@ -1,9 +1,11 @@
 ﻿#include "abmdaolib.h"
 #include "common/log/easylogging++.h"
+#include <memory>
 
 #pragma execution_character_set("utf-8")
 //初始化easilogging
 INITIALIZE_EASYLOGGINGPP
+
 
 ABMDaoLib *ABMDaoLib::getInstance()
 {
@@ -22,7 +24,7 @@ ABMDaoLib::~ABMDaoLib()
 
 ABMDaoLib::ABMDaoLib()
 {
-  m_sqlUtils = QSharedPointer<SqlUtils>(new SqlUtils("abm100","root","123456", "192.168.1.132"));
+  m_sqlUtils = QSharedPointer<SqlUtils>(new SqlUtils("abm100","root","123456", "192.168.1.126"));
   m_sqlUtils->connectDatabase();
 }
 
@@ -44,12 +46,12 @@ void ABMDaoLib::setSqlUtils(const QSharedPointer<SqlUtils> &sqlUtils)
   m_sqlUtils = sqlUtils;
 }
 
-std::shared_ptr<WellDao> ABMDaoLib::getJsonInterface()
-{
-  if(!m_JsonDaoInterface){
-    m_JsonDaoInterface = std::make_shared<WellDao>();
+std::shared_ptr<WellDao> ABMDaoLib::getJsonInterface() {
+  static std::shared_ptr<WellDao> jsonDaoInterface = nullptr;
+  if(jsonDaoInterface == nullptr){
+    jsonDaoInterface = std::make_shared<WellDao>();
   }
-  return m_JsonDaoInterface;
+  return jsonDaoInterface;
 }
 
 

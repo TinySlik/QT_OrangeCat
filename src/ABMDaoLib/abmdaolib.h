@@ -102,7 +102,6 @@ private:
 
   QSharedPointer<SqlUtils> m_sqlUtils;//数据库工具类
   //数据库交互类
-  std::shared_ptr<WellDao> m_JsonDaoInterface;
   //配置 当前数据
   QSharedPointer<CurrentDataDao> m_currentDataDao;
   //井信息

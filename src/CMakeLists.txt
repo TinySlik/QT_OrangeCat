@@ -293,8 +293,10 @@ else()
   target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++)
 endif()
 
-add_library(ABMDaoLib ${SOURCE_ABMDAO_FILES})
 
+add_definitions(-DABMDAOLIB_LIBRARY)
+
+add_library(ABMDaoLib ${SOURCE_ABMDAO_FILES})
 target_link_libraries(ABMDaoLib PRIVATE Qt5::Widgets Qt5::Sql)
 
 add_executable(display ${SOURCE_GENERAL_FILES})

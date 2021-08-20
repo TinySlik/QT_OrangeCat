@@ -50,7 +50,7 @@ public:
   //配置：当前数据
   QSharedPointer<CurrentDataDao> getCurrentDataDao();
   //**json 读写接口**/
-  std::shared_ptr<WellDao> getJsonInterface();
+  std::shared_ptr<WellDaoJsonInterface> getJsonInterface();
 
   //*****************************井信息******************************
 

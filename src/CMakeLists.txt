@@ -273,6 +273,7 @@ set(SOURCE_ABMDAO_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/welldao.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/welldao.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/jsoninterface.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/jsoninterface.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodepthstatus.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodepthstatus.h
 )

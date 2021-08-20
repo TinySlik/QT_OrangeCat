@@ -10,10 +10,10 @@
 #include <mutex>
 #include <string>
 
-class ABMDAOLIB_EXPORT WellDao: public jsonInterface, public std::enable_shared_from_this<WellDao> {
+class ABMDAOLIB_EXPORT WellDaoJsonInterface: public jsonInterface, public std::enable_shared_from_this<WellDaoJsonInterface> {
  public:
-  WellDao();
-  ~WellDao();
+  WellDaoJsonInterface();
+  ~WellDaoJsonInterface();
   virtual bool add(const std::string &json);
   virtual bool update(const std::string &json);
   virtual std::string find(const std::string &json);

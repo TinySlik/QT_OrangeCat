@@ -46,10 +46,10 @@ void ABMDaoLib::setSqlUtils(const QSharedPointer<SqlUtils> &sqlUtils)
   m_sqlUtils = sqlUtils;
 }
 
-std::shared_ptr<WellDao> ABMDaoLib::getJsonInterface() {
-  static std::shared_ptr<WellDao> jsonDaoInterface = nullptr;
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getJsonInterface() {
+  static std::shared_ptr<WellDaoJsonInterface> jsonDaoInterface = nullptr;
   if(jsonDaoInterface == nullptr){
-    jsonDaoInterface = std::make_shared<WellDao>();
+    jsonDaoInterface = std::make_shared<WellDaoJsonInterface>();
   }
   return jsonDaoInterface;
 }

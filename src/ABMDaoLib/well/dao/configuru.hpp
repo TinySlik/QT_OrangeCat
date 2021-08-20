@@ -133,7 +133,7 @@ www.github.com/emilk/configuru
 #undef check // Needed on OSX
 
 /// The Configuru namespace.
-namespace configtini
+namespace configuru
 {
 	struct DocInfo;
 	using DocInfo_SP = std::shared_ptr<DocInfo>;
@@ -212,7 +212,7 @@ namespace configtini
 		```
 	*/
 	template<typename T>
-	inline T as(const configtini::Config& config);
+	inline T as(const configuru::Config& config);
 
 	/// A dynamic config variable.
 	/// Acts like something out of Python or Lua.
@@ -900,7 +900,7 @@ namespace configtini
 	// ------------------------------------------------------------------------
 
 	template<typename T>
-	inline T as(const configtini::Config& config)
+	inline T as(const configuru::Config& config)
 	{
 		return config.get<T>();
 	}
@@ -1497,7 +1497,7 @@ This will define all the Configuru functions so that the linker may find them.
 #include <ostream>
 
 // ----------------------------------------------------------------------------
-namespace configtini
+namespace configuru
 {
 	void DocInfo::append_include_info(std::string& ret, const std::string& indent) const
 	{
@@ -2229,7 +2229,7 @@ namespace configtini
 #include <cerrno>
 #include <cstdlib>
 
-namespace configtini
+namespace configuru
 {
 	void append(Comments& a, Comments&& b)
 	{
@@ -2247,9 +2247,9 @@ namespace configtini
 
 	void ConfigComments::append(ConfigComments&& other)
 	{
-		configtini::append(this->prefix,        std::move(other.prefix));
-		configtini::append(this->postfix,       std::move(other.postfix));
-		configtini::append(this->pre_end_brace, std::move(other.pre_end_brace));
+		configuru::append(this->prefix,        std::move(other.prefix));
+		configuru::append(this->postfix,       std::move(other.postfix));
+		configuru::append(this->pre_end_brace, std::move(other.pre_end_brace));
 	}
 
 	// Returns the number of bytes written, or 0 on error
@@ -3413,7 +3413,7 @@ namespace configtini
 
 #include <cstdlib>  // strtod
 
-namespace configtini
+namespace configuru
 {
 	bool is_identifier(const char* p)
 	{
@@ -4123,13 +4123,13 @@ namespace configtini
 		}
 	}
 
-	void dump_file(const std::string& path, const configtini::Config& config, const FormatOptions& options)
+	void dump_file(const std::string& path, const configuru::Config& config, const FormatOptions& options)
 	{
 		auto str = dump_string(config, options);
 		write_text_file(path.c_str(), str);
 	}
 
-	void dump_file_add(const std::string& path, const configtini::Config& config, const FormatOptions& options)
+	void dump_file_add(const std::string& path, const configuru::Config& config, const FormatOptions& options)
 	{
 		auto str = dump_string(config, options);
 		write_text_file_a(path.c_str(), str);

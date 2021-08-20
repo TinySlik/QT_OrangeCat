@@ -47,18 +47,33 @@ void DepthWindow::CreateDepthCtrlDialog() {
 
 void DepthWindow::CreateMainMenu() {
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
-//  WellDao dao;
-
-  //初始化井信息
-//  QString wellId = ABMDaoLib::getInstance()->getConfig()->getSystemWellId();
-
   configuru::Config cfg = {{"target_table", {
       {"name", "u_well_depth_status"},
       {"wellId", "001"}
     }}
   };
-//  LOG(INFO) << jsonInterface;
   auto js = jsonInterface->find(dump_string(cfg, configuru::JSON).c_str());
+  auto res = configuru::parse_string(js.c_str(),configuru::JSON, "null");
+
+  res["drilling"] = 2.0;
+
+  configuru::Config updateval = {
+    {"target_table", "u_well_depth_status"},
+    {"update_val", res},
+    {"index_val", {{"wellId", res["wellId"]}}}
+  };
+
+  jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
+
+  res["wellId"] = "002";
+  configuru::Config insertval = {
+    {"target_table", "u_well_depth_status"},
+    {"insert_val", res},
+  };
+
+  jsonInterface->add(dump_string(insertval, configuru::JSON).c_str());
+
+
 
   QMenu *fileMenu = ui->menubar->addMenu(tr("File"));
 //  fileMenu->addSeparator();

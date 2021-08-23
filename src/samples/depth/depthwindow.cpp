@@ -11,18 +11,105 @@
 #include "easylogging++.h"
 #include <QSql>
 #include <QToolBar>
+#include <QTimer>
+#include "parameterserver.h"
 
 DepthWindow::DepthWindow(QWidget *parent) :
   QMainWindow(parent),
-  ui(new Ui::DepthWindow)
-{
+  ui(new Ui::DepthWindow) {
+  // todo
   ui->setupUi(this);
   CreateMainMenu();
   InitStatus();
 #ifndef QT_NO_SESSIONMANAGER
-    QGuiApplication::setFallbackSessionManagementEnabled(false);
+  QGuiApplication::setFallbackSessionManagementEnabled(false);
 #endif
   setUnifiedTitleAndToolBarOnMac(true);
+  auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
+  configuru::Config cfg = {
+    {"T_DActivaty",          ui->label_internal_status->text().toLatin1().data()},
+    {"bitDepth",             ui->label_5->text().toFloat()},
+    {"block",                ui->label_9->text().toFloat()},
+    {"blockHeight",          0.0f},
+    {"blockHeightZero",      0.0f},
+    {"blockSpeedThreshold",  0.0f},
+    {"bottomStatus",         ui->label_bottom_status->text().toLatin1().data()},
+    {"calibration",          "empty"},
+    {"compenstr",            ui->label_10->text().toFloat()},
+    {"depthOnJoint",         ui->label_7->text().toFloat()},
+    {"depthSensorCount",     0},
+    {"drilling",             2.0f},
+    {"factor",               ui->label_13->text().toFloat()},
+    {"holeDepth",            ui->label_4->text().toFloat()},
+    {"hookLoad",             ui->label_12->text().toFloat()},
+    {"id",                   1},
+    {"ignoreIn_OutSlipTag",  0},
+    {"lagDepth",             ui->label_6->text().toFloat()},
+    {"offBottomDist",        ui->label_8->text().toFloat()},
+    {"riser",                ui->label_11->text().toFloat()},
+    {"rop",                  0.0f},
+    {"rotaryCheckEnable",    0},
+    {"rotaryCheckThreshold", 0.0f},
+    {"slipSatus",            ui->label_slips_status->text().toLatin1().data()},
+    {"tripping",             0.0f},
+    {"wellId",               "001"},
+    {"wobCheckEnable",       0},
+    {"wobCheckThreshold",    0.0f}
+  };
+
+  ctr.judge_with_create_key("Depth") = cfg;
+  auto stu = ParameterServer::instance()->GetCfgStatusRoot();
+  stu += cfg;
+
+#define STR_LABEL_REGISTER(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {\
+  if (!b.is_string()) return false; \
+  auto s = std::string(b); \
+  ui->y->setText(s.c_str()); \
+  return true; \
+});
+
+#define NUM_LABEL_REGISTER(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool { \
+  if (!b.is_float()) return false; \
+  auto s = float(b); \
+  ui->y->setText(QString::number(static_cast<double>(s))); \
+  return true; \
+});
+  STR_LABEL_REGISTER("T_DActivaty", label_internal_status)
+  STR_LABEL_REGISTER("bottomStatus", label_bottom_status)
+  STR_LABEL_REGISTER("slipSatus", label_slips_status)
+  NUM_LABEL_REGISTER("bitDepth", label_5)
+  NUM_LABEL_REGISTER("block", label_9)
+  NUM_LABEL_REGISTER("compenstr", label_10)
+  NUM_LABEL_REGISTER("depthOnJoint", label_7)
+  NUM_LABEL_REGISTER("factor", label_13)
+  NUM_LABEL_REGISTER("holeDepth", label_4)
+  NUM_LABEL_REGISTER("hookLoad", label_12)
+  NUM_LABEL_REGISTER("lagDepth", label_6)
+  NUM_LABEL_REGISTER("offBottomDist", label_8)
+  NUM_LABEL_REGISTER("riser", label_11)
+#undef STR_LABEL_REGISTER
+#undef NUM_LABEL_REGISTER
+  connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateFromDao()));
+  m_timer.start(1000);
+}
+
+DepthWindow::~DepthWindow() {
+  auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
+  ctr.erase("Depth");
+  delete ui;
+}
+
+void DepthWindow::updateFromDao() {
+  auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
+  configuru::Config cfg = {{"target_table", {
+      {"name", "u_well_depth_status"},
+      {"wellId", "001"}
+    }}
+  };
+  auto js = jsonInterface->find(dump_string(cfg, configuru::JSON).c_str());
+  auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
+  auto stu = ParameterServer::instance()->GetCfgStatusRoot();
+  stu << configuru::parse_string(js.c_str(), configuru::JSON, "null");
 }
 
 void DepthWindow::CreateActivatyDialog() {
@@ -46,35 +133,6 @@ void DepthWindow::CreateDepthCtrlDialog() {
 }
 
 void DepthWindow::CreateMainMenu() {
-  auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
-  configuru::Config cfg = {{"target_table", {
-      {"name", "u_well_depth_status"},
-      {"wellId", "001"}
-    }}
-  };
-  auto js = jsonInterface->find(dump_string(cfg, configuru::JSON).c_str());
-  auto res = configuru::parse_string(js.c_str(),configuru::JSON, "null");
-
-  res["drilling"] = 2.0;
-
-  configuru::Config updateval = {
-    {"target_table", "u_well_depth_status"},
-    {"update_val", res},
-    {"index_val", {{"wellId", res["wellId"]}}}
-  };
-
-  jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
-
-  res["wellId"] = "002";
-  configuru::Config insertval = {
-    {"target_table", "u_well_depth_status"},
-    {"insert_val", res},
-  };
-
-  jsonInterface->add(dump_string(insertval, configuru::JSON).c_str());
-
-
-
   QMenu *fileMenu = ui->menubar->addMenu(tr("File"));
 //  fileMenu->addSeparator();
   QAction *exitAct = fileMenu->addAction(tr("Exit"), this, &QWidget::close);
@@ -174,7 +232,4 @@ void DepthWindow::InitStatus(const SLIP_STATUS slip, const BOTTOM_STATUS bottom,
   activity_status->setPalette(label_palette);
 }
 
-DepthWindow::~DepthWindow()
-{
-  delete ui;
-}
+

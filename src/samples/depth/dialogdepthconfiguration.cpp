@@ -35,8 +35,6 @@ DialogDepthConfiguration::DialogDepthConfiguration(QWidget *parent) :
 #undef CREATE_DROP_UNIT
 }
 
-
-
 DialogDepthConfiguration::~DialogDepthConfiguration() {
   delete ui;
 }

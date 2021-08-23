@@ -207,10 +207,10 @@ static void handle_get_device_usage(struct mg_connection *nc) {
     cfg["dev_status"]= Config::object();
   }
   auto dev_status = cfg["dev_status"];
-  dev_status["mem"] = mem;
-  dev_status["vmem"] = vmem;
-  dev_status["io_r"] = r;
-  dev_status["io_w"] = w;
+//  dev_status["mem"] = mem;
+//  dev_status["vmem"] = vmem;
+//  dev_status["io_r"] = r;
+//  dev_status["io_w"] = w;
 
   mg_printf_http_chunk(nc, dump_string(dev_status, JSON).c_str());
 

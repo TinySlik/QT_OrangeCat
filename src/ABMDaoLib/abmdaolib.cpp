@@ -24,7 +24,7 @@ ABMDaoLib::~ABMDaoLib()
 
 ABMDaoLib::ABMDaoLib()
 {
-  m_sqlUtils = QSharedPointer<SqlUtils>(new SqlUtils("abm100","root","123456", "192.168.1.126"));
+  m_sqlUtils = QSharedPointer<SqlUtils>(new SqlUtils("abm100","root","123456", "192.168.1.132"));
   m_sqlUtils->connectDatabase();
 }
 

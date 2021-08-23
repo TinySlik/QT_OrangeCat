@@ -2,6 +2,7 @@
 #define DEPTHWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
 
 typedef enum {
   SLIP_IN_SLIPS = 0,
@@ -38,9 +39,11 @@ public Q_SLOTS:
   void CreateActivatyDialog();
   void CreateDepthCalibrationDialog();
   void CreateDepthCtrlDialog();
+  void updateFromDao();
 
 private:
   Ui::DepthWindow *ui;
+  QTimer m_timer;
 };
 
 #endif // DEPTHWINDOW_H

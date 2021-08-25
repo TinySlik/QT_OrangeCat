@@ -30,7 +30,7 @@
    <property name="title">
     <string>New Depth(ft)</string>
    </property>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox">
+   <widget class="QDoubleSpinBox" name="doubleSpinBox_1">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -38,6 +38,9 @@
       <width>91</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
@@ -49,6 +52,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
+    </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
     <property name="geometry">
@@ -58,6 +64,9 @@
       <width>91</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_read1_2">
@@ -228,6 +237,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
+    </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
     <property name="geometry">
@@ -238,6 +250,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
+    </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
     <property name="geometry">
@@ -247,6 +262,9 @@
       <width>91</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_read1_8">
@@ -357,6 +375,9 @@
       <width>91</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -500,6 +521,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
+    </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_16">
     <property name="geometry">
@@ -509,6 +533,9 @@
       <width>91</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_read1_17">
@@ -536,7 +563,7 @@
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="checkBox_1">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -582,6 +609,9 @@
       <width>91</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
@@ -677,6 +707,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
+    </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_19">
     <property name="geometry">
@@ -686,6 +719,9 @@
       <width>91</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <double>999.990000000000009</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_read1_18">

@@ -2,6 +2,7 @@
 #define DIALOGDEPTHCTRL_H
 
 #include <QDialog>
+#include "depthwindow.h"
 
 namespace Ui {
   class DialogDepthCtrl;
@@ -15,6 +16,10 @@ public:
   explicit DialogDepthCtrl(QWidget *parent = nullptr);
   ~DialogDepthCtrl();
 
+  void Accept();
+signals:
+  void acceptSig();
+
 private slots:
   void on_pushButton_2_clicked();
 
@@ -22,6 +27,7 @@ private slots:
 
 private:
   Ui::DialogDepthCtrl *ui;
+  friend DepthWindow;
 };
 
 #endif // DIALOGDEPTHCTRL_H

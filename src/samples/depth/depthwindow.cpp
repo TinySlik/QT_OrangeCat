@@ -12,12 +12,49 @@
 #include <QSql>
 #include <QToolBar>
 #include <QTimer>
-#include "parameterserver.h"
+//  configuru::Config cfg = {
+//    {"T_DActivaty",          ui->label_internal_status->text().toLatin1().data()},
+//    {"bitDepth",             ui->label_5->text().toFloat()},
+//    {"block",                ui->label_9->text().toFloat()},
+//    {"blockHeight",          0.0f},
+//    {"blockHeightZero",      0.0f},
+//    {"blockSpeedThreshold",  0.0f},
+//    {"bottomStatus",         ui->label_bottom_status->text().toLatin1().data()},
+//    {"calibration",          "empty"},
+//    {"compenstr",            ui->label_10->text().toFloat()},
+//    {"depthOnJoint",         ui->label_7->text().toFloat()},
+//    {"depthSensorCount",     0},
+//    {"drilling",             2.0f},
+//    {"factor",               ui->label_13->text().toFloat()},
+//    {"holeDepth",            ui->label_4->text().toFloat()},
+//    {"hookLoad",             ui->label_12->text().toFloat()},
+//    {"id",                   1},
+//    {"ignoreIn_OutSlipTag",  0},
+//    {"lagDepth",             ui->label_6->text().toFloat()},
+//    {"offBottomDist",        ui->label_8->text().toFloat()},
+//    {"riser",                ui->label_11->text().toFloat()},
+//    {"rop",                  0.0f},
+//    {"rotaryCheckEnable",    0},
+//    {"rotaryCheckThreshold", 0.0f},
+//    {"slipSatus",            ui->label_slips_status->text().toLatin1().data()},
+//    {"tripping",             0.0f},
+//    {"wellId",               "001"},
+//    {"wobCheckEnable",       0},
+//    {"wobCheckThreshold",    0.0f}
+//  };
 
 DepthWindow::DepthWindow(QWidget *parent) :
   QMainWindow(parent),
-  ui(new Ui::DepthWindow) {
-  // todo
+  ui(new Ui::DepthWindow),
+  m_DialogActivatySettings(nullptr),
+  m_DialogDepthConfiguration(nullptr),
+  m_DialogDepthCalibration(nullptr),
+  m_DialogDepthCtrl(nullptr)
+//  m_DialogActivatySettings(new DialogActivatySettings(this)),
+//  m_DialogDepthConfiguration(new DialogDepthConfiguration(this)),
+//  m_DialogDepthCalibration(new DialogDepthCalibration(this)),
+//  m_DialogDepthCtrl(new DialogDepthCtrl(this))
+{
   ui->setupUi(this);
   CreateMainMenu();
   InitStatus();
@@ -26,69 +63,75 @@ DepthWindow::DepthWindow(QWidget *parent) :
 #endif
   setUnifiedTitleAndToolBarOnMac(true);
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
-  configuru::Config cfg = {
-    {"T_DActivaty",          ui->label_internal_status->text().toLatin1().data()},
-    {"bitDepth",             ui->label_5->text().toFloat()},
-    {"block",                ui->label_9->text().toFloat()},
-    {"blockHeight",          0.0f},
-    {"blockHeightZero",      0.0f},
-    {"blockSpeedThreshold",  0.0f},
-    {"bottomStatus",         ui->label_bottom_status->text().toLatin1().data()},
-    {"calibration",          "empty"},
-    {"compenstr",            ui->label_10->text().toFloat()},
-    {"depthOnJoint",         ui->label_7->text().toFloat()},
-    {"depthSensorCount",     0},
-    {"drilling",             2.0f},
-    {"factor",               ui->label_13->text().toFloat()},
-    {"holeDepth",            ui->label_4->text().toFloat()},
-    {"hookLoad",             ui->label_12->text().toFloat()},
-    {"id",                   1},
-    {"ignoreIn_OutSlipTag",  0},
-    {"lagDepth",             ui->label_6->text().toFloat()},
-    {"offBottomDist",        ui->label_8->text().toFloat()},
-    {"riser",                ui->label_11->text().toFloat()},
-    {"rop",                  0.0f},
-    {"rotaryCheckEnable",    0},
-    {"rotaryCheckThreshold", 0.0f},
-    {"slipSatus",            ui->label_slips_status->text().toLatin1().data()},
-    {"tripping",             0.0f},
-    {"wellId",               "001"},
-    {"wobCheckEnable",       0},
-    {"wobCheckThreshold",    0.0f}
+  auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
+  configuru::Config cfg_sql_table_current = {{"target_table", {
+      {"name", "u_current_data"},
+      {"key", "wellId"}
+    }}
   };
+  auto js_sql_table = jsonInterface->find(dump_string(cfg_sql_table_current, configuru::JSON).c_str());
+  configuru::Config cfg_sql_table = configuru::parse_string(js_sql_table.c_str(), configuru::JSON, "null");
 
+  LOG(INFO) << "target well: " << cfg_sql_table["value"];
+  configuru::Config cfg_sql = {{"target_table", {
+      {"name", "u_well_depth_status"},
+      {"wellId", cfg_sql_table["value"]}
+    }}
+  };
+  auto js = jsonInterface->find(dump_string(cfg_sql, configuru::JSON).c_str());
+  configuru::Config cfg = configuru::parse_string(js.c_str(), configuru::JSON, "null");
+ LOG(INFO) << cfg;
   ctr.judge_with_create_key("Depth") = cfg;
-  auto stu = ParameterServer::instance()->GetCfgStatusRoot();
+  auto stu = ParameterServer:: instance()->GetCfgStatusRoot();
   stu += cfg;
 
-#define STR_LABEL_REGISTER(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {\
+  ctr["Depth"].add_callback([](configuru::Config &, const configuru::Config &b)->bool {
+    auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
+    configuru::Config updateval = {
+      {"target_table", "u_well_depth_status"},
+      {"update_val", b},
+      {"index_val", {{"wellId", b["wellId"]}}}
+    };
+    jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
+    return true;
+  });
+
+#define STR_DISPLAY_LABEL_REGISTER_WITH_INIT(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {\
   if (!b.is_string()) return false; \
   auto s = std::string(b); \
   ui->y->setText(s.c_str()); \
   return true; \
-});
+}); \
+std::string cur##y = std::string(stu[x]); \
+ui->y->setText(cur##y.c_str());
 
-#define NUM_LABEL_REGISTER(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool { \
+#define NUM_DISPLAY_LABEL_REGISTER_WITH_INIT(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool { \
   if (!b.is_float()) return false; \
   auto s = float(b); \
   ui->y->setText(QString::number(static_cast<double>(s))); \
   return true; \
-});
-  STR_LABEL_REGISTER("T_DActivaty", label_internal_status)
-  STR_LABEL_REGISTER("bottomStatus", label_bottom_status)
-  STR_LABEL_REGISTER("slipSatus", label_slips_status)
-  NUM_LABEL_REGISTER("bitDepth", label_5)
-  NUM_LABEL_REGISTER("block", label_9)
-  NUM_LABEL_REGISTER("compenstr", label_10)
-  NUM_LABEL_REGISTER("depthOnJoint", label_7)
-  NUM_LABEL_REGISTER("factor", label_13)
-  NUM_LABEL_REGISTER("holeDepth", label_4)
-  NUM_LABEL_REGISTER("hookLoad", label_12)
-  NUM_LABEL_REGISTER("lagDepth", label_6)
-  NUM_LABEL_REGISTER("offBottomDist", label_8)
-  NUM_LABEL_REGISTER("riser", label_11)
-#undef STR_LABEL_REGISTER
-#undef NUM_LABEL_REGISTER
+}); \
+float cur_##y = float(stu[x]); \
+ui->y->setText(QString::number(static_cast<double>(cur_##y)));
+
+  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("T_DActivaty", label_internal_status)
+  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("bottomStatus", label_bottom_status)
+  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("slipSatus", label_slips_status)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("bitDepth", label_5)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("block", label_9)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("compenstr", label_10)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("depthOnJoint", label_7)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("factor", label_13)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("holeDepth", label_4)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("hookLoad", label_12)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("lagDepth", label_6)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("offBottomDist", label_8)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("riser", label_11)
+#undef STR_DISPLAY_LABEL_REGISTER_WITH_INIT
+#undef NUM_DISPLAY_LABEL_REGISTER_WITH_INIT
+
+//  connect(m_DialogDepthCtrl, SIGNAL(DialogDepthCtrl::acceptSig()), this, SLOT(DepthCtrlUpdate()));
+
   connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateFromDao()));
   m_timer.start(1000);
 }
@@ -112,24 +155,35 @@ void DepthWindow::updateFromDao() {
   stu << configuru::parse_string(js.c_str(), configuru::JSON, "null");
 }
 
+void DepthWindow::DepthCtrlUpdate() {
+  if (m_DialogDepthCtrl)
+    m_DialogDepthCtrl->Accept();
+}
+
 void DepthWindow::CreateActivatyDialog() {
-  auto dg = new DialogActivatySettings(this);
-  dg->show();
+  if (!m_DialogActivatySettings)
+    m_DialogActivatySettings = new DialogActivatySettings(this);
+  m_DialogActivatySettings->show();
 }
 
 void DepthWindow::CreateDepthConfigDialog() {
-  auto dg = new DialogDepthConfiguration(this);
-  dg->show();
+  if (!m_DialogDepthConfiguration)
+    m_DialogDepthConfiguration = new DialogDepthConfiguration(this);
+  m_DialogDepthConfiguration->show();
 }
 
 void DepthWindow::CreateDepthCalibrationDialog() {
-  auto dg = new DialogDepthCalibration(this);
-  dg->show();
+  if (!m_DialogDepthCalibration)
+    m_DialogDepthCalibration = new DialogDepthCalibration(this);
+  m_DialogDepthCalibration->show();
 }
 
 void DepthWindow::CreateDepthCtrlDialog() {
-  auto dg = new DialogDepthCtrl(this);
-  dg->show();
+  if (!m_DialogDepthCtrl) {
+    m_DialogDepthCtrl = new DialogDepthCtrl(this);
+//    connect(m_DialogDepthCtrl, SIGNAL(acceptSig()), this, SLOT(DepthCtrlUpdate()));
+  }
+  m_DialogDepthCtrl->show();
 }
 
 void DepthWindow::CreateMainMenu() {

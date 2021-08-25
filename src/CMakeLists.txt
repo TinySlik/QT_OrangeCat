@@ -294,7 +294,6 @@ else()
   target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++)
 endif()
 
-
 add_definitions(-DABMDAOLIB_LIBRARY)
 
 add_library(ABMDaoLib ${SOURCE_ABMDAO_FILES})

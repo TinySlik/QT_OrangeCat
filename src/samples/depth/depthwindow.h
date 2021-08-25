@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 #include <QTimer>
+class DialogActivatySettings;
+class DialogDepthConfiguration;
+class DialogDepthCalibration;
+class DialogDepthCtrl;
 
 typedef enum {
   SLIP_IN_SLIPS = 0,
@@ -40,10 +44,15 @@ public Q_SLOTS:
   void CreateDepthCalibrationDialog();
   void CreateDepthCtrlDialog();
   void updateFromDao();
+  void DepthCtrlUpdate();
 
 private:
   Ui::DepthWindow *ui;
   QTimer m_timer;
+  DialogActivatySettings *m_DialogActivatySettings;
+  DialogDepthConfiguration *m_DialogDepthConfiguration;
+  DialogDepthCalibration *m_DialogDepthCalibration;
+  DialogDepthCtrl *m_DialogDepthCtrl;
 };
 
 #endif // DEPTHWINDOW_H

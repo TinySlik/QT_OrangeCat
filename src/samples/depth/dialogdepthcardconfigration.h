@@ -1,29 +1,30 @@
-#ifndef DIALOGDEPTHCARDCONFIGRATION_H
-#define DIALOGDEPTHCARDCONFIGRATION_H
+/** Copyright 2021 Tiny Oh, Ltd. All rights reserved.
+ *
+ */
+
+#ifndef SRC_SAMPLES_DEPTH_DIALOGDEPTHCARDCONFIGRATION_H_
+#define SRC_SAMPLES_DEPTH_DIALOGDEPTHCARDCONFIGRATION_H_
 
 #include <QDialog>
 
 namespace Ui {
-  class DialogDepthCardConfigration;
+class DialogDepthCardConfigration;
 }
 
-class DialogDepthCardConfigration : public QDialog
-{
+class DialogDepthCardConfigration : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   explicit DialogDepthCardConfigration(QWidget *parent = nullptr);
   ~DialogDepthCardConfigration();
 
-private slots:
+ private slots:
   void on_pushButton_clicked();
-
   void on_pushButton_2_clicked();
-
   void on_checkBox_toggled(bool checked);
 
-private:
+ private:
   Ui::DialogDepthCardConfigration *ui;
 };
 
-#endif // DIALOGDEPTHCARDCONFIGRATION_H
+#endif  // SRC_SAMPLES_DEPTH_DIALOGDEPTHCARDCONFIGRATION_H_

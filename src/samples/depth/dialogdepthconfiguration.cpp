@@ -1,3 +1,7 @@
+/** Copyright 2021 Tiny Oh, Ltd. All rights reserved.
+ *
+ */
+
 #include "dialogdepthconfiguration.h"
 #include "ui_dialogdepthconfiguration.h"
 #include <QDragEnterEvent>
@@ -19,19 +23,19 @@ DialogDepthConfiguration::DialogDepthConfiguration(QWidget *parent) :
   setMinimumSize(this->size());
   ui->listWidget->setDragEnabled(true);
   ui->listWidget->setMouseTracking(true);
-  connect(ui->listWidget,SIGNAL(itemPressed(QListWidgetItem*)),this,SLOT(itemPressed(QListWidgetItem*)));
-#define CREATE_DROP_UNIT(x,y,z) m_dropUnits.push_back(\
-  {ui->label_##x->geometry().translated(ui->groupBox_##y->pos()), \
-   ui->label_##x,\
-   ui->radioButton_##z})
-  CREATE_DROP_UNIT(2,10,7);
-  CREATE_DROP_UNIT(3,10,7);
-  CREATE_DROP_UNIT(4,9,10);
-  CREATE_DROP_UNIT(5,9,10);
-  CREATE_DROP_UNIT(6,8,12);
-  CREATE_DROP_UNIT(7,8,12);
-  CREATE_DROP_UNIT(8,7,14);
-  CREATE_DROP_UNIT(9,7,14);
+  connect(ui->listWidget, SIGNAL(itemPressed(QListWidgetItem*)), this, SLOT(itemPressed(QListWidgetItem*)));
+#define CREATE_DROP_UNIT(x, y, z) m_dropUnits.push_back(\
+  { ui->label_##x->geometry().translated(ui->groupBox_##y->pos()), \
+    ui->label_##x, \
+    ui->radioButton_##z})
+  CREATE_DROP_UNIT(2, 10, 7);
+  CREATE_DROP_UNIT(3, 10, 7);
+  CREATE_DROP_UNIT(4, 9, 10);
+  CREATE_DROP_UNIT(5, 9, 10);
+  CREATE_DROP_UNIT(6, 8, 12);
+  CREATE_DROP_UNIT(7, 8, 12);
+  CREATE_DROP_UNIT(8, 7, 14);
+  CREATE_DROP_UNIT(9, 7, 14);
 #undef CREATE_DROP_UNIT
 }
 

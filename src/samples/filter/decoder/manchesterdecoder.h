@@ -20,7 +20,7 @@
 #include "parameterserver.h"
 
 class ManchesterDecoder: public std::enable_shared_from_this<ManchesterDecoder> {
-public:
+ public:
   virtual bool decodeBeforeWait(std::shared_ptr<std::vector<float>> data) = 0;
   virtual bool decodeAfterWait() =  0;
   virtual configuru::Config defaultParams() = 0;
@@ -33,7 +33,7 @@ public:
   virtual char getCurrentResualt();
   virtual const std::shared_ptr<std::vector<char>> getResualtList();
 
-protected:
+ protected:
   std::shared_ptr<std::vector<char>> _resualt;
   std::shared_ptr<std::vector<float>> _displayBuffer;
   size_t _resualtMemSizeTag;

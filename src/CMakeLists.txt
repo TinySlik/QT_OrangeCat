@@ -115,27 +115,9 @@ set(SOURCE_GAMMA_FILES ${QRC_FILES}
     ${QT_GAMMA_PLATFORM_FILES}
 )
 
-if(OS_WIN)
-  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/impl.win32.cpp)
-else()
-  set(QT_DEPTH_PLATFORM_FILES ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/impl.linux.cpp)
-endif()
 
 set(SOURCE_DEPTH_FILES ${QRC_FILES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/urldecode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/mainwindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/window.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/window.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/memorymapped.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/memorymapped.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/displaywidget.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/displaywidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/time.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/renderutil.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/renderutil.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/depthwindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/depthwindow.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/depthwindow.ui
@@ -160,7 +142,6 @@ set(SOURCE_DEPTH_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcardconfigration.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcardconfigration.ui
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/depth/dialogdepthcardconfigration.h
-    ${QT_DEPTH_PLATFORM_FILES}
 )
 
 set(SOURCE_ABMDAO_FILES

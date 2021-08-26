@@ -1,8 +1,14 @@
-#ifndef DEPTHWINDOW_H
-#define DEPTHWINDOW_H
+/** Copyright 2021 Tiny Oh, Ltd. All rights reserved.
+ *
+ */
+
+#ifndef SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_
+#define SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_
 
 #include <QMainWindow>
 #include <QTimer>
+#include <string>
+
 class DialogActivatySettings;
 class DialogDepthConfiguration;
 class DialogDepthCalibration;
@@ -27,18 +33,17 @@ typedef enum {
 } INTERNAL_STATUS;
 
 namespace Ui {
-  class DepthWindow;
+class DepthWindow;
 }
 
-class DepthWindow : public QMainWindow
-{
+class DepthWindow : public QMainWindow {
   Q_OBJECT
-public:
+ public:
   explicit DepthWindow(QWidget *parent = nullptr);
   ~DepthWindow();
   void InitStatus(const SLIP_STATUS slip = SLIP_IN_SLIPS, const BOTTOM_STATUS bottom = BOTTOM_OFF, INTERNAL_STATUS activity = INTERNAL_DRILLING);
   void CreateMainMenu();
-public Q_SLOTS:
+  public Q_SLOTS:
   void CreateDepthConfigDialog();
   void CreateActivatyDialog();
   void CreateDepthCalibrationDialog();
@@ -46,7 +51,7 @@ public Q_SLOTS:
   void updateFromDao();
   void DepthCtrlUpdate();
 
-private:
+ private:
   Ui::DepthWindow *ui;
   QTimer m_timer;
   DialogActivatySettings *m_DialogActivatySettings;
@@ -57,4 +62,4 @@ private:
   std::string targetTable;
 };
 
-#endif // DEPTHWINDOW_H
+#endif  // SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_

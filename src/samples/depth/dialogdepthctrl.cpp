@@ -1,3 +1,7 @@
+/** Copyright 2021 Tiny Oh, Ltd. All rights reserved.
+ *
+ */
+
 #include "dialogdepthctrl.h"
 #include "ui_dialogdepthctrl.h"
 #include "abmdaolib.h"
@@ -12,7 +16,7 @@ ui(new Ui::DialogDepthCtrl) {
   setMinimumSize(this->size());
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot()["Depth"];
 
-#define NUM_DISPLAY_SPIN_INIT(x, y)  float cur_##y = float(ctr[x]); \
+#define NUM_DISPLAY_SPIN_INIT(x, y)  float cur_##y = static_cast<float>(ctr[x]);\
   ui->y->setValue(static_cast<double>(cur_##y));
   NUM_DISPLAY_SPIN_INIT("holeDepth", doubleSpinBox_1)
   NUM_DISPLAY_SPIN_INIT("bitDepth", doubleSpinBox_3)
@@ -28,7 +32,7 @@ ui(new Ui::DialogDepthCtrl) {
   NUM_DISPLAY_SPIN_INIT("wobCheckThreshold", doubleSpinBox_16)
 #undef NUM_DISPLAY_SPIN_INIT
 
-#define BOOL_DISPLAY_CKBOX_INIT(x, y)  int cur_##y = int(ctr[x]); \
+#define BOOL_DISPLAY_CKBOX_INIT(x, y)  int cur_##y = static_cast<int>(ctr[x]); \
   ui->y->setChecked(static_cast<bool>(cur_##y));
   BOOL_DISPLAY_CKBOX_INIT("enableBlockDirection", checkBox_3)
   BOOL_DISPLAY_CKBOX_INIT("wobCheckEnable", checkBox_2)
@@ -45,12 +49,13 @@ DialogDepthCtrl::~DialogDepthCtrl() {
 void DialogDepthCtrl::Accept() {
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
   configuru::Config a = ctr["Depth"];
-#define BOOL_CKBOX_SET(x, y)  a[x] = int(ui->y->isChecked());
+#define BOOL_CKBOX_SET(x, y)  a[x] = static_cast<int>(ui->y->isChecked());
   BOOL_CKBOX_SET("wobCheckEnable", checkBox_2)
   BOOL_CKBOX_SET("rotaryCheckEnable", checkBox_1)
   BOOL_CKBOX_SET("enableBlockDirection", checkBox_3)
 #undef BOOL_CKBOX_SET
-#define NUM_SPIN_SET(x, y, z)  a[x] = (ui->y->value()); ui->z->setPixmap(QPixmap(":/svg/right.svg"));
+#define NUM_SPIN_SET(x, y, z)  a[x] = (ui->y->value());\
+  ui->z->setPixmap(QPixmap(":/svg/right.svg"));
   NUM_SPIN_SET("holeDepth", doubleSpinBox_1, label_1)
   NUM_SPIN_SET("bitDepth", doubleSpinBox_3, label_8)
   NUM_SPIN_SET("depthOnJoint", doubleSpinBox_2, label_2)
@@ -86,8 +91,10 @@ void DialogDepthCtrl::on_pushButton_3_clicked() {
 
 #define CHECK_IF_SPIN_EQUL_SQL(x, y, z)  void DialogDepthCtrl::on_##y##_valueChanged(double arg1) {\
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot()["Depth"];\
-  if (ctr[x] != arg1) ui->z->setPixmap(QPixmap(":/svg/wrong.svg"));\
-  else ui->z->setPixmap(QPixmap(":/svg/right.svg"));\
+  if (ctr[x] != arg1)\
+    ui->z->setPixmap(QPixmap(":/svg/wrong.svg"));\
+  else\
+    ui->z->setPixmap(QPixmap(":/svg/right.svg"));\
 }
 
 CHECK_IF_SPIN_EQUL_SQL("holeDepth", doubleSpinBox_1, label_1)

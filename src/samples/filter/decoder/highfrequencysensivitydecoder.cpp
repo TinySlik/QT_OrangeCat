@@ -14,6 +14,8 @@
  */
 #include "highfrequencysensivitydecoder.h"
 #include "easylogging++.h"
+#include <memory>
+#include <vector>
 
 HighFrequencySensivityDecoder::HighFrequencySensivityDecoder():
 m_match_alpha(50),
@@ -42,12 +44,12 @@ bool HighFrequencySensivityDecoder::decodeBeforeWait(std::shared_ptr<std::vector
 
   float average = 0.f;
   auto sz = static_cast<int>(data->size());
-  for(int i = 0; i < sz; i++) {
+  for (int i = 0; i < sz; i++) {
     average += (*data)[static_cast<size_t>(i)] / sz;
   }
 
   std::vector<int> tm;
-  for(int i = 0; i < sz; i++) {
+  for (int i = 0; i < sz; i++) {
     static int count_i = 0;
     if ((*data)[static_cast<size_t>(i)] > average) {
       cache[static_cast<size_t>(i)] = 1.f;
@@ -57,11 +59,11 @@ bool HighFrequencySensivityDecoder::decodeBeforeWait(std::shared_ptr<std::vector
     count_i++;
   }
 
-  if (init_wait >= 0) init_wait --;
+  if (init_wait >= 0) init_wait--;
   count++;
 
   if (init_wait < 0 && count >= (m_matchClockFrequency - 1)) {
-    for(int j = 0; j < sz / m_matchClockFrequency; j++) {
+    for (int j = 0; j < sz / m_matchClockFrequency; j++) {
       int count_j = 0;
       for (int k = 0; k < m_matchClockFrequency; k++) {
         if (cache[static_cast<size_t>(j * m_matchClockFrequency + k + sz % m_matchClockFrequency)] > average) {

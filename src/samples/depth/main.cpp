@@ -21,7 +21,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
-#include "mainwindow.h"
 #include <QApplication>
 #include <QGuiApplication>
 #include "easylogging++.h"
@@ -77,11 +76,11 @@ int main(int argc, char **argv) {
   mainWindow.setMinimumSize(QSize(442, 414));
 
 //  mainWindow.resize(mainWindow.sizeHint());
-  mainWindow.resize(412,312);
+  mainWindow.resize(412, 312);
   int desktopArea = QApplication::desktop()->width() *
                     QApplication::desktop()->height();
   int widgetArea = mainWindow.width() * mainWindow.height();
-  if (((float)widgetArea / (float)desktopArea) < 0.75f)
+  if ((static_cast<float>(widgetArea)/static_cast<float>(desktopArea) < 0.75f))
       mainWindow.show();
   else
       mainWindow.showMaximized();

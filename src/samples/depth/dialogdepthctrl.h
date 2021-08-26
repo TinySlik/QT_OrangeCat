@@ -1,30 +1,31 @@
-#ifndef DIALOGDEPTHCTRL_H
-#define DIALOGDEPTHCTRL_H
+/** Copyright 2021 Tiny Oh, Ltd. All rights reserved.
+ *
+ */
+
+#ifndef SRC_SAMPLES_DEPTH_DIALOGDEPTHCTRL_H_
+#define SRC_SAMPLES_DEPTH_DIALOGDEPTHCTRL_H_
 
 #include <QDialog>
 #include "depthwindow.h"
 
 namespace Ui {
-  class DialogDepthCtrl;
+class DialogDepthCtrl;
 }
 
-class DialogDepthCtrl : public QDialog
-{
+class DialogDepthCtrl : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   explicit DialogDepthCtrl(QWidget *parent = nullptr);
   ~DialogDepthCtrl();
-
   void Accept();
-signals:
+
+ signals:
   void acceptSig();
 
-private slots:
+ private slots:
   void on_pushButton_2_clicked();
-
   void on_pushButton_3_clicked();
-
   void on_doubleSpinBox_1_valueChanged(double arg1);
   void on_doubleSpinBox_3_valueChanged(double arg1);
   void on_doubleSpinBox_2_valueChanged(double arg1);
@@ -37,14 +38,12 @@ private slots:
   void on_doubleSpinBox_14_valueChanged(double arg1);
   void on_doubleSpinBox_18_valueChanged(double arg1);
   void on_doubleSpinBox_16_valueChanged(double arg1);
-
   void on_checkBox_1_toggled(bool checked);
-
   void on_checkBox_2_toggled(bool checked);
 
-private:
+ private:
   Ui::DialogDepthCtrl *ui;
   friend DepthWindow;
 };
 
-#endif // DIALOGDEPTHCTRL_H
+#endif  // SRC_SAMPLES_DEPTH_DIALOGDEPTHCTRL_H_

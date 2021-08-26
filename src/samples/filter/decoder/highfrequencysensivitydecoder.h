@@ -13,21 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef HIGHFREQUENCYSENSIVITYDECODER_H
-#define HIGHFREQUENCYSENSIVITYDECODER_H
+#ifndef SRC_SAMPLES_FILTER_DECODER_HIGHFREQUENCYSENSIVITYDECODER_H_
+#define SRC_SAMPLES_FILTER_DECODER_HIGHFREQUENCYSENSIVITYDECODER_H_
 
 #include "manchesterdecoder.h"
 #include <deque>
 #include <string>
+#include <memory>
+#include <vector>
 
 class HighFrequencySensivityDecoder : public ManchesterDecoder {
  public:
   HighFrequencySensivityDecoder();
-  virtual ~HighFrequencySensivityDecoder() override;
-  virtual bool decodeBeforeWait(std::shared_ptr<std::vector<float>> data) override;
-  virtual bool decodeAfterWait() override;
-  virtual configuru::Config defaultParams() override;
-  virtual bool reset() override;
+  virtual ~HighFrequencySensivityDecoder();
+  bool decodeBeforeWait(std::shared_ptr<std::vector<float>> data) override;
+  bool decodeAfterWait() override;
+  configuru::Config defaultParams() override;
+  bool reset() override;
 
  private:
   int m_match_alpha;
@@ -38,4 +40,4 @@ class HighFrequencySensivityDecoder : public ManchesterDecoder {
   std::shared_ptr<std::vector<float>> s_tmpBuffer;
 };
 
-#endif // HIGHFREQUENCYSENSIVITYDECODER_H
+#endif  // SRC_SAMPLES_FILTER_DECODER_HIGHFREQUENCYSENSIVITYDECODER_H_

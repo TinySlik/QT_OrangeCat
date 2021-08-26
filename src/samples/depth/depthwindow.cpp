@@ -1,3 +1,7 @@
+/** Copyright 2021 Tiny Oh, Ltd. All rights reserved.
+ *
+ */
+
 #include "depthwindow.h"
 #include "ui_depthwindow.h"
 #include "qpalette.h"
@@ -12,6 +16,7 @@
 #include <QSql>
 #include <QToolBar>
 #include <QTimer>
+#include <string>
 
 DepthWindow::DepthWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -19,8 +24,7 @@ DepthWindow::DepthWindow(QWidget *parent) :
   m_DialogActivatySettings(nullptr),
   m_DialogDepthConfiguration(nullptr),
   m_DialogDepthCalibration(nullptr),
-  m_DialogDepthCtrl(nullptr)
-{
+  m_DialogDepthCtrl(nullptr) {
   ui->setupUi(this);
   CreateMainMenu();
   InitStatus();
@@ -38,7 +42,7 @@ DepthWindow::DepthWindow(QWidget *parent) :
   auto js_sql_table = jsonInterface->find(dump_string(cfg_sql_table_current, configuru::JSON).c_str());
   configuru::Config cfg_sql_table = configuru::parse_string(js_sql_table.c_str(), configuru::JSON, "null");
 
-  LOG(INFO) << "target well: " << cfg_sql_table["value"];
+//  LOG(INFO) << "target well: " << cfg_sql_table["value"];
   targetTable = std::string(cfg_sql_table["value"]);
   configuru::Config cfg_sql = {{"target_table", {
       {"name", "u_well_depth_status"},
@@ -46,10 +50,9 @@ DepthWindow::DepthWindow(QWidget *parent) :
     }}
   };
 
-
   auto js = jsonInterface->find(dump_string(cfg_sql, configuru::JSON).c_str());
   configuru::Config cfg = configuru::parse_string(js.c_str(), configuru::JSON, "null");
- LOG(INFO) << cfg;
+  LOG(INFO) << cfg;
   ctr.judge_with_create_key("Depth") = cfg;
   auto stu = ParameterServer:: instance()->GetCfgStatusRoot();
   stu += cfg;
@@ -70,17 +73,17 @@ DepthWindow::DepthWindow(QWidget *parent) :
   auto s = std::string(b); \
   ui->y->setText(s.c_str()); \
   return true; \
-}); \
-std::string cur##y = std::string(stu[x]); \
-ui->y->setText(cur##y.c_str());
+});\
+  std::string cur##y = static_cast<std::string>(stu[x]);\
+  ui->y->setText(cur##y.c_str());
 
-#define NUM_DISPLAY_LABEL_REGISTER_WITH_INIT(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool { \
-  if (!b.is_float()) return false; \
-  auto s = float(b); \
-  ui->y->setText(QString::number(static_cast<double>(s))); \
+#define NUM_DISPLAY_LABEL_REGISTER_WITH_INIT(x, y)  stu[x].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {\
+  if (!b.is_float()) return false;\
+  auto s = static_cast<float>(b);\
+  ui->y->setText(QString::number(static_cast<double>(s)));\
   return true; \
 }); \
-float cur_##y = float(stu[x]); \
+float cur_##y = static_cast<float>(stu[x]); \
 ui->y->setText(QString::number(static_cast<double>(cur_##y)));
 
   STR_DISPLAY_LABEL_REGISTER_WITH_INIT("T_DActivaty", label_internal_status)
@@ -189,29 +192,34 @@ void DepthWindow::CreateMainMenu() {
 
   QAction *FOBAct = new QAction(tr("Force On Bottom"), this);
   FOBAct->setStatusTip(tr("Force the bit on bottom"));
+  FOBAct->setCheckable(true);
   depthMenu->addAction(FOBAct);
 
   QAction *LOBAct = new QAction(tr("Lock Off Bottom"), this);
+  LOBAct->setCheckable(true);
   LOBAct->setStatusTip(tr("Lock the bit off bottom"));
   depthMenu->addAction(LOBAct);
 
   QAction *AOBAct = new QAction(tr("Auto On/Off Bottom"), this);
+  AOBAct->setCheckable(true);
+  AOBAct->setChecked(true);
   AOBAct->setStatusTip(tr("Relase any On/Off bottom locks"));
   depthMenu->addAction(AOBAct);
-
   depthMenu->addSeparator();
 
   QAction *LISAct = new QAction(tr("Lock In Slips"), this);
   LISAct->setCheckable(true);
-  LISAct->setChecked(true);
   LISAct->setStatusTip(tr("Lock in slip status"));
   depthMenu->addAction(LISAct);
 
   QAction *LOSAct = new QAction(tr("Lock Out of Slips"), this);
+  LOSAct->setCheckable(true);
   LOSAct->setStatusTip(tr("Lock out slip status"));
   depthMenu->addAction(LOSAct);
 
   QAction *AISAct = new QAction(tr("Auto In/Out Slips"), this);
+  AISAct->setCheckable(true);
+  AISAct->setChecked(true);
   AISAct->setStatusTip(tr("Relase any In/Out slip locks"));
   depthMenu->addAction(AISAct);
   ui->menubar->addSeparator();
@@ -241,8 +249,8 @@ void DepthWindow::InitStatus(const SLIP_STATUS slip, const BOTTOM_STATUS bottom,
   auto bottom_status = ui->label_bottom_status;
   auto activity_status = ui->label_internal_status;
   QPalette label_palette;
-  //label_palette.setColor(QPalette::Background, QColor(0, 0, 0));
-  //label_palette.setColor(QPalette::Background,Qt::black);
+// label_palette.setColor(QPalette::Background, QColor(0, 0, 0));
+// label_palette.setColor(QPalette::Background,Qt::black);
   label_palette.setColor(QPalette::Background, QColor("green"));
   slip_status->setAutoFillBackground(true);
   slip_status->setPalette(label_palette);

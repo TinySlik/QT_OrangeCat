@@ -53,6 +53,8 @@ private:
   DialogDepthConfiguration *m_DialogDepthConfiguration;
   DialogDepthCalibration *m_DialogDepthCalibration;
   DialogDepthCtrl *m_DialogDepthCtrl;
+
+  std::string targetTable;
 };
 
 #endif // DEPTHWINDOW_H

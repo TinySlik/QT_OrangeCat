@@ -144,7 +144,7 @@
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="label_1">
     <property name="geometry">
      <rect>
       <x>182</x>
@@ -960,6 +960,12 @@
      <bool>true</bool>
     </property>
    </widget>
+   <zorder>label_11</zorder>
+   <zorder>pushButton_4</zorder>
+   <zorder>checkBox_3</zorder>
+   <zorder>label_read1_20</zorder>
+   <zorder>label_14</zorder>
+   <zorder>doubleSpinBox_14</zorder>
   </widget>
  </widget>
  <resources>

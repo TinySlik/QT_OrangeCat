@@ -25,6 +25,23 @@ private slots:
 
   void on_pushButton_3_clicked();
 
+  void on_doubleSpinBox_1_valueChanged(double arg1);
+  void on_doubleSpinBox_3_valueChanged(double arg1);
+  void on_doubleSpinBox_2_valueChanged(double arg1);
+  void on_doubleSpinBox_7_valueChanged(double arg1);
+  void on_doubleSpinBox_9_valueChanged(double arg1);
+  void on_doubleSpinBox_8_valueChanged(double arg1);
+  void on_doubleSpinBox_10_valueChanged(double arg1);
+  void on_doubleSpinBox_17_valueChanged(double arg1);
+  void on_doubleSpinBox_19_valueChanged(double arg1);
+  void on_doubleSpinBox_14_valueChanged(double arg1);
+  void on_doubleSpinBox_18_valueChanged(double arg1);
+  void on_doubleSpinBox_16_valueChanged(double arg1);
+
+  void on_checkBox_1_toggled(bool checked);
+
+  void on_checkBox_2_toggled(bool checked);
+
 private:
   Ui::DialogDepthCtrl *ui;
   friend DepthWindow;

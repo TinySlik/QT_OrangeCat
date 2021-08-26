@@ -2,8 +2,8 @@
  *
  */
 
-#ifndef SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_
-#define SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_
+#ifndef OIL_SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_
+#define OIL_SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_
 
 #include <QMainWindow>
 #include <QTimer>
@@ -62,4 +62,4 @@ class DepthWindow : public QMainWindow {
   std::string targetTable;
 };
 
-#endif  // SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_
+#endif   // OIL_SRC_SAMPLES_DEPTH_DEPTHWINDOW_H_

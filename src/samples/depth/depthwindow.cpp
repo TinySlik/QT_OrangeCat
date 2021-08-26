@@ -81,9 +81,9 @@ DepthWindow::DepthWindow(QWidget *parent) :
   if (!b.is_float()) return false;\
   auto s = static_cast<float>(b);\
   ui->y->setText(QString::number(static_cast<double>(s)));\
-  return true; \
-}); \
-float cur_##y = static_cast<float>(stu[x]); \
+  return true;\
+});\
+float cur_##y = static_cast<float>(stu[x]);\
 ui->y->setText(QString::number(static_cast<double>(cur_##y)));
 
   STR_DISPLAY_LABEL_REGISTER_WITH_INIT("T_DActivaty", label_internal_status)

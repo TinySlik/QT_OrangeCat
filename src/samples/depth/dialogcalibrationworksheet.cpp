@@ -84,6 +84,12 @@ void DialogCalibrationWorksheet::on_pushButton_clicked() {
   int c6 = ui->lineEdit_c6->text().toInt();
   int c[6] = {c1, c2, c3, c4, c5, c6};
   int i = 0;
+
+  auto stu = ParameterServer:: instance()->GetCfgStatusRoot();
+  float bp_ori = float(stu["blockHeightZero"]);
+  res.push_back({
+    {"factor", (bp[0] - bp_ori)/c[0]}
+  });
   for (; i < 5; ++i) {
     if (c[i+1] - c[i] == 0) {
       break;
@@ -93,10 +99,6 @@ void DialogCalibrationWorksheet::on_pushButton_clicked() {
       {"critical", c[i]},
     });
   }
-  if (i == 5)
-      res.push_back({
-        {"critical", c6},
-      });
 
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
 

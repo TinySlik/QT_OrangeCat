@@ -10,6 +10,7 @@
 #include "parameterserver.h"
 #include "abmdaolib.h"
 #include <string>
+#include "easylogging++.h"
 
 DialogSetupDrawworks::DialogSetupDrawworks(QWidget *parent) :
   QDialog(parent),
@@ -62,6 +63,36 @@ void DialogSetupDrawworks::updateFromDao() {
   configuru::Config cfg = configuru::parse_string(js.c_str(), configuru::JSON, "null");
   ui->label_14->setText(QString::number(static_cast<int>(cfg["count"])));
   ui->label_15->setText(QString::number(static_cast<float>(cfg["blockHeight"])));
+  ui->lineEdit_zero_height->setText(QString::number(static_cast<float>(cfg["blockHeightZero"])));
+  std::string hh = static_cast<std::string>(cfg["calibration"]);
+  configuru::Config calibration = configuru::parse_string(hh.c_str(), configuru::JSON, "null");
+//  LOG(INFO) << calibration;
+  QLineEdit *factorVec[6] = {
+    ui->lineEdit_f1,
+    ui->lineEdit_f2,
+    ui->lineEdit_f3,
+    ui->lineEdit_f4,
+    ui->lineEdit_f5,
+    ui->lineEdit_f6,
+  };
+  QLineEdit *criticalVec[6] = {
+    ui->lineEdit_c1,
+    ui->lineEdit_c2,
+    ui->lineEdit_c3,
+    ui->lineEdit_c4,
+    ui->lineEdit_c5
+  };
+  factorVec[0]->setText(QString::number(static_cast<float>(calibration[0]["factor"])));
+  for (size_t i = 0; i < (calibration.as_array().size() - 1); ++i) {
+    if (calibration[i + 1].has_key("factor")) {
+      auto tmp = static_cast<float>(calibration[i + 1]["factor"]);
+      factorVec[i+1]->setText(QString::number(tmp));
+    }
+    if (calibration[i + 1].has_key("critical")) {
+      auto tmp = static_cast<int>(calibration[i + 1]["critical"]);
+      criticalVec[i]->setText(QString::number(tmp));
+    }
+  }
 }
 
 DialogSetupDrawworks::~DialogSetupDrawworks() {

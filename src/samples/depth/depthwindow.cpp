@@ -101,7 +101,6 @@ ui->y->setText(QString::number(static_cast<double>(cur_##y)));
   NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("riser", label_11)
 #undef STR_DISPLAY_LABEL_REGISTER_WITH_INIT
 #undef NUM_DISPLAY_LABEL_REGISTER_WITH_INIT
-
 //  connect(m_DialogDepthCtrl, SIGNAL(DialogDepthCtrl::acceptSig()), this, SLOT(DepthCtrlUpdate()));
 
   connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateFromDao()));
@@ -124,6 +123,48 @@ void DepthWindow::updateFromDao() {
   auto js = jsonInterface->find(dump_string(cfg, configuru::JSON).c_str());
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
   auto stu = ParameterServer::instance()->GetCfgStatusRoot();
+
+  configuru::Config tmp = configuru::parse_string(js.c_str(), configuru::JSON, "null");
+  auto cur_count = static_cast<int>(tmp["count"]);
+  float length = static_cast<float>(tmp["blockHeightZero"]);
+  std::string hh = static_cast<std::string>(tmp["calibration"]);
+  configuru::Config calibration = configuru::parse_string(hh.c_str(), configuru::JSON, "null");
+  auto factor = static_cast<float>(calibration[0]["factor"]);
+  int last_count = 0;
+  for (size_t i = 0; i < (calibration.as_array().size() - 1); ++i) {
+    if (calibration[i + 1].has_key("critical")) {
+      auto tmp = static_cast<int>(calibration[i + 1]["critical"]);
+      if (cur_count < tmp) {
+        length += factor * (cur_count - last_count);
+        break;
+      } else {
+        length += factor * (tmp - last_count);
+      }
+      last_count = tmp;
+    }
+    if (calibration[i + 1].has_key("factor")) {
+      factor = static_cast<float>(calibration[i + 1]["factor"]);
+    }
+  }
+  auto height = float(tmp["blockHeight"]);
+  const float EPSINON = 0.01f;
+
+  if (((height-length) >= - EPSINON) && ((height-length) <= EPSINON)){}
+  else {
+    LOG(INFO) << length;
+    configuru::Config a = configuru::Config::object();
+    a["blockHeight"] = length;
+
+    LOG(INFO) << "write blockHeight "<< length <<" res to SQL:" << a;
+    configuru::Config updateval = {
+      {"target_table", "u_well_depth_status"},
+      {"update_val", a},
+      {"index_val", {{"wellId", targetTable.c_str()}}}
+    };
+    jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
+  }
+
+
   stu << configuru::parse_string(js.c_str(), configuru::JSON, "null");
 }
 

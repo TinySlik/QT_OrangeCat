@@ -156,7 +156,6 @@
       }
     }
   },
-
   "display logo default": {
     "lineThickness": 0.01,
     "test_switch": 0,
@@ -219,12 +218,12 @@
       }
     }
   },
-  "cdf": {
+  "test_msg_decoder": {
     "lineThickness": 0.005,
-    "compute1_switch": false,
+    "compute1_switch": true,
     "test_switch": 3,
     "display_switch": 2,
-    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
+    "test_file_path": "D:/Users/dell-a6/Desktop/8.31/PPDet/WaveArch/Default.010",
     "cdf": "D:/Users/dell-a6/Desktop/CDSFiles/PCD001_100_HCIM_PCD_1.cdf",
     "svg_background_path": "empty",
     "file_load_location": 1713,
@@ -243,7 +242,7 @@
     "transform": {
       "m_translate": {
         "x": 0,
-        "y": 0,
+        "y": -0.5,
         "z": -1
       },
       "m_rotate": {
@@ -254,9 +253,9 @@
       "m_angle": 180,
       "m_scale": {
         "x": 0.5,
-        "y": 0.5,
+        "y": 3,
         "z": 1
       }
     }
-  },
+  }
 }

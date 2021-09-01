@@ -276,13 +276,12 @@ DisplayWidget::DisplayWidget(QWidget *parent)
   format.setProfile(QSurfaceFormat::CoreProfile);
   setFormat(format);
 
-//  QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
-//  if (file_testcase.exists()) {
-//      LOG(INFO) << "dafdsadf";
-//    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["display logo default"];
-//    cfg_local << cfg;
-//    LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
-//  }
+  QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
+  if (file_testcase.exists()) {
+    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["display logo default"];
+    cfg_local << cfg;
+    LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
+  }
 }
 
 void DisplayWidget::reset(size_t size) {

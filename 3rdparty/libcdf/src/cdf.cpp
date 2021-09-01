@@ -52,18 +52,14 @@
 */
 
 std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
-  configuru::Config res = configuru::Config::object();
-  res["Alarm"] = configuru::Config::array();
-  res["List1Preamble"] = configuru::Config::array();
-  res["List1Loop"] = configuru::Config::array();
-  res["List2Preamble"] = configuru::Config::array();
-  res["List2Loop"] = configuru::Config::array();
-  res["SRSPreamble"] = configuru::Config::array();
-  res["SRSLoop"] = configuru::Config::array();
+  configuru::Config res = configuru::Config::array();
+
   std::string tmp_or = src;
   char *cur = const_cast<char *>(tmp_or.c_str());
   cur += 28;
   std::string cur_list_name = "Alarm";
+  int cur_index = -1;
+  bool break_tag = false;
   for (size_t i = 0; i< src.length(); ++i) {
     auto val = (unsigned int) (unsigned char)(*cur);
 #ifdef DEBUG_CDF
@@ -76,13 +72,25 @@ std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
         val == 0x3d ||
         val == 0x66 ||
         val == 0x7C) {
-      if (val == 0x46) {
-        res[cur_list_name.c_str()].push_back("PU");
+      if (val == 0x46 && i == 0) {
+        res.push_back(
+              {
+                {"name", cur_list_name.c_str()},
+                {"array", configuru::Config::array({"PU"})}
+              });
+        cur_index++;
+      } else if (val == 0x46) {
+        res[static_cast<size_t>(cur_index)]["array"].push_back("PU");
       } else if (val == 0x3e) {
         if (cur_list_name == "Alarm") cur_list_name = "List1Preamble";
         else if (cur_list_name == "List1Preamble") cur_list_name = "List2Preamble";
         else if (cur_list_name == "List1Loop") cur_list_name = "List2Preamble";
-        res[cur_list_name.c_str()].push_back("PD");
+        res.push_back(
+              {
+                {"name", cur_list_name.c_str()},
+                {"array", configuru::Config::array({"PD"})}
+              });
+        cur_index++;
       } else if (val == 0x4c) {
         if (cur_list_name == "Alarm") cur_list_name = "List1Loop";
         else if (cur_list_name == "List1Preamble") cur_list_name = "List1Loop";
@@ -90,78 +98,102 @@ std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
         else if (cur_list_name == "List1Loop") cur_list_name = "List2Loop";
         else if (cur_list_name == "SRSPreamble") cur_list_name = "SRSLoop";
         else if (cur_list_name == "List2Loop") cur_list_name = "SRSLoop";
-        res[cur_list_name.c_str()].push_back("PU");
+        res.push_back(
+              {
+                {"name", cur_list_name.c_str()},
+                {"array", configuru::Config::array({"PU"})}
+              }
+              );
+        cur_index++;
       } else if (val == 0x3c) {
         if (cur_list_name == "Alarm") cur_list_name = "List1Preamble";
         else if (cur_list_name == "List1Preamble") cur_list_name = "List2Preamble";
         else if (cur_list_name == "List1Loop") cur_list_name = "List2Preamble";
-        res[cur_list_name.c_str()].push_back("PD");
+        res.push_back(
+              {
+                {"name", cur_list_name.c_str()},
+                {"array", configuru::Config::array({"PD"})}
+              }
+              );
+        cur_index++;
       } else if (val == 0x3d) {
         cur_list_name = "SRSPreamble";
-        res[cur_list_name.c_str()].push_back("PD");
+        res.push_back(
+              {
+                {"name", cur_list_name.c_str()},
+                {"array", configuru::Config::array({"PD"})}
+              }
+              );
+        cur_index++;
       } else if (val == 0x66 || val == 0x7c) {
-        res[cur_list_name.c_str()].push_back("PD");
+        res[static_cast<size_t>(cur_index)]["array"].push_back("PD");
       }
     } else {
       switch (val) {
-        case 0x74:	res[cur_list_name.c_str()].push_back("GX");
+        case 0x74:	res[static_cast<size_t>(cur_index)]["array"].push_back("GX");
           break;
-        case 0x75:	res[cur_list_name.c_str()].push_back("GY");
+        case 0x75:	res[static_cast<size_t>(cur_index)]["array"].push_back("GY");
           break;
-        case 0x76:	res[cur_list_name.c_str()].push_back("GZ");
+        case 0x76:	res[static_cast<size_t>(cur_index)]["array"].push_back("GZ");
           break;
-        case 0x62:	res[cur_list_name.c_str()].push_back("BX");
+        case 0x62:	res[static_cast<size_t>(cur_index)]["array"].push_back("BX");
           break;
-        case 0x63:	res[cur_list_name.c_str()].push_back("BY");
+        case 0x63:	res[static_cast<size_t>(cur_index)]["array"].push_back("BY");
           break;
-        case 0x64:	res[cur_list_name.c_str()].push_back("BZ");
+        case 0x64:	res[static_cast<size_t>(cur_index)]["array"].push_back("BZ");
           break;
-        case 0x50:	res[cur_list_name.c_str()].push_back("RM");
+        case 0x50:	res[static_cast<size_t>(cur_index)]["array"].push_back("RM");
           break;
-        case 0x4d:	res[cur_list_name.c_str()].push_back("TM");
+        case 0x4d:	res[static_cast<size_t>(cur_index)]["array"].push_back("TM");
           break;
-        case 0x78:	res[cur_list_name.c_str()].push_back("TS");
+        case 0x78:	res[static_cast<size_t>(cur_index)]["array"].push_back("TS");
           break;
-        case 0x54:	res[cur_list_name.c_str()].push_back("TF");
+        case 0x54:	res[static_cast<size_t>(cur_index)]["array"].push_back("TF");
           break;
-        case 0x49:	res[cur_list_name.c_str()].push_back("IN");
+        case 0x49:	res[static_cast<size_t>(cur_index)]["array"].push_back("IN");
           break;
-        case 0x79:	res[cur_list_name.c_str()].push_back("CV");
+        case 0x79:	res[static_cast<size_t>(cur_index)]["array"].push_back("CV");
           break;
-        case 0x43:	res[cur_list_name.c_str()].push_back("SC");
+        case 0x43:	res[static_cast<size_t>(cur_index)]["array"].push_back("SC");
           break;
-        case 0x41:	res[cur_list_name.c_str()].push_back("LC");
+        case 0x41:	res[static_cast<size_t>(cur_index)]["array"].push_back("LC");
           break;
-        case 0x47:	res[cur_list_name.c_str()].push_back("GT");
+        case 0x47:	res[static_cast<size_t>(cur_index)]["array"].push_back("GT");
           break;
-        case 0x48:	res[cur_list_name.c_str()].push_back("HS");
+        case 0x48:	res[static_cast<size_t>(cur_index)]["array"].push_back("HS");
           break;
-        case 0x28:	res[cur_list_name.c_str()].push_back("BT");
+        case 0x28:	res[static_cast<size_t>(cur_index)]["array"].push_back("BT");
           break;
-        case 0x29:	res[cur_list_name.c_str()].push_back("BT");
+        case 0x29:	res[static_cast<size_t>(cur_index)]["array"].push_back("BT");
           break;
-        case 0x59:	res[cur_list_name.c_str()].push_back("BS");
+        case 0x59:	res[static_cast<size_t>(cur_index)]["array"].push_back("BS");
           break;
-        case 0x77:	res[cur_list_name.c_str()].push_back("SV");
+        case 0x77:	res[static_cast<size_t>(cur_index)]["array"].push_back("SV");
           break;
-        case 0x4E:	res[cur_list_name.c_str()].push_back("GR");
+        case 0x4E:	res[static_cast<size_t>(cur_index)]["array"].push_back("GR");
           break;
-        case 0x26:	res[cur_list_name.c_str()].push_back("GR");
+        case 0x26:	res[static_cast<size_t>(cur_index)]["array"].push_back("GR");
           break;
-        case 0x40:	res[cur_list_name.c_str()].push_back("CG");
+        case 0x40:	res[static_cast<size_t>(cur_index)]["array"].push_back("CG");
           break;
-        case 0xFF:	res[cur_list_name.c_str()].push_back("AB");
+        case 0xFF:	res[static_cast<size_t>(cur_index)]["array"].push_back("AB");
           break;
-        case 0xFE:	res[cur_list_name.c_str()].push_back("GA");
+        case 0xFE:	res[static_cast<size_t>(cur_index)]["array"].push_back("GA");
           break;
-        case 0xFD:	res[cur_list_name.c_str()].push_back("GB");
+        case 0xFD:	res[static_cast<size_t>(cur_index)]["array"].push_back("GB");
           break;
-        case 0xFC:	res[cur_list_name.c_str()].push_back("ABS");
+        case 0xFC:	res[static_cast<size_t>(cur_index)]["array"].push_back("ABS");
+          break;
+        case 0x2e:
+        case 0x20:	break_tag = true;
           break;
         default:
+          std::cout << "unknow tag in decode cdf file." << "0x" << std::hex << val << std::endl;
+          std::cout.flush();
           break;
       }
     }
+    if (break_tag) break;
     cur++;
   }
 #ifdef DEBUG_CDF

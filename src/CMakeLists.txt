@@ -37,14 +37,16 @@ set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/memorymapped.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/dataprocesswidget.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/dataprocesswidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/manchesterdecoder.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/manchesterdecoder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoder.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoderv2.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/personificationdecoderv2.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/highfrequencysensivitydecoder.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/decoder/highfrequencysensivitydecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/manchesterdecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/manchesterdecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/personificationdecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/personificationdecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/personificationdecoderv2.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/personificationdecoderv2.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/highfrequencysensivitydecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/highfrequencysensivitydecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/msgdecoder/msgdecoder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/msgdecoder/msgdecoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/time.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.cpp
@@ -267,19 +269,19 @@ include_directories(../3rdparty/liblas/include)
 include_directories(../3rdparty/libcdf/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib)
 
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
-add_executable(sample ${SOURCE_FILTER_FILES})
-#target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
-if (ADLINK_32)
-  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ADlink)
-else()
-  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ cdf)
-endif()
-
 add_definitions(-DABMDAOLIB_LIBRARY)
 
 add_library(ABMDaoLib ${SOURCE_ABMDAO_FILES})
 target_link_libraries(ABMDaoLib PRIVATE Qt5::Widgets Qt5::Sql)
+
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
+add_executable(sample ${SOURCE_FILTER_FILES})
+#target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
+if (ADLINK_32)
+  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ABMDaoLib ADlink)
+else()
+  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ABMDaoLib)
+endif()
 
 add_executable(display ${SOURCE_GENERAL_FILES})
 

@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-
-#include <string>
 #include "dataprocesswidget.h"
+#include <string>
 #include <math.h>
 #ifdef OS_WIN
 #include <windows.h>
@@ -25,19 +24,20 @@
 #include <QCoreApplication>
 #include <QBasicTimer>
 #include <QtSvg>
+
 #include "parameterserver.h"
 #include "easylogging++.h"
 #include "time.h"
 #include "async++.h"
-#include "decoder/personificationdecoder.h"
-#include "decoder/personificationdecoderv2.h"
-#include "decoder/highfrequencysensivitydecoder.h"
-#include "renderutil.h"
 #include "cdf.h"
-
 #ifdef ADLINK_32
 #include "adlink.h"
 #endif
+#include "renderutil.h"
+
+#include "bitdecoder/personificationdecoder.h"
+#include "bitdecoder/personificationdecoderv2.h"
+#include "bitdecoder/highfrequencysensivitydecoder.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/filter_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/general_v.glsl"
@@ -109,8 +109,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     registerDecoder(register_table[i].name, register_table[i].object);
   }
 
-//  LOG(INFO) << cdf::cdfStringToInfoListJson("hello");
-
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(reinterpret_cast<long>(this));
@@ -172,13 +170,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
   cfg_local["front_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
       if (!b.is_string()) return false;
-      std::string color_string = (std::string)b;
+      std::string color_string = static_cast<std::string>(b);
       m_color = color_format_string_to_int(color_string);
       return true;
     });
   cfg_local["background_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
       if (!b.is_string()) return false;
-      std::string color_string = (std::string)b;
+      std::string color_string = static_cast<std::string>(b);
       m_backgroundColor = color_format_string_to_int(color_string);
       return true;
     });
@@ -191,14 +189,14 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     size_t i = 0;
     for(auto it:_decoders) {
       if (it.name == str2) {
-        _decoder_active_index = i;
+        _decoder_active_index = static_cast<int>(i);
       }
       i++;
     }
     return true;
   });
 
-  cfg_local["m_samplingSpeed"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+  cfg_local["m_samplingSpeed"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = int(b);
     m_samplingSpeed = tg;
@@ -315,7 +313,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     size_t sz;
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;
-    sz = m_fileMMap->size();
+    sz = static_cast<size_t>(m_fileMMap->size());
     emit TitelChanged(QString(tg.c_str()));
     LOG(INFO) << "file name: " << tg << " open, size: " << sz;
     return true;
@@ -345,12 +343,12 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     size_t sz;
     m_fileCdfMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileCdfMMap) return false;
-    sz = m_fileCdfMMap->size();
+    sz = static_cast<size_t>(m_fileCdfMMap->size());
     LOG(INFO) << "file name: " << tg << " open, size: " << sz;
 
     std::string org =  (char *)(m_fileCdfMMap->data());
-
-    LOG(INFO) << configuru::parse_string(cdf::cdfStringToInfoListJson_v1_0(org).c_str(), configuru::JSON, "null");
+    auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+    cfg.judge_with_create_key("decode_info") = configuru::parse_string(cdf::cdfStringToInfoListJson_v1_0(org).c_str(), configuru::JSON, "null");
     return true;
   });
 
@@ -464,6 +462,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   format.setVersion(4, 3);
   format.setProfile(QSurfaceFormat::CoreProfile);
   setFormat(format);
+
+  QFile file_testcase(":/test/testcase.json");
+  if (file_testcase.exists()) {
+    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["test_msg_decoder"];
+    cfg_local << cfg;
+    LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
+  }
 }
 
 void DataProcessWidget::reset(size_t size) {
@@ -506,12 +511,11 @@ QSize DataProcessWidget::sizeHint() const {
   return QSize(1024, 256);
 }
 
-
 void DataProcessWidget::getData(std::shared_ptr<std::vector<float>> data) {
   if (!data) {
     float value = 0.f;
     if (m_fileMMap) {
-      size_t size = m_fileMMap->size();
+      size_t size = static_cast<size_t>(m_fileMMap->size());
       auto head = m_fileMMap->data();
       if((m_file_find_index - _file_find_index_set_tmp) % 600 == 0) {
         auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();

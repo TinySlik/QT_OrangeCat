@@ -32,7 +32,7 @@
 #include <QtSvg>
 
 #include "memorymapped.h"
-#include "decoder/manchesterdecoder.h"
+#include "bitdecoder/manchesterdecoder.h"
 #define MAX_PAINT_BUF_SIZE (32768)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
@@ -44,6 +44,11 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
     std::string                           name;
     std::shared_ptr<ManchesterDecoder>    object;
   } PLUG_PROCESS_UNIT;
+
+//  typedef struct {
+//    std::string                           name;
+//    std::shared_ptr<MsgDecoder>           object;
+//  } PLUG_MSG_PROCESS_UNIT;
 
  public:
   explicit DataProcessWidget(QWidget *parent = nullptr);

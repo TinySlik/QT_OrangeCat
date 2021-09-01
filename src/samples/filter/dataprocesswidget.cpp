@@ -33,6 +33,7 @@
 #include "decoder/personificationdecoderv2.h"
 #include "decoder/highfrequencysensivitydecoder.h"
 #include "renderutil.h"
+#include "cdf.h"
 
 #ifdef ADLINK_32
 #include "adlink.h"
@@ -58,6 +59,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_tex_tmp_ptr(new std::vector<float>()),
     code_step1_trust_count(0),
     m_fileMMap(nullptr),
+    m_fileCdfMMap(nullptr),
     m_CvertexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::VertexBuffer)),
     m_CindexBuffer(std::make_shared<QOpenGLBuffer>(QOpenGLBuffer::IndexBuffer)),
     m_CcomputeProgram(std::make_shared<QOpenGLShaderProgram>()),
@@ -107,6 +109,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     registerDecoder(register_table[i].name, register_table[i].object);
   }
 
+//  LOG(INFO) << cdf::cdfStringToInfoListJson("hello");
+
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(reinterpret_cast<long>(this));
@@ -136,6 +140,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 #endif
       {"front_color", color_format_int_to_string(m_color).c_str()},
       {"background_color", color_format_int_to_string(m_backgroundColor).c_str()},
+      {"cdf", "empty"},
       {"transform", {
         {
           "m_translate", {
@@ -313,6 +318,39 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     sz = m_fileMMap->size();
     emit TitelChanged(QString(tg.c_str()));
     LOG(INFO) << "file name: " << tg << " open, size: " << sz;
+    return true;
+  });
+
+  cfg_local["cdf"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_string()) return false;
+    auto tg = static_cast<std::string>(b);
+    auto ora = static_cast<std::string>(a);
+    if (tg == "empty") {
+      if (ora != "empty" && m_fileCdfMMap) {
+        LOG(INFO) << "file name: " << ora << " closed";
+        m_fileCdfMMap->close();
+        m_fileCdfMMap = nullptr;
+        m_file_find_index = 0;
+      }
+      return true;
+    }
+
+    if (ora != "empty" && m_fileCdfMMap) {
+      LOG(INFO) << "file name: " << ora << " closed";
+      m_fileCdfMMap->close();
+      m_fileCdfMMap = nullptr;
+      m_file_find_index = 0;
+    }
+
+    size_t sz;
+    m_fileCdfMMap = std::make_shared<MemoryMapped::File>(tg);
+    if (!m_fileCdfMMap) return false;
+    sz = m_fileCdfMMap->size();
+    LOG(INFO) << "file name: " << tg << " open, size: " << sz;
+
+    std::string org =  (char *)(m_fileCdfMMap->data());
+
+    LOG(INFO) << configuru::parse_string(cdf::cdfStringToInfoListJson_v1_0(org).c_str(), configuru::JSON, "null");
     return true;
   });
 

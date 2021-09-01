@@ -101,7 +101,6 @@ ui->y->setText(QString::number(static_cast<double>(cur_##y)));
   NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("riser", label_11)
 #undef STR_DISPLAY_LABEL_REGISTER_WITH_INIT
 #undef NUM_DISPLAY_LABEL_REGISTER_WITH_INIT
-//  connect(m_DialogDepthCtrl, SIGNAL(DialogDepthCtrl::acceptSig()), this, SLOT(DepthCtrlUpdate()));
 
   connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateFromDao()));
   m_timer.start(1000);
@@ -129,6 +128,7 @@ void DepthWindow::updateFromDao() {
   float length = static_cast<float>(tmp["blockHeightZero"]);
   std::string hh = static_cast<std::string>(tmp["calibration"]);
   configuru::Config calibration = configuru::parse_string(hh.c_str(), configuru::JSON, "null");
+
   auto factor = static_cast<float>(calibration[0]["factor"]);
   int last_count = 0;
   for (size_t i = 0; i < (calibration.as_array().size() - 1); ++i) {
@@ -149,13 +149,12 @@ void DepthWindow::updateFromDao() {
   auto height = float(tmp["blockHeight"]);
   const float EPSINON = 0.01f;
 
-  if (((height-length) >= - EPSINON) && ((height-length) <= EPSINON)){}
-  else {
-    LOG(INFO) << length;
+  if (((height-length) < - EPSINON) || ((height-length) > EPSINON)) {
+    LOG(INFO) << calibration;
     configuru::Config a = configuru::Config::object();
     a["blockHeight"] = length;
 
-    LOG(INFO) << "write blockHeight "<< length <<" res to SQL:" << a;
+    LOG(INFO) << "update blockHeight "<< length <<" to SQL";
     configuru::Config updateval = {
       {"target_table", "u_well_depth_status"},
       {"update_val", a},
@@ -163,7 +162,6 @@ void DepthWindow::updateFromDao() {
     };
     jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
   }
-
 
   stu << configuru::parse_string(js.c_str(), configuru::JSON, "null");
 }

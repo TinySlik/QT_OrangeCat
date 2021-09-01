@@ -122,7 +122,7 @@
     "compute1_switch": true,
     "test_switch": 3,
     "display_switch": 2,
-    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
+    "test_file_path": "D:/data_8.26/PPDet/WaveArch/Default.000",
     "svg_background_path": "empty",
     "file_load_location": 1713,
     "fft_level": 1024,
@@ -131,7 +131,7 @@
     "m_min_cut_filter": 24,
     "m_fft_display_scale": 0.05,
     "m_samplingSpeed": 1,
-    "m_decoder": "PersonificationDecoder",
+    "m_decoder": "PersonificationDecoderV2",
     "m_decoder_unsigned": true,
     "adlink_card_ID": 256,
     "adlink_card_enable": false,
@@ -218,5 +218,45 @@
         "z": 1
       }
     }
-  }
+  },
+  "cdf": {
+    "lineThickness": 0.005,
+    "compute1_switch": false,
+    "test_switch": 3,
+    "display_switch": 2,
+    "test_file_path": "D:/data/wavearch/WaveArch/Default.006",
+    "cdf": "D:/Users/dell-a6/Desktop/CDSFiles/PCD001_100_HCIM_PCD_1.cdf",
+    "svg_background_path": "empty",
+    "file_load_location": 1713,
+    "fft_level": 1024,
+    "buffer_size": 1024,
+    "m_max_cut_filter": 1000,
+    "m_min_cut_filter": 24,
+    "m_fft_display_scale": 0.05,
+    "m_samplingSpeed": 1,
+    "m_decoder": "PersonificationDecoderV2",
+    "m_decoder_unsigned": true,
+    "adlink_card_ID": 256,
+    "adlink_card_enable": false,
+    "front_color": "#ffad00",
+    "background_color": "#303afd",
+    "transform": {
+      "m_translate": {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      "m_rotate": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "m_angle": 180,
+      "m_scale": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 1
+      }
+    }
+  },
 }

@@ -42,7 +42,6 @@ DialogCalibrationWorksheet::DialogCalibrationWorksheet(QWidget *parent) :
   auto js_sql_table = jsonInterface->find(dump_string(cfg_sql_table_current, configuru::JSON).c_str());
   configuru::Config cfg_sql_table = configuru::parse_string(js_sql_table.c_str(), configuru::JSON, "null");
 
-//  LOG(INFO) << "target well: " << cfg_sql_table["value"];
   m_targetTable = std::string(cfg_sql_table["value"]);
 
   connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateFromDao()));

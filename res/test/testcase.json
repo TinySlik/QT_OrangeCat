@@ -234,6 +234,7 @@
     "m_fft_display_scale": 0.05,
     "m_samplingSpeed": 1,
     "m_decoder": "PersonificationDecoderV2",
+    "m_msg_decoder": "TiniMsgDecoderv1",
     "m_decoder_unsigned": true,
     "adlink_card_ID": 256,
     "adlink_card_enable": false,

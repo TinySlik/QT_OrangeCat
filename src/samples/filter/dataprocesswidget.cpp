@@ -39,6 +39,8 @@
 #include "bitdecoder/personificationdecoderv2.h"
 #include "bitdecoder/highfrequencysensivitydecoder.h"
 
+#include "msgdecoder/tinimsgdecoderv1.h"
+
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/filter_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/general_v.glsl"
 #define DEFAULT_FAGERMENT_SHADER_PATH ":/shader/general_f.glsl"
@@ -67,6 +69,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_Ctexture(std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target1D)),
     m_SVGRender(nullptr),
     _decoder_active_index(-1),
+    _msgdecoder(nullptr),
     m_lineThickness(0.01f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(0),
@@ -109,6 +112,15 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     registerDecoder(register_table[i].name, register_table[i].object);
   }
 
+  PLUG_MSG_PROCESS_UNIT msg_register_table[] = {
+    {"EmptyDefault",                              EmptyMsgDecoder::create                  },
+    {"TiniMsgDecoderv1",                          TiniMsgDecoderv1::create                 }
+  };
+
+  for (size_t i = 0; i < sizeof(msg_register_table) / sizeof(PLUG_MSG_PROCESS_UNIT); ++i) {
+    registerMsgDecoder(msg_register_table[i].name, msg_register_table[i].create);
+  }
+
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
   std::string class_obj_id = typeid(*this).name();
   class_obj_id += std::to_string(reinterpret_cast<long>(this));
@@ -131,6 +143,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_fft_display_scale", m_fft_display_scale},
       {"m_samplingSpeed", m_samplingSpeed},
       {"m_decoder", "empty"},
+      {"m_msg_decoder", "empty"},
       {"m_decoder_unsigned", m_decoder_unsigned},
 #ifdef ADLINK_32
       {"adlink_card_ID", m_adlink_card_current_ID},
@@ -190,6 +203,24 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     for(auto it:_decoders) {
       if (it.name == str2) {
         _decoder_active_index = static_cast<int>(i);
+      }
+      i++;
+    }
+    return true;
+  });
+
+  cfg_local["m_msg_decoder"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_string()) return false;
+    auto str1 = std::string(a);
+    auto str2 = std::string(b);
+    if (str1 == str2) return false;
+    size_t i = 0;
+    for(auto it:_msg_decoders) {
+      if (it.name == str2) {
+        auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+        if (cfg.has_key("decode_info")) {
+          _msgdecoder = it.create(configuru::dump_string(cfg["decode_info"], configuru::JSON));
+        }
       }
       i++;
     }
@@ -348,6 +379,17 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
     std::string org =  (char *)(m_fileCdfMMap->data());
     auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+    std::string class_obj_id = typeid(*this).name();
+    class_obj_id += std::to_string(reinterpret_cast<long>(this));
+    auto cfg_local = cfg[class_obj_id.c_str()];
+    if (std::string(cfg_local["m_msg_decoder"]) != "empty") {
+      for(auto it:_msg_decoders) {
+        if (it.name == std::string(cfg_local["m_msg_decoder"])) {
+          _msgdecoder = it.create(org);
+        }
+      }
+    }
+
     cfg.judge_with_create_key("decode_info") = configuru::parse_string(cdf::cdfStringToInfoListJson_v1_0(org).c_str(), configuru::JSON, "null");
     return true;
   });
@@ -466,8 +508,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   QFile file_testcase(":/test/testcase.json");
   if (file_testcase.exists()) {
     auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["test_msg_decoder"];
-    cfg_local << cfg;
     LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
+    cfg_local << cfg;
   }
 }
 
@@ -735,6 +777,18 @@ void DataProcessWidget::paintGL() {
           _decoder = _decoders[static_cast<size_t>(_decoder_active_index)].object;
       auto task_cpu = async::spawn([this, _decoder] {
         if (_decoder) _decoder->decodeBeforeWait(m_tex_tmp_ptr);
+        auto res = _decoder->getCurrentResualt();
+        if (res == -1) {
+          // todo
+        } else {
+          std::shared_ptr<MsgDecoder> _msg_decoder = nullptr;
+          if (_msgdecoder) {
+            if (res == '0')
+              _msgdecoder->decode(false);
+            else if(res == '1')
+              _msgdecoder->decode(true);
+          }
+        }
       });
 
       // about 16ms ~ 32 ms
@@ -744,7 +798,7 @@ void DataProcessWidget::paintGL() {
 
       if (_decoder) _decoder->decodeAfterWait();
 
-      if (_decoder) {
+      if (_decoder && !_msgdecoder) {
         auto res = _decoder->getCurrentResualt();
         if (res == -1) {
           // todo
@@ -821,6 +875,11 @@ void DataProcessWidget::paintGL() {
 
 bool DataProcessWidget::registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj) {
   _decoders.push_back({name, obj});
+  return true;
+}
+
+bool DataProcessWidget::registerMsgDecoder(const std::string & name, std::function<std::shared_ptr<MsgDecoder>(const std::string &cfg)>  create) {
+  _msg_decoders.push_back({name, create});
   return true;
 }
 

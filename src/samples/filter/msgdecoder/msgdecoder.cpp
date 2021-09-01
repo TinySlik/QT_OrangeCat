@@ -17,57 +17,39 @@
 using namespace configuru;
 #include "easylogging++.h"
 
-//ManchesterDecoder::ManchesterDecoder():
-//_resualt(std::make_shared<std::vector<char>>()),
-//_displayBuffer(nullptr),
-//_resualtMemSizeTag(_resualt->size()) {
-//}
+MsgDecoder::MsgDecoder(const std::string &decode_info) {
+  std::string tmp = decode_info;
+  decode_info_ = configuru::parse_string(tmp.c_str(), configuru::JSON, "null");
+}
 
-//ManchesterDecoder::~ManchesterDecoder() {
-//}
+configuru::Config MsgDecoder::syncParams(configuru::Config &cfg) {
+  return {};
+}
 
-//char ManchesterDecoder::getCurrentResualt() {
-//  if (_resualt && _resualtMemSizeTag != _resualt->size()) {
-//    _resualtMemSizeTag = _resualt->size();
-//    return _resualt->back();
-//  }
-//  return -1;
-//}
+MsgDecoder::~MsgDecoder() {
+}
 
-//const std::shared_ptr<std::vector<char>> ManchesterDecoder::getResualtList() {
-//  return _resualt;
-//}
+EmptyMsgDecoder::EmptyMsgDecoder(const std::string &decode_info):
+MsgDecoder(decode_info) {
+}
 
-//configuru::Config ManchesterDecoder::syncParams(configuru::Config &cfg) {
-//  return cfg;
-//}
+EmptyMsgDecoder::~EmptyMsgDecoder() {
+}
 
-//std::shared_ptr<std::vector<float>>  ManchesterDecoder::displayBuffer() {
-//  return _displayBuffer;
-//}
+bool EmptyMsgDecoder::decode(const bool &value) {
+  return false;
+}
 
-//EmptyDefault::EmptyDefault() {}
+bool EmptyMsgDecoder::reset() {
+  return false;
+  //
+}
 
-//EmptyDefault::~EmptyDefault()
-//{}
+std::shared_ptr<MsgDecoder> EmptyMsgDecoder::create(const std::string &decode_info) {
+  std::shared_ptr<EmptyMsgDecoder> res(new EmptyMsgDecoder(decode_info));
+  return res;
+}
 
-//configuru::Config EmptyDefault::defaultParams() {
-//  LOG(INFO) << __FUNCTION__ << __LINE__;
-//  return {};
-//}
-
-//bool EmptyDefault::reset() {
-//  return true;
-//}
-
-//bool EmptyDefault::decodeBeforeWait(std::shared_ptr<std::vector<float>> data) {
-////  auto cache = *data;
-
-//  _displayBuffer = data;
-//  return true;
-//}
-
-//bool EmptyDefault::decodeAfterWait() {
-////  LOG(INFO) << __FUNCTION__ << __LINE__;
-//  return false;
-//}
+configuru::Config EmptyMsgDecoder::defaultParams() {
+  return {};
+}

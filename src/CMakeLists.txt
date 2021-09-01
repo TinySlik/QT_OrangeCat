@@ -47,6 +47,8 @@ set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/bitdecoder/highfrequencysensivitydecoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/msgdecoder/msgdecoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/msgdecoder/msgdecoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/msgdecoder/tinimsgdecoderv1.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/msgdecoder/tinimsgdecoderv1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/time.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.h
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/renderutil.cpp

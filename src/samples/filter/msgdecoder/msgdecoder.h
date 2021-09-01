@@ -21,32 +21,25 @@
 
 class MsgDecoder: public std::enable_shared_from_this<MsgDecoder> {
  protected:
-  explicit MsgDecoder();
+  explicit MsgDecoder(const std::string &decode_info);
  public:
-  virtual bool decodeBeforeWait(const bool &value) = 0;
-  virtual bool decodeAfterWait() =  0;
+  virtual bool decode(const bool &value) = 0;
   virtual configuru::Config defaultParams() = 0;
   virtual bool reset() = 0;
-  virtual std::shared_ptr<std::vector<float>> displayBuffer();
   virtual configuru::Config syncParams(configuru::Config &cfg);
   virtual ~MsgDecoder();
-  virtual char getCurrentResualt();
-  virtual const std::shared_ptr<std::vector<char>> getResualtList();
-
  protected:
   configuru::Config decode_info_;
 };
 
 class EmptyMsgDecoder : public MsgDecoder {
-  EmptyMsgDecoder();
+  explicit EmptyMsgDecoder(const std::string &decode_info);
  public:
   virtual ~EmptyMsgDecoder() override;
-  virtual bool decodeBeforeWait(const bool &valuedata) override;
-  virtual bool decodeAfterWait() override;
+  virtual bool decode(const bool &value) override;
   virtual configuru::Config defaultParams() override;
   virtual bool reset() override;
   static  std::shared_ptr<MsgDecoder> create(const std::string &decode_info);
 };
-
 
 #endif  // MSGDECODER_H

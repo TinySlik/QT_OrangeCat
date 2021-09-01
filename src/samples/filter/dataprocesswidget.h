@@ -33,6 +33,7 @@
 
 #include "memorymapped.h"
 #include "bitdecoder/manchesterdecoder.h"
+#include "msgdecoder/msgdecoder.h"
 #define MAX_PAINT_BUF_SIZE (32768)
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
@@ -45,10 +46,10 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
     std::shared_ptr<ManchesterDecoder>    object;
   } PLUG_PROCESS_UNIT;
 
-//  typedef struct {
-//    std::string                           name;
-//    std::shared_ptr<MsgDecoder>           object;
-//  } PLUG_MSG_PROCESS_UNIT;
+  typedef struct {
+    std::string                                                         name;
+    std::function<std::shared_ptr<MsgDecoder>(const std::string &cfg)>  create;
+  } PLUG_MSG_PROCESS_UNIT;
 
  public:
   explicit DataProcessWidget(QWidget *parent = nullptr);
@@ -87,6 +88,8 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
   void resetBuf(int size);
   bool resetComputeShader(int level);
   bool registerDecoder(const std::string & name, std::shared_ptr<ManchesterDecoder> obj);
+  bool registerMsgDecoder(const std::string & name,
+           std::function<std::shared_ptr<MsgDecoder>(const std::string &cfg)>  create);
   bool unRegisterDecoder(const std::string & name);
   std::string getComputeShaderContent(int level);
   QTimer timer;
@@ -117,6 +120,9 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   int _decoder_active_index;
   std::vector<PLUG_PROCESS_UNIT> _decoders;
+//  int _msg_decoder_active_index;
+  std::shared_ptr<MsgDecoder> _msgdecoder;
+  std::vector<PLUG_MSG_PROCESS_UNIT> _msg_decoders;
 
   float m_lineThickness;
   bool m_ComputeShaderSwitch;

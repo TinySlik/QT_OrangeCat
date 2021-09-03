@@ -120,9 +120,9 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
   int _decoder_active_index;
   std::vector<PLUG_PROCESS_UNIT> _decoders;
-//  int _msg_decoder_active_index;
   std::shared_ptr<MsgDecoder> _msgdecoder;
   std::vector<PLUG_MSG_PROCESS_UNIT> _msg_decoders;
+  std::string decode_info;
 
   float m_lineThickness;
   bool m_ComputeShaderSwitch;

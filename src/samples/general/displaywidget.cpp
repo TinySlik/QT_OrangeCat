@@ -119,7 +119,6 @@ DisplayWidget::DisplayWidget(QWidget *parent)
     }}
   };
 
-
   auto cfg_local = cfg[class_obj_id.c_str()];
 
   cfg_local["front_color"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
@@ -278,7 +277,11 @@ DisplayWidget::DisplayWidget(QWidget *parent)
 
   QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
   if (file_testcase.exists()) {
-    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["display logo default"];
+      auto jsonconfig = configuru::make_json_options();
+      jsonconfig.single_line_comments     = true;
+      jsonconfig.block_comments           = true;
+      jsonconfig.nesting_block_comments   = true;
+    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", jsonconfig)["display logo default"];
     cfg_local << cfg;
     LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
   }

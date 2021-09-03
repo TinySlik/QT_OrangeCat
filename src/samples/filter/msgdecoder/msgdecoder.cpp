@@ -20,6 +20,14 @@ using namespace configuru;
 MsgDecoder::MsgDecoder(const std::string &decode_info) {
   std::string tmp = decode_info;
   decode_info_ = configuru::parse_string(tmp.c_str(), configuru::JSON, "null");
+//  for (auto& v: decode_info_.as_array()) {
+//    v["worklist"] = configuru::Config::array();
+//    for (auto& vi: v["array"].as_array()) {
+//      configuru::Config tmp = {{"code", vi}};
+//      v["worklist"].push_back(tmp);
+//    }
+//    v.erase("array");
+//  }
 }
 
 configuru::Config MsgDecoder::syncParams(configuru::Config &cfg) {

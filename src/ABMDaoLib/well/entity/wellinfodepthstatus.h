@@ -6,11 +6,11 @@
 #include "../../common/base/baseentity.h"
 
 #define CUSTOM_PROPERTY_TINI(yu, type, target) yu:\
-  Q_PROPERTY(type target READ get##target WRITE set##target)\
+  Q_PROPERTY(type target READ get##_##target WRITE set##_##target)\
   type target;\
   public:\
-  inline type get##target() const {return target;} \
-  inline void set##target(type value){target = value;}
+  inline type get##_##target() const {return target;} \
+  inline void set##_##target(type value){target = value;}
 
 struct WellInfoDepthStatus : public BaseEntity
 {

@@ -70,6 +70,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     m_SVGRender(nullptr),
     _decoder_active_index(-1),
     _msgdecoder(nullptr),
+    decode_info(""),
     m_lineThickness(0.01f),
     m_ComputeShaderSwitch(true),
     m_TestSwitch(0),
@@ -217,9 +218,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     size_t i = 0;
     for(auto it:_msg_decoders) {
       if (it.name == str2) {
-        auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
-        if (cfg.has_key("decode_info")) {
-          _msgdecoder = it.create(configuru::dump_string(cfg["decode_info"], configuru::JSON));
+        if (decode_info.size() > 0) {
+          _msgdecoder = it.create(decode_info);
         }
       }
       i++;
@@ -356,19 +356,19 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     auto ora = static_cast<std::string>(a);
     if (tg == "empty") {
       if (ora != "empty" && m_fileCdfMMap) {
-        LOG(INFO) << "file name: " << ora << " closed";
+        LOG(INFO) << "cdf file name: " << ora << " closed";
         m_fileCdfMMap->close();
         m_fileCdfMMap = nullptr;
-        m_file_find_index = 0;
+        decode_info = "";
       }
       return true;
     }
 
     if (ora != "empty" && m_fileCdfMMap) {
-      LOG(INFO) << "file name: " << ora << " closed";
+      LOG(INFO) << "cdf file name: " << ora << " closed";
       m_fileCdfMMap->close();
       m_fileCdfMMap = nullptr;
-      m_file_find_index = 0;
+      decode_info = "";
     }
 
     size_t sz;
@@ -376,8 +376,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (!m_fileCdfMMap) return false;
     sz = static_cast<size_t>(m_fileCdfMMap->size());
     LOG(INFO) << "file name: " << tg << " open, size: " << sz;
-
-    std::string org =  (char *)(m_fileCdfMMap->data());
+    decode_info = cdf::cdfStringToInfoListJson_v1_0((char *)(m_fileCdfMMap->data()));
     auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
     std::string class_obj_id = typeid(*this).name();
     class_obj_id += std::to_string(reinterpret_cast<long>(this));
@@ -385,12 +384,10 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     if (std::string(cfg_local["m_msg_decoder"]) != "empty") {
       for(auto it:_msg_decoders) {
         if (it.name == std::string(cfg_local["m_msg_decoder"])) {
-          _msgdecoder = it.create(org);
+          _msgdecoder = it.create(decode_info);
         }
       }
     }
-
-    cfg.judge_with_create_key("decode_info") = configuru::parse_string(cdf::cdfStringToInfoListJson_v1_0(org).c_str(), configuru::JSON, "null");
     return true;
   });
 
@@ -505,9 +502,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
   format.setProfile(QSurfaceFormat::CoreProfile);
   setFormat(format);
 
-  QFile file_testcase(":/test/testcase.json");
+  QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
   if (file_testcase.exists()) {
-    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["test_msg_decoder"];
+    auto jsonconfig = configuru::make_json_options();
+    jsonconfig.single_line_comments     = true;
+    jsonconfig.block_comments           = true;
+    jsonconfig.nesting_block_comments   = true;
+    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", jsonconfig)["test_msg_decoder"];
     LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
     cfg_local << cfg;
   }
@@ -781,7 +782,6 @@ void DataProcessWidget::paintGL() {
         if (res == -1) {
           // todo
         } else {
-          std::shared_ptr<MsgDecoder> _msg_decoder = nullptr;
           if (_msgdecoder) {
             if (res == '0')
               _msgdecoder->decode(false);

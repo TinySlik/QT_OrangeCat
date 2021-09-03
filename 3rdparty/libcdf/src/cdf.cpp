@@ -162,9 +162,9 @@ std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
           break;
         case 0x48:	res[static_cast<size_t>(cur_index)]["array"].push_back("HS");
           break;
-        case 0x28:	res[static_cast<size_t>(cur_index)]["array"].push_back("BT");
+        case 0x28:	res[static_cast<size_t>(cur_index)]["array"].push_back("BM");
           break;
-        case 0x29:	res[static_cast<size_t>(cur_index)]["array"].push_back("BT");
+        case 0x29:	res[static_cast<size_t>(cur_index)]["array"].push_back("BC");
           break;
         case 0x59:	res[static_cast<size_t>(cur_index)]["array"].push_back("BS");
           break;
@@ -176,7 +176,7 @@ std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
           break;
         case 0x40:	res[static_cast<size_t>(cur_index)]["array"].push_back("CG");
           break;
-        case 0xFF:	res[static_cast<size_t>(cur_index)]["array"].push_back("AB");
+        case 0xFF:	res[static_cast<size_t>(cur_index)]["array"].push_back("ABI");
           break;
         case 0xFE:	res[static_cast<size_t>(cur_index)]["array"].push_back("GA");
           break;

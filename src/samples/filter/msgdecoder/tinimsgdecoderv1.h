@@ -22,6 +22,7 @@ class TiniMsgDecoderv1 : public MsgDecoder {
   std::vector<std::vector<DECODE_UNIT>> _decoders;
   size_t tag_bit;
   int cur_tag;
+  bool start_tag;
 };
 
 #endif // TINIMSGDECODERV1_H

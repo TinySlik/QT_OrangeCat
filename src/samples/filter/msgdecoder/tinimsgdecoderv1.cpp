@@ -6,18 +6,28 @@ struct decode_tempalete_unit {
   const char *name;
   size_t check;
   size_t length;
-  std::function<configuru::Config(std::vector<char> data, size_t check_bit)> func;
+  std::function<configuru::Config(std::vector<char> data)> func;
 };
 
-static configuru::Config DefaultProcess(std::vector<char> data, size_t check_bit) {
+configuru::Config DefaultProcess(std::vector<char> data) {
   data.push_back('\0');
-  LOG(INFO) << "ibt: " << check_bit << "  content: " << data.data();
+  LOG(INFO) << "  content: " << data.data();
   return data.data();
 }
 
+int charArrayToInt(std::vector<char> data) {
+  int res = 0;
+//  for(size_t i = 0; i < data.size(); ++i) {
+//    int tmp = data[i] == '1' ? 1 : 0;
+//    if (i == 0 && tmp == 1) res = 0xffffffff
+//    res += data[i] == '1' ? 1 : 0;
+//    res <<= 1;
+//  }
+}
+
 const struct decode_tempalete_unit decode_tempalete_table[] = {
-  {"PU",  0, 8,   DefaultProcess},
-  {"PD",  0, 8,   DefaultProcess},
+  {"PU",  0, 8,   nullptr},
+  {"PD",  0, 8,   nullptr},
   {"GX",  1, 13,  DefaultProcess},
   {"GY",  1, 13,  DefaultProcess},
   {"GZ",  1, 13,  DefaultProcess},
@@ -36,19 +46,21 @@ const struct decode_tempalete_unit decode_tempalete_table[] = {
   {"TF",  1, 7,   DefaultProcess},
   {"CV",  0, 1,   DefaultProcess},
   {"SC",  1, 12,  DefaultProcess},
+  {"LC",  1, 12,  DefaultProcess},
   {"GA",  1, 9,   DefaultProcess},
   {"GB",  1, 9,   DefaultProcess},
   {"ABI", 1, 13,  DefaultProcess},
-  {"ABS", 1, 13,  DefaultProcess},
+  {"ABS", 1, 9,   DefaultProcess},
 };
 
 TiniMsgDecoderv1::TiniMsgDecoderv1(const std::string &decode_info):
 MsgDecoder(decode_info),
 tag_bit(0),
-cur_tag(-1) {
+cur_tag(-1),
+start_tag(false) {
   LOG(INFO) << __FUNCTION__ << decode_info_;
   auto list_count = decode_info_.as_array().size();
-  int res_log = 1;
+  unsigned int res_log = 1;
   while (res_log < list_count) {
     res_log <<= 1;
     tag_bit++;
@@ -57,7 +69,7 @@ cur_tag(-1) {
     _decoders.push_back(std::vector<DECODE_UNIT>());
     for (auto& vi: v["array"].as_array()) {
       DECODE_UNIT res = {std::string(vi), 0, nullptr};
-      for(int k = 0; k < sizeof(decode_tempalete_table)/sizeof(decode_tempalete_unit); ++k) {
+      for(size_t k = 0; k < sizeof(decode_tempalete_table)/sizeof(decode_tempalete_unit); ++k) {
         if (res.name == decode_tempalete_table[k].name) {
           res.size = decode_tempalete_table[k].length;
 //          LOG(INFO) << res.size;
@@ -74,19 +86,32 @@ cur_tag(-1) {
     auto str2 = std::string(b);
     if (str1 == "NULL") return true;
     LOG(INFO) << str1;
-    for (int k = 0; k < sizeof(decode_tempalete_table)/sizeof(decode_tempalete_unit); ++k) {
+    for (size_t k = 0; k < sizeof(decode_tempalete_table)/sizeof(decode_tempalete_unit); ++k) {
       if (str1 == decode_tempalete_table[k].name) {
-         if (data_.size() < decode_tempalete_table[k].length) {
-           break;
-         }
-         std::vector<char> res;
-         char * dt = data_.data() + data_.size() - decode_tempalete_table[k].length;
-         for (size_t j = 0; j < decode_tempalete_table[k].length; ++j) {
-           res.push_back(*dt);
-           dt++;
-         }
-         decode_tempalete_table[k].func(res, decode_tempalete_table[k].check);
-         return true;
+      if (data_.size() < decode_tempalete_table[k].length) {
+        break;
+      }
+      std::vector<char> res;
+      char * dt = data_.data() + data_.size() - decode_tempalete_table[k].length;
+      for (size_t j = 0; j < decode_tempalete_table[k].length; ++j) {
+        res.push_back(*dt);
+        dt++;
+      }
+      if (decode_tempalete_table[k].check > 0) {
+        unsigned char res_check = res[res.size() - 1] == '1' ? 1 : 0;
+        res.pop_back();
+        for (size_t k = 0; k < res.size(); ++k) {
+          res_check ^= res[k] == '1' ? 1 : 0;
+        }
+        if (res_check == 0) {
+          decode_tempalete_table[k].func(res);
+        } else {
+          LOG(INFO) << "check bit error";
+        }
+      } else {
+        decode_tempalete_table[k].func(res);
+      }
+      return true;
       }
     }
     return false;
@@ -107,11 +132,44 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
   size_t sz = data_.size();
   char *data = data_.data();
   if (sz > 6 && memcmp(data + sz - 7 , "1111110", 7) == 0) {
-    status["list_current_target"] << "NULL";
+    if (start_tag) {
+      data_.pop_back();
+      data_.pop_back();
+      data_.pop_back();
+      data_.pop_back();
+      data_.pop_back();
+      data_.pop_back();
+      data_.pop_back();
+      data_.pop_back();
+      status["list_current_target"] << "NULL";
+      auto index = static_cast<size_t>(cur_tag);
+      auto queue = _decoders[index];
+      size_t leg = tag_bit;
+      for (size_t k = 0; k < queue.size(); ++k) {
+        leg += queue[k].size;
+      }
+      if (leg == data_.size()) {
+        LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
+        status["last_msg_completeness_check"] = "Credible";
+      } else {
+        LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
+        status["last_msg_completeness_check"] = "Undependable";
+        start_tag = false;
+      }
+    } else {
+      start_tag = true;
+    }
+
     data_ = {'0', '1', '1', '1', '1', '1', '1', '0'};
     cur_tag = -1;
-    if (status.has_key("list_name")) status.erase("list_name");
-    if (status.has_key("list_content")) status.erase("list_content");
+    if (status.has_key("list_name")) {
+      status["last_name"] = status["list_name"];
+      status.erase("list_name");
+    }
+    if (status.has_key("list_content")) {
+      status["last_content"] = status["list_content"];
+      status.erase("list_content");
+    }
   }
   std::vector<char> data__ = data_;
   data__.push_back('\0');

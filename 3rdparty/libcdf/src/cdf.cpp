@@ -12,6 +12,33 @@
 
 //#define DEBUG_CDF
 
+//{"GX" ,0x74},
+//{"GY" ,0x75},
+//{"GZ" ,0x76},
+//{"BX" ,0x62},
+//{"BY" ,0x63},
+//{"BZ" ,0x64},
+//{"RM" ,0x50},
+//{"TM" ,0x4d},
+//{"TS" ,0x78},
+//{"TF" ,0x54},
+//{"IN" ,0x49},
+//{"CV" ,0x79},
+//{"SC" ,0x43},
+//{"LC" ,0x41},
+//{"GT" ,0x47},
+//{"HS" ,0x48},
+//{"BTM",0x28},
+//{"BTC",0x29},
+//{"BS" ,0x59},
+//{"SV" ,0x77},
+
+//{"HGR" ,0xfe},
+//{"HGA" ,0xfd},
+//{"HGB" ,0xfc},
+//{"HAI" ,0xff},
+//{"HVS",0xFB};
+
 /**
   0x3e	List1/List2的Preamble中第一个PU
   0x4c	List1/List2/SRS中Loop中的第一个PU
@@ -184,6 +211,22 @@ std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
           break;
         case 0xFC:	res[static_cast<size_t>(cur_index)]["array"].push_back("ABS");
           break;
+          //{"HGR" ,0xfe},
+          //{"HGA" ,0xfd},
+          //{"HGB" ,0xfc},
+          //{"HAI" ,0xff},
+          //{"HVS",0xFB};
+//        case 0xfe:	res[static_cast<size_t>(cur_index)]["array"].push_back("HGR");
+//          break;
+//        case 0xfd:	res[static_cast<size_t>(cur_index)]["array"].push_back("HGA");
+//          break;
+//        case 0xfc:	res[static_cast<size_t>(cur_index)]["array"].push_back("HGB");
+//          break;
+//        case 0xff:	res[static_cast<size_t>(cur_index)]["array"].push_back("HAI");
+//          break;
+//        case 0xfb:	res[static_cast<size_t>(cur_index)]["array"].push_back("HVS");
+//          break;
+
         case 0x2e:
         case 0x20:	break_tag = true;
           break;

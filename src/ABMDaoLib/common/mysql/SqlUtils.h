@@ -31,14 +31,16 @@ struct SqlPage
 enum SqlLocationType{
   SqlWell,
   SqlRun,
-  Sqldefault
+  Sqldefault,
+  SqlSys
 };
 
 enum SqlDataType{
   SqlInt,
   SqlDouble,
   SqlString,
-  SqlDateTime
+  SqlDateTime,
+  SqlDataTypeUninit
 };
 
 enum SqlOperator{
@@ -96,6 +98,8 @@ public:
                     QString host = "localhost",int port = 3306,QObject *parent = nullptr);
 
   ~SqlUtils();
+
+  bool createDatabase(const std::string &name);
 
   /**
    * @brief connectDatabase 连接数据库

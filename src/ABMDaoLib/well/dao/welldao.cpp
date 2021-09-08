@@ -58,6 +58,26 @@ const configuru::Config qvalToConfig(const QVariant &a) {
   return res;
 }
 
+const SqlDataType configToForm(const configuru::Config &a) {
+  if(a.is_string()) {
+    SqlDataType res = SqlDataTypeUninit;
+    auto form = std::string(a);
+    if (form == "bool") {
+      res = SqlInt;
+    } else if (form == "int") {
+      res = SqlInt;
+    } else if (form == "float" || form == "double" ) {
+      res = SqlDouble;
+    } else if (form == "string") {
+      res = SqlString;
+    } else if (form == "date") {
+      res = SqlDateTime;
+    }
+    return res;
+  } else {
+    return SqlDataTypeUninit;
+  }
+}
 
 WellDaoJsonInterface::WellDaoJsonInterface(){
 }
@@ -92,6 +112,31 @@ bool WellDaoJsonInterface::add(const std::string &json) {
   }
   _mutex.unlock();
   return res;
+}
+
+bool WellDaoJsonInterface::createTable(const std::string &content) {
+  auto data = configuru::parse_string(content.c_str(), configuru::JSON, "null");
+  bool res = false;
+  _mutex.lock();
+  if (data.has_key("target_table") &&
+      data["target_table"].is_string() &&
+      data.has_key("design_map") &&
+      data["design_map"].is_object() &&
+      data.has_key("primary_key") &&
+      data["primary_key"].is_string()) {
+    auto name = std::string(data["target_table"]);
+    QMap<QString, SqlDataType> formatData;
+    for (auto& p : data["design_map"].as_object()) {
+      formatData[p.key().c_str()] = configToForm((p.value()));
+    }
+    res = _util->createTable(name.c_str(), formatData, std::string(data["primary_key"]).c_str());
+  }
+  _mutex.unlock();
+  return res;
+}
+
+bool WellDaoJsonInterface::createDatabase(const std::string &name) {
+  return _util->createDatabase(name);
 }
 
 bool WellDaoJsonInterface::update(const std::string &json) {

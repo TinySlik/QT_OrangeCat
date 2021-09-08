@@ -37,10 +37,14 @@ DepthWindow::DepthWindow(QWidget *parent) :
   std::string well_name = "well001";
   std::string run_name = "run0100";
 
+  if (ABMDaoLib::createDataBase("bingo")) {
+    LOG(INFO) << "bingo";
+  }
+
   bool res = ABMDaoLib::getInstance()->open(well_name.c_str(), run_name.c_str());
   if (res) LOG(INFO) << "well: " << well_name << "--run: " << run_name << " success";
-  ABMDaoLib::getInstance()->getWellJsonInterface();
-  ABMDaoLib::getInstance()->getRunJsonInterface();
+
+//  ABMDaoLib::getInstance()->getRunJsonInterface();
 
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql_table_current = {{"target_table", {
@@ -135,7 +139,7 @@ void DepthWindow::updateFromDao() {
   auto stu = ParameterServer::instance()->GetCfgStatusRoot();
 
   configuru::Config tmp = configuru::parse_string(js.c_str(), configuru::JSON, "null");
-  tmp["holeDepth"] = tmp["blockHeight"];
+  ctr["Depth"]["holeDepth"] << tmp["blockHeight"];
   auto cur_count = static_cast<int>(tmp["count"]);
   float length = static_cast<float>(tmp["blockHeightZero"]);
   std::string hh = static_cast<std::string>(tmp["calibration"]);

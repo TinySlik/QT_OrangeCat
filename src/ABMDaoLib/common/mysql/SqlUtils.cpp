@@ -13,10 +13,12 @@ SqlUtils::SqlUtils(QString databaseName,QString userName,QString password,
   m_database.setPort(port);
 }
 
+
+
 SqlUtils::SqlUtils(const SqlLocationType &type, QString databaseName,QString userName,QString password,
                    QString host,int port,QObject *parent) {
   if (type == SqlLocationType::Sqldefault) {
-    m_database = QSqlDatabase::addDatabase("QMYSQL");
+    m_database = QSqlDatabase::addDatabase("QMYSQL", "default");
     m_database.setHostName(host);
     m_database.setDatabaseName(databaseName);
     m_database.setUserName(userName);
@@ -36,6 +38,14 @@ SqlUtils::SqlUtils(const SqlLocationType &type, QString databaseName,QString use
     m_database.setUserName(userName);
     m_database.setPassword(password);
     m_database.setPort(port);
+  } else if (type == SqlLocationType::SqlSys) {
+    m_database = QSqlDatabase::addDatabase("QMYSQL", "sys");
+    m_database.setHostName(host);
+    m_database.setDatabaseName("mysql");
+    m_database.setUserName(userName);
+    m_database.setPassword(password);
+    m_database.setPort(port);
+    connectDatabase();
   }
 }
 
@@ -84,8 +94,13 @@ bool SqlUtils::createTable(const QString &tableName, const QMap<QString, SqlData
   return execSql(sqlStr);
 }
 
-bool SqlUtils::insertValue(const QString &tableName, QMap<QString, QVariant> &datas, const bool replace)
-{
+bool SqlUtils::createDatabase(const std::string &name) {
+  QString sqlStr = QString("CREATE DATABASE ");
+  sqlStr += name.c_str();
+  return execSql(sqlStr);
+}
+
+bool SqlUtils::insertValue(const QString &tableName, QMap<QString, QVariant> &datas, const bool replace) {
   if(datas.isEmpty()) {return false;}
 
   QStringList keyList;

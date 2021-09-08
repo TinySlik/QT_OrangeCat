@@ -6,13 +6,17 @@
 //初始化easilogging
 INITIALIZE_EASYLOGGINGPP
 
-
 ABMDaoLib *ABMDaoLib::getInstance() {
   static ABMDaoLib *instance = nullptr;
   if (instance == nullptr) {
     instance = new ABMDaoLib();
   }
   return instance;
+}
+
+bool ABMDaoLib::createDataBase(const std::string &name) {
+  auto sql_ = SqlUtils::create(SqlLocationType::SqlSys, "","root","123456","192.168.1.171");
+  return sql_->createDatabase(name);
 }
 
 ABMDaoLib::~ABMDaoLib() {

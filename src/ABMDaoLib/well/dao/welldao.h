@@ -40,13 +40,15 @@ jsonInterface->add(dump_string(insertval, configuru::JSON).c_str());
 
 class ABMDAOLIB_EXPORT WellDaoJsonInterface: public jsonInterface, public std::enable_shared_from_this<WellDaoJsonInterface> {
  public:
-  WellDaoJsonInterface();
   ~WellDaoJsonInterface();
   virtual bool add(const std::string &json);
   virtual bool update(const std::string &json);
   virtual std::string find(const std::string &json);
+  static std::shared_ptr<WellDaoJsonInterface> create(std::shared_ptr<SqlUtils> util = nullptr);
  private:
+  WellDaoJsonInterface();
   std::mutex _mutex;
+  std::shared_ptr<SqlUtils> _util;
 };
 
 #endif // WELLINFODEPTHSTATUSDAO_H

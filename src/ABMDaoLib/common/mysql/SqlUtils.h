@@ -28,6 +28,12 @@ struct SqlPage
 /**
  * @brief The SqlDataType enum  数据库数据枚举
  */
+enum SqlLocationType{
+  SqlWell,
+  SqlRun,
+  Sqldefault
+};
+
 enum SqlDataType{
   SqlInt,
   SqlDouble,
@@ -80,11 +86,13 @@ struct ABMDAOLIB_EXPORT SqlCondition{
  * @brief The SqlUtils class
  * Sqlit 数据库封装
  */
-class SqlUtils : public QObject
-{
+class SqlUtils : public QObject, public std::enable_shared_from_this<SqlUtils> {
   Q_OBJECT
 public:
   explicit SqlUtils(QString databaseName,QString userName,QString password,
+                    QString host = "localhost",int port = 3306,QObject *parent = nullptr);
+
+  explicit SqlUtils(const SqlLocationType &type, QString databaseName,QString userName,QString password,
                     QString host = "localhost",int port = 3306,QObject *parent = nullptr);
 
   ~SqlUtils();
@@ -176,6 +184,9 @@ public:
    * @return
    */
   bool queryOne(const QString &tableName, const QVector<SqlCondition> &conditions, QMap<QString, QVariant> &resultData);
+
+  static std::shared_ptr<SqlUtils> create(const SqlLocationType &type, QString databaseName,QString userName,QString password,
+                                          QString host = "localhost",int port = 3306,QObject *parent = nullptr);
 
 private:
   /**

@@ -122,7 +122,7 @@ void CustomPlotTest::initChart() {
   m_paint_units.push_back({{}, wideAxisRectRight, {}});
 
   customPlot->plotLayout()->setColumnSpacing(0);
-  customPlot->plotLayout()->setColumnStretchFactor(1, 1.03);
+//  customPlot->plotLayout()->setColumnStretchFactor(1, 1.03);
 }
 
 void CustomPlotTest::addColum(const PAINT_LINE_UNIT &unit) {

@@ -10,16 +10,16 @@ class Config
 public:
   Config();
 
-  QString getSystemWellId();
-  void setSystemWellId(const QString &value);
+//  QString getSystemWellId();
+//  void setSystemWellId(const QString &value);
 
-  QString getSystemRun() ;
-  void setSystemRun(const QString &value);
+//  QString getSystemRun() ;
+//  void setSystemRun(const QString &value);
 
 private:
-  QString getCurrentData(QString key);
+//  QString getCurrentData(QString key);
 
-  bool setCurrentData(QString key, QString value,QString model = "system",QString remark = nullptr);
+//  bool setCurrentData(QString key, QString value,QString model = "system",QString remark = nullptr);
 private:
   QSharedPointer<CurrentData> m_currentData;
 

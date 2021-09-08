@@ -23,6 +23,7 @@ int charArrayToInt(std::vector<char> data) {
 //    res += data[i] == '1' ? 1 : 0;
 //    res <<= 1;
 //  }
+  return res;
 }
 
 const struct decode_tempalete_unit decode_tempalete_table[] = {

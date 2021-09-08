@@ -328,7 +328,6 @@ QSize DisplayWidget::sizeHint() const {
   return QSize(768, 512);
 }
 
-
 void DisplayWidget::getData(std::shared_ptr<std::vector<float>> data) {
   if (!data) {
     float value = 0.f;

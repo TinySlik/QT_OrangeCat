@@ -231,7 +231,6 @@ DisplayWidget::DisplayWidget(QWidget *parent)
       m_fileMMap = nullptr;
       m_file_find_index = 0;
     }
-
     size_t sz;
     m_fileMMap = std::make_shared<MemoryMapped::File>(tg);
     if (!m_fileMMap) return false;

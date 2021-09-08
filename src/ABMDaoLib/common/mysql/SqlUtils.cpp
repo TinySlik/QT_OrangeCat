@@ -13,6 +13,38 @@ SqlUtils::SqlUtils(QString databaseName,QString userName,QString password,
   m_database.setPort(port);
 }
 
+SqlUtils::SqlUtils(const SqlLocationType &type, QString databaseName,QString userName,QString password,
+                   QString host,int port,QObject *parent) {
+  if (type == SqlLocationType::Sqldefault) {
+    m_database = QSqlDatabase::addDatabase("QMYSQL");
+    m_database.setHostName(host);
+    m_database.setDatabaseName(databaseName);
+    m_database.setUserName(userName);
+    m_database.setPassword(password);
+    m_database.setPort(port);
+  } else if (type == SqlLocationType::SqlWell){
+    m_database = QSqlDatabase::addDatabase("QMYSQL", "well");
+    m_database.setHostName(host);
+    m_database.setDatabaseName(databaseName);
+    m_database.setUserName(userName);
+    m_database.setPassword(password);
+    m_database.setPort(port);
+  } else if (type == SqlLocationType::SqlRun){
+    m_database = QSqlDatabase::addDatabase("QMYSQL", "run");
+    m_database.setHostName(host);
+    m_database.setDatabaseName(databaseName);
+    m_database.setUserName(userName);
+    m_database.setPassword(password);
+    m_database.setPort(port);
+  }
+}
+
+std::shared_ptr<SqlUtils> SqlUtils::create(const SqlLocationType &type, QString databaseName,QString userName,QString password,
+                 QString host,int port,QObject *parent) {
+  std::shared_ptr<SqlUtils> res(new SqlUtils(type, databaseName, userName, password, host, port, parent));
+  return res;
+};
+
 SqlUtils::~SqlUtils()
 {
   if(!m_sqlQuery){
@@ -59,8 +91,6 @@ bool SqlUtils::insertValue(const QString &tableName, QMap<QString, QVariant> &da
   QStringList keyList;
   QStringList valueList;
   for(auto it = datas.cbegin(); it != datas.cend(); ++it){
-
-
     keyList << QString("`%1`").arg(it.key());
 
     valueList << this->judgeInsertValue(it.value());
@@ -108,7 +138,6 @@ bool SqlUtils::insertValues(const QString &tableName, const QVector<QMap<QString
     }
     valueList.append(QString("(%1)").arg(onceValueList.join(',')));
   }
-
 
   QString sqlStr;
   if(replace) {

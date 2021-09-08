@@ -67,25 +67,6 @@ WellInfoLocationPage WellInfoLocationDao::findPage(QVector<SqlCondition> &condit
   return page;
 }
 
-QSharedPointer<WellInfoLocation> WellInfoLocationDao::findById(int id)
-{
-  QVector<SqlCondition> conditions;
-  conditions.append(SqlCondition(SqlEqual,"id",id));
-  conditions.append(SqlCondition(SqlEqual,"is_del",0));
-  QMap<QString,QVariant> resultData;
-
-  QSharedPointer<WellInfoLocation> entity = QSharedPointer<WellInfoLocation>(new WellInfoLocation());
-
-  if(!ABMDaoLib::getInstance()->getSqlUtils()->queryOne(m_tableName,conditions,resultData)){
-    return entity;
-  }
-
-  for(auto it = resultData.cbegin(); it != resultData.cend(); ++it){
-    entity->setProperty(it.key().toLocal8Bit(),it.value());
-  }
-  return entity;
-}
-
 QSharedPointer<WellInfoLocation> WellInfoLocationDao::findByWellInfoId(int wellInfoId)
 {
   QVector<SqlCondition> conditions;

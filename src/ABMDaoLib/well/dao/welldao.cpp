@@ -52,6 +52,8 @@ const configuru::Config qvalToConfig(const QVariant &a) {
     res = std::string(a.toString().toLatin1().data());
   } else if (a.type() == QVariant::Double) {
     res = a.toDouble();
+  } else if (a.type() == QMetaType::QDateTime) {
+    res = std::string(a.toString().toLatin1().data());
   }
   return res;
 }
@@ -61,6 +63,16 @@ WellDaoJsonInterface::WellDaoJsonInterface(){
 }
 
 WellDaoJsonInterface::~WellDaoJsonInterface(){
+}
+
+std::shared_ptr<WellDaoJsonInterface> WellDaoJsonInterface::create(std::shared_ptr<SqlUtils> util) {
+  std::shared_ptr<WellDaoJsonInterface> res(new WellDaoJsonInterface());
+  if (util == nullptr) {
+    res->_util = ABMDaoLib::getInstance()->getSqlUtils();
+  } else {
+    res->_util = util;
+  }
+  return res;
 }
 
 bool WellDaoJsonInterface::add(const std::string &json) {
@@ -76,7 +88,7 @@ bool WellDaoJsonInterface::add(const std::string &json) {
     for (auto& p : data["insert_val"].as_object()) {
         mapInsert[p.key().c_str()] = configToQval((p.value()));
     }
-    res = ABMDaoLib::getInstance()->getSqlUtils()->insertValue(name.c_str(), mapInsert);
+    res = _util->insertValue(name.c_str(), mapInsert);
   }
   _mutex.unlock();
   return res;
@@ -104,7 +116,7 @@ bool WellDaoJsonInterface::update(const std::string &json) {
     for (auto& p : data["update_val"].as_object()) {
         mapUpdate[p.key().c_str()] = configToQval((p.value()));
     }
-    res = ABMDaoLib::getInstance()->getSqlUtils()->updateValue(name.c_str(), mapUpdate, conditions);
+    res = _util->updateValue(name.c_str(), mapUpdate, conditions);
   }
   _mutex.unlock();
   return res;
@@ -128,7 +140,7 @@ std::string WellDaoJsonInterface::find(const std::string &json) {
       QString a = st.c_str();
       conditions.append(SqlCondition(SqlEqual, a, configToQval(p.value())));
     }
-    if(!ABMDaoLib::getInstance()->getSqlUtils()->queryOne(name.c_str(), conditions, resultData)) {
+    if(!_util->queryOne(name.c_str(), conditions, resultData)) {
       LOG(ERROR) << "not find target table!";
       _mutex.unlock();
       return "{}";

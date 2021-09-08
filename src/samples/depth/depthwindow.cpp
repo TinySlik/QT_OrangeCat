@@ -17,6 +17,7 @@
 #include <QToolBar>
 #include <QTimer>
 #include <string>
+#include <QDateTime>
 
 DepthWindow::DepthWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -33,6 +34,14 @@ DepthWindow::DepthWindow(QWidget *parent) :
 #endif
   setUnifiedTitleAndToolBarOnMac(true);
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
+  std::string well_name = "well001";
+  std::string run_name = "run0100";
+
+  bool res = ABMDaoLib::getInstance()->open(well_name.c_str(), run_name.c_str());
+  if (res) LOG(INFO) << "well: " << well_name << "--run: " << run_name << " success";
+  ABMDaoLib::getInstance()->getWellJsonInterface();
+  ABMDaoLib::getInstance()->getRunJsonInterface();
+
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql_table_current = {{"target_table", {
       {"name", "u_current_data"},
@@ -86,7 +95,7 @@ DepthWindow::DepthWindow(QWidget *parent) :
 float cur_##y = static_cast<float>(stu[x]);\
 ui->y->setText(QString::number(static_cast<double>(cur_##y)));
 
-  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("T_DActivaty", label_internal_status)
+  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("T_DActivity", label_internal_status)
   STR_DISPLAY_LABEL_REGISTER_WITH_INIT("bottomStatus", label_bottom_status)
   STR_DISPLAY_LABEL_REGISTER_WITH_INIT("slipSatus", label_slips_status)
   NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("bitDepth", label_5)
@@ -109,11 +118,13 @@ ui->y->setText(QString::number(static_cast<double>(cur_##y)));
 DepthWindow::~DepthWindow() {
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
   ctr.erase("Depth");
+  ABMDaoLib::getInstance()->close();
   delete ui;
 }
 
 void DepthWindow::updateFromDao() {
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
+  auto jsonRecordInterface = ABMDaoLib::getInstance()->getRunJsonInterface();
   configuru::Config cfg = {{"target_table", {
       {"name", "u_well_depth_status"},
       {"wellId", targetTable.c_str()}
@@ -124,11 +135,11 @@ void DepthWindow::updateFromDao() {
   auto stu = ParameterServer::instance()->GetCfgStatusRoot();
 
   configuru::Config tmp = configuru::parse_string(js.c_str(), configuru::JSON, "null");
+  tmp["holeDepth"] = tmp["blockHeight"];
   auto cur_count = static_cast<int>(tmp["count"]);
   float length = static_cast<float>(tmp["blockHeightZero"]);
   std::string hh = static_cast<std::string>(tmp["calibration"]);
   configuru::Config calibration = configuru::parse_string(hh.c_str(), configuru::JSON, "null");
-
   auto factor = static_cast<float>(calibration[0]["factor"]);
   int last_count = 0;
   for (size_t i = 0; i < (calibration.as_array().size() - 1); ++i) {
@@ -163,7 +174,25 @@ void DepthWindow::updateFromDao() {
     jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
   }
 
-  stu << configuru::parse_string(js.c_str(), configuru::JSON, "null");
+//  QDateTime QDateTime::fromString(const QString& string, const QString& format) [static]
+//  time = QDateTime::fromString(dateContent, “yyyy-MM-dd hh:mm:ss”);
+  static int count = 0;
+  if (count ++ > 3) {
+    configuru::Config insertval = {
+      {"btmstatus",          tmp["bottomStatus"]},
+      {"depth",              height},
+      {"t_d_activitystatus", tmp["T_DActivity"]},
+      {"time",               std::string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz").toLatin1().data()).c_str()}
+    };
+
+    configuru::Config insertvalrecord = {
+      {"target_table", "u_run_depth_record"},
+      {"insert_val", insertval}
+    };
+    jsonRecordInterface->add(dump_string(insertvalrecord, configuru::JSON).c_str());
+    count = 0;
+  }
+  stu << tmp;
 }
 
 void DepthWindow::DepthCtrlUpdate() {

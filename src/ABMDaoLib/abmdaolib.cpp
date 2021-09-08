@@ -7,220 +7,85 @@
 INITIALIZE_EASYLOGGINGPP
 
 
-ABMDaoLib *ABMDaoLib::getInstance()
-{
-    static ABMDaoLib *instance = nullptr;
-    if (instance == nullptr)
-    {
-        instance = new ABMDaoLib();
-    }
-    return instance;
-}
-
-ABMDaoLib::~ABMDaoLib()
-{
-
-}
-
-ABMDaoLib::ABMDaoLib()
-{
-  m_sqlUtils = QSharedPointer<SqlUtils>(new SqlUtils("abm100","root","123456", "192.168.1.171"));
-  m_sqlUtils->connectDatabase();
-}
-
-QSharedPointer<Config> ABMDaoLib::getConfig()
-{
-  if(m_config.isNull()){
-    m_config = QSharedPointer<Config>(new Config());
+ABMDaoLib *ABMDaoLib::getInstance() {
+  static ABMDaoLib *instance = nullptr;
+  if (instance == nullptr) {
+    instance = new ABMDaoLib();
   }
-  return m_config;
+  return instance;
 }
 
-QSharedPointer<SqlUtils> ABMDaoLib::getSqlUtils() const
-{
+ABMDaoLib::~ABMDaoLib() {
+}
+
+ABMDaoLib::ABMDaoLib() {
+}
+
+std::shared_ptr<SqlUtils> ABMDaoLib::getSqlUtils() const {
   return m_sqlUtils;
 }
 
-void ABMDaoLib::setSqlUtils(const QSharedPointer<SqlUtils> &sqlUtils)
-{
+void ABMDaoLib::setSqlUtils(const std::shared_ptr<SqlUtils> &sqlUtils) {
   m_sqlUtils = sqlUtils;
 }
 
+std::shared_ptr<SqlUtils> ABMDaoLib::getWellSqlUtils() const {
+  return m_wellUtils;
+}
+
+std::shared_ptr<SqlUtils> ABMDaoLib::getRunSqlUtils() const {
+  return m_runUtils;
+}
+
+void ABMDaoLib::setRunSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils) {
+  m_runUtils = sqlUtils;
+}
+
+void ABMDaoLib::setWellSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils) {
+  m_wellUtils = sqlUtils;
+}
+
 std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getJsonInterface() {
+  return getWellJsonInterface();
+}
+
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getRunJsonInterface() {
   static std::shared_ptr<WellDaoJsonInterface> jsonDaoInterface = nullptr;
-  if(jsonDaoInterface == nullptr){
-    jsonDaoInterface = std::make_shared<WellDaoJsonInterface>();
+  if(jsonDaoInterface == nullptr) {
+    jsonDaoInterface = WellDaoJsonInterface::create(m_runUtils);
   }
   return jsonDaoInterface;
 }
 
-
-QSharedPointer<CurrentDataDao> ABMDaoLib::getCurrentDataDao()
-{
-  if(m_currentDataDao.isNull()){
-    m_currentDataDao = QSharedPointer<CurrentDataDao>(new CurrentDataDao());
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getWellJsonInterface() {
+  static std::shared_ptr<WellDaoJsonInterface> jsonDaoInterface = nullptr;
+  if(jsonDaoInterface == nullptr) {
+    jsonDaoInterface = WellDaoJsonInterface::create(m_wellUtils);
   }
-  return m_currentDataDao;
+  return jsonDaoInterface;
 }
 
-QSharedPointer<WellInfoGeneralDao> ABMDaoLib::getWellInfoGeneralDao()
-{
-  if(m_wellInfoGeneralDao.isNull()){
-    m_wellInfoGeneralDao = QSharedPointer<WellInfoGeneralDao>(new WellInfoGeneralDao());
-  }
-  return m_wellInfoGeneralDao;
+bool ABMDaoLib::open(const std::string well, const std::string run, const std::string userName, const std::string password, const std::string host) {
+  m_wellUtils = SqlUtils::create(SqlLocationType::SqlWell, well.c_str(), userName.c_str(), password.c_str(), host.c_str());
+  m_runUtils = SqlUtils::create(SqlLocationType::SqlRun, (well + "_" + run).c_str(), userName.c_str(), password.c_str(), host.c_str());
+  bool res = true;
+  if (m_wellUtils)
+      res &= m_wellUtils->connectDatabase();
+  else return false;
+  if (m_runUtils)
+      res &= m_runUtils->connectDatabase();
+  else return false;
+  return res;
 }
 
-QSharedPointer<WellInfoDistancesDao> ABMDaoLib::getWellInfoDistancesDao()
-{
-  if(m_wellInfoDistancesDao.isNull()){
-    m_wellInfoDistancesDao = QSharedPointer<WellInfoDistancesDao>(new WellInfoDistancesDao());
+void ABMDaoLib::close() {
+  if (m_wellUtils) {
+    m_wellUtils->disconnect();
+    m_wellUtils = nullptr;
   }
-  return m_wellInfoDistancesDao;
-}
 
-QSharedPointer<WellInfoLocationDao> ABMDaoLib::getWellInfoLocationDao()
-{
-  if(m_wellInfoLocationDao.isNull()){
-    m_wellInfoLocationDao = QSharedPointer<WellInfoLocationDao>(new WellInfoLocationDao());
+  if (m_runUtils) {
+    m_runUtils->disconnect();
+    m_runUtils = nullptr;
   }
-  return m_wellInfoLocationDao;
 }
-
-QSharedPointer<WellInfoSurveyInfoDao> ABMDaoLib::getWellInfoSurveyInfoDao()
-{
-  if(m_wellInfoSurveyInfoDao.isNull()){
-    m_wellInfoSurveyInfoDao = QSharedPointer<WellInfoSurveyInfoDao>(new WellInfoSurveyInfoDao());
-  }
-  return m_wellInfoSurveyInfoDao;
-}
-
-QSharedPointer<WellInfoPersonnelDao> ABMDaoLib::getWellInfoPersonnelDao()
-{
-  if(m_wellInfoPersonnelDao.isNull()){
-    m_wellInfoPersonnelDao = QSharedPointer<WellInfoPersonnelDao>(new WellInfoPersonnelDao());
-  }
-  return m_wellInfoPersonnelDao;
-}
-
-QSharedPointer<WellInfoFormationDao> ABMDaoLib::getWellInfoFormationDao()
-{
-  if(m_wellInfoFormationDao.isNull()){
-    m_wellInfoFormationDao = QSharedPointer<WellInfoFormationDao>(new WellInfoFormationDao());
-  }
-  return m_wellInfoFormationDao;
-}
-
-QSharedPointer<WellInfoMatchedSystemsTrackingDao> ABMDaoLib::getWellInfoMatchedSystemsTrackingDao()
-{
-  if(m_wellInfoMatchedSystemsTrackingDao.isNull()){
-    m_wellInfoMatchedSystemsTrackingDao = QSharedPointer<WellInfoMatchedSystemsTrackingDao>(new WellInfoMatchedSystemsTrackingDao());
-  }
-  return m_wellInfoMatchedSystemsTrackingDao;
-}
-
-QSharedPointer<RunInfoGeneralDao> ABMDaoLib::getRunInfoGeneralDao()
-{
-  if(m_runInfoGeneralDao.isNull()){
-    m_runInfoGeneralDao = QSharedPointer<RunInfoGeneralDao>(new RunInfoGeneralDao());
-  }
-  return m_runInfoGeneralDao;
-}
-
-QSharedPointer<RunInfoReliabilityDao> ABMDaoLib::getRunInfoReliabilityDao()
-{
-  if(m_runInfoReliabilityDao.isNull()){
-    m_runInfoReliabilityDao = QSharedPointer<RunInfoReliabilityDao>(new RunInfoReliabilityDao());
-  }
-  return m_runInfoReliabilityDao;
-}
-
-QSharedPointer<RunInfoMWDStatsDao> ABMDaoLib::getRunInfoMWDStatsDao()
-{
-  if(m_runInfoMWDStatsDao.isNull()){
-    m_runInfoMWDStatsDao = QSharedPointer<RunInfoMWDStatsDao>(new RunInfoMWDStatsDao());
-  }
-  return m_runInfoMWDStatsDao;
-}
-
-QSharedPointer<RunInfoMudStatsDao> ABMDaoLib::getRunInfoMudStatsDao()
-{
-  if(m_runInfoMudStatsDao.isNull()){
-    m_runInfoMudStatsDao = QSharedPointer<RunInfoMudStatsDao>(new RunInfoMudStatsDao());
-  }
-  return m_runInfoMudStatsDao;
-}
-
-QSharedPointer<RunInfoDrillStatsDao> ABMDaoLib::getRunInfoDrillStatsDao()
-{
-  if(m_runInfoDrillStatsDao.isNull()){
-    m_runInfoDrillStatsDao = QSharedPointer<RunInfoDrillStatsDao>(new RunInfoDrillStatsDao());
-  }
-  return m_runInfoDrillStatsDao;
-}
-
-QSharedPointer<RunInfoMatchedSystemsTrackingDao> ABMDaoLib::getRunInfoMatchedSystemsTrackingDao()
-{
-  if(m_runInfoMatchedSystemsTrackingDao.isNull()){
-    m_runInfoMatchedSystemsTrackingDao = QSharedPointer<RunInfoMatchedSystemsTrackingDao>(new RunInfoMatchedSystemsTrackingDao());
-  }
-  return m_runInfoMatchedSystemsTrackingDao;
-}
-
-QSharedPointer<RunInfoDesDao> ABMDaoLib::getRunInfoDesDao()
-{
-  if(m_runInfoDesDao.isNull()){
-    m_runInfoDesDao = QSharedPointer<RunInfoDesDao>(new RunInfoDesDao());
-  }
-  return m_runInfoDesDao;
-}
-
-QSharedPointer<ToolParametersDao> ABMDaoLib::getToolParametersDao()
-{
-  if(m_toolParametersDao.isNull()){
-    m_toolParametersDao = QSharedPointer<ToolParametersDao>(new ToolParametersDao());
-  }
-  return m_toolParametersDao;
-}
-
-QSharedPointer<ABIDao> ABMDaoLib::getAbiDao()
-{
-  if(m_abiDao.isNull()){
-    m_abiDao = QSharedPointer<ABIDao>(new ABIDao());
-  }
-  return m_abiDao;
-}
-
-
-QSharedPointer<DGRDao> ABMDaoLib::getDgrDao()
-{
-  if(m_dgrDao.isNull()){
-    m_dgrDao = QSharedPointer<DGRDao>(new DGRDao());
-  }
-  return m_dgrDao;
-}
-
-QSharedPointer<HCIMDao> ABMDaoLib::getHcimDao()
-{
-  if(m_hcimDao.isNull()){
-    m_hcimDao = QSharedPointer<HCIMDao>(new HCIMDao());
-  }
-  return m_hcimDao;
-}
-
-QSharedPointer<PCDDao> ABMDaoLib::getPcdDao()
-{
-  if(m_pcdDao.isNull()){
-    m_pcdDao = QSharedPointer<PCDDao>(new PCDDao());
-  }
-  return m_pcdDao;
-}
-
-QSharedPointer<PosPulserDao> ABMDaoLib::getPosPulserDao()
-{
-  if(m_posPulserDao.isNull()){
-    m_posPulserDao = QSharedPointer<PosPulserDao>(new PosPulserDao());
-  }
-  return m_posPulserDao;
-}
-

@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 **                                                                        **
 **  QCustomPlot, an easy to use, modern plotting widget for Qt            **
 **  Copyright (C) 2011-2021 Emanuel Eichhammer                            **
@@ -2285,6 +2285,8 @@ public:
   QList<QCPAbstractPlottable*> plottables() const;
   QList<QCPGraph*> graphs() const;
   QList<QCPAbstractItem*> items() const;
+
+  QList<double> getTicksPos() const;
   
   static AxisType marginSideToAxisType(QCP::MarginSide side);
   static Qt::Orientation orientation(AxisType type) { return type==atBottom || type==atTop ? Qt::Horizontal : Qt::Vertical; }
@@ -2427,6 +2429,7 @@ public:
   QVector<double> subTickPositions;
   QVector<double> tickPositions;
   QVector<QString> tickLabels;
+  QList<double> ticksPos;
   
 protected:
   struct CachedLabel

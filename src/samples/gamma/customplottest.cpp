@@ -207,6 +207,40 @@ void CustomPlotTest::rangeUpdate(int min, int max) {
   }
   QCustomPlot *customPlot = ui->widget_cus;
   customPlot->replot();
+
+  updateTicks();
+}
+
+void CustomPlotTest::updateTicks()
+{
+  int x = getFirstChartWidth();
+
+  QList<double> ticksPos = wideAxisRectLeft->axis(QCPAxis::atRight)->getTicksPos();
+  QVector<double> tickLabels = wideAxisRectLeft->axis(QCPAxis::atRight)->tickVector();
+
+  while(m_labelList.count() < ticksPos.count()) {
+    QLabel* label = new QLabel("Test",ui->widget_cus);
+    label->setAlignment(Qt::AlignCenter);
+    m_labelList.append(label);
+  }
+
+  while(m_labelList.count() > ticksPos.count()) {
+    QLabel* label = m_labelList.takeLast();
+    label->deleteLater();
+  }
+
+  for (int i = 0; i < m_labelList.size(); ++i) {
+    QLabel* label = m_labelList[i];
+    label->setText(QString::number(tickLabels[i]));
+    label->resize(46,label->height());
+    label->setGeometry(x,ticksPos[i]-label->height()/2,46,label->height());
+    label->show();
+  }
+}
+
+void CustomPlotTest::resizeEvent(QResizeEvent *)
+{
+  this->updateTicks();
 }
 
 void CustomPlotTest::onRangeChangedLow(int aMin) {

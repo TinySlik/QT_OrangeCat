@@ -9475,6 +9475,11 @@ QList<QCPAbstractItem*> QCPAxis::items() const
   return result;
 }
 
+QList<double> QCPAxis::getTicksPos() const
+{
+  return mAxisPainter->ticksPos;
+}
+
 /*!
   Transforms a margin side to the logically corresponding axis type. (QCP::msLeft to
   QCPAxis::atLeft, QCP::msRight to QCPAxis::atRight, etc.)
@@ -10005,8 +10010,11 @@ void QCPAxisPainterPrivate::draw(QCPPainter *painter)
         painter->drawLine(QLineF(tickPos+xCor, origin.y()-tickLengthOut*tickDir+yCor, tickPos+xCor, origin.y()+tickLengthIn*tickDir+yCor));
     } else
     {
-      foreach (double tickPos, tickPositions)
+      ticksPos.clear();
+      foreach (double tickPos, tickPositions) {
+        ticksPos << tickPos+yCor;
         painter->drawLine(QLineF(origin.x()-tickLengthOut*tickDir+xCor, tickPos+yCor, origin.x()+tickLengthIn*tickDir+xCor, tickPos+yCor));
+      }
     }
   }
   

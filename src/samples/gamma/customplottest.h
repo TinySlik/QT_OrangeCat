@@ -49,6 +49,11 @@ public:
   void rangeUpdate(int min, int max);
   void setSlider(RangeSlider *slider_) {slider = slider_;}
 
+  void updateTicks();
+
+protected:
+  void resizeEvent(QResizeEvent *event) override;
+
 public slots:
   void updateIndex();
   void scroll(int index);
@@ -88,6 +93,8 @@ private:
   int rangeMin;
   int rangeMax;
   RangeSlider *slider;
+
+  QList<QLabel*> m_labelList;
 };
 
 #endif // CUSTOMPLOTTEST_H

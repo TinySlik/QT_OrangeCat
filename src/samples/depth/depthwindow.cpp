@@ -37,10 +37,6 @@ DepthWindow::DepthWindow(QWidget *parent) :
   std::string well_name = "well001";
   std::string run_name = "run0100";
 
-  if (ABMDaoLib::createDataBase("bingo")) {
-    LOG(INFO) << "bingo";
-  }
-
   bool res = ABMDaoLib::getInstance()->open(well_name.c_str(), run_name.c_str());
   if (res) LOG(INFO) << "well: " << well_name << "--run: " << run_name << " success";
 

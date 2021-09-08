@@ -52,13 +52,13 @@ const configuru::Config qvalToConfig(const QVariant &a) {
     res = std::string(a.toString().toLatin1().data());
   } else if (a.type() == QVariant::Double) {
     res = a.toDouble();
-  } else if (a.type() == QMetaType::QDateTime) {
+  } else if (a.type() == QVariant::DateTime) {
     res = std::string(a.toString().toLatin1().data());
   }
   return res;
 }
 
-const SqlDataType configToForm(const configuru::Config &a) {
+SqlDataType configToForm(const configuru::Config &a) {
   if(a.is_string()) {
     SqlDataType res = SqlDataTypeUninit;
     auto form = std::string(a);

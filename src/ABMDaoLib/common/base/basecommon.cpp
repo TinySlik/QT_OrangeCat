@@ -1,20 +1,17 @@
 ﻿#include "basecommon.h"
 
-BaseCommon::BaseCommon(QObject *parent) : QObject(parent)
-{
-
+BaseCommon::BaseCommon(QObject *parent) : QObject(parent) {
+  // todo
 }
 
-QMap<QString, QVariant> BaseCommon::toMap()
-{
+QMap<QString, QVariant> BaseCommon::toMap() {
 //  WellInfoGeneral classTestClass;
   QMap<QString, QVariant> map;
 
   const QMetaObject *theMetaObject = this->metaObject();//定义一个QMetaObject对象指针，用来获取类classTestClass的相关信息
   int nPropertyCount = theMetaObject->propertyCount();
 
-  for(int nPropertyIndex = 1;nPropertyIndex < nPropertyCount;nPropertyIndex++)
-  {
+  for(int nPropertyIndex = 1;nPropertyIndex < nPropertyCount;nPropertyIndex++) {
       QMetaProperty property = theMetaObject->property(nPropertyIndex);
 //      qDebug() <<"name: " <<property.name()
 //               <<"typeName: " <<property.typeName()
@@ -23,7 +20,6 @@ QMap<QString, QVariant> BaseCommon::toMap()
 //               <<"signature: " <<property.userType()
 //               << this->property(property.name())
 //               << "\n";
-
       map[property.name()] = this->property(property.name());
   }
   return map;

@@ -7,8 +7,7 @@
 #include <QDebug>
 
 
-class BaseCommon : public QObject
-{
+class BaseCommon : public QObject {
   Q_OBJECT
 public:
   explicit BaseCommon(QObject *parent = nullptr);

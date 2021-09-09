@@ -2,11 +2,8 @@
 #include "common/log/easylogging++.h"
 #include <memory>
 #include <QtCore/qglobal.h>
-
 #include "common/mysql/SqlUtils.h"
-
 #pragma execution_character_set("utf-8")
-//初始化easilogging
 INITIALIZE_EASYLOGGINGPP
 
 class ABMDaoLibPrivate {
@@ -31,7 +28,6 @@ class ABMDaoLibPrivate {
   std::shared_ptr<SqlUtils> m_wellUtils;
   std::shared_ptr<SqlUtils> m_runUtils;
 };
-
 
 ABMDaoLib *ABMDaoLib::getInstance() {
   static ABMDaoLib *instance = nullptr;

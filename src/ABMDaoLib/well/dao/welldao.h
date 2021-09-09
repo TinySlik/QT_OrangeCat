@@ -4,7 +4,7 @@
 
 #include "../entity/wellinfodepthstatus.h"
 #include "../../common/mysql/SqlUtils.h"
-#include "../../ABMDaoLib_global.h"
+#include "../../windllsupport.h"
 #include <vector>
 #include <memory>
 #include <mutex>
@@ -57,7 +57,7 @@ if (ABMDaoLib::createDataBase("bingo")) {
 }
 */
 
-class ABMDAOLIB_EXPORT WellDaoJsonInterface: public jsonInterface, public std::enable_shared_from_this<WellDaoJsonInterface> {
+class CLASS_DECLSPEC WellDaoJsonInterface: public jsonInterface, public std::enable_shared_from_this<WellDaoJsonInterface> {
 
  public:
   virtual ~WellDaoJsonInterface();

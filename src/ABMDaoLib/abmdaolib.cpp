@@ -1,10 +1,37 @@
 ﻿#include "abmdaolib.h"
 #include "common/log/easylogging++.h"
 #include <memory>
+#include <QtCore/qglobal.h>
+
+#include "common/mysql/SqlUtils.h"
 
 #pragma execution_character_set("utf-8")
 //初始化easilogging
 INITIALIZE_EASYLOGGINGPP
+
+class ABMDaoLibPrivate {
+ public:
+  ~ABMDaoLibPrivate() {
+  }
+  ABMDaoLibPrivate() {
+  }
+  std::shared_ptr<SqlUtils> getSqlUtils() const;
+  void setSqlUtils(const std::shared_ptr<SqlUtils> &sqlUtils);
+  std::shared_ptr<WellDaoJsonInterface> getJsonInterface();
+  std::shared_ptr<WellDaoJsonInterface> getWellJsonInterface();
+  std::shared_ptr<WellDaoJsonInterface> getRunJsonInterface();
+  bool open(const std::string well, const std::string run, const std::string userName = "root", const std::string password = "123456", const std::string host = "192.168.1.171");
+  void close();
+  std::shared_ptr<SqlUtils> getWellSqlUtils() const;
+  std::shared_ptr<SqlUtils> getRunSqlUtils() const;
+  void setRunSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils);
+  void setWellSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils);
+ private:
+  std::shared_ptr<SqlUtils> m_sqlUtils;
+  std::shared_ptr<SqlUtils> m_wellUtils;
+  std::shared_ptr<SqlUtils> m_runUtils;
+};
+
 
 ABMDaoLib *ABMDaoLib::getInstance() {
   static ABMDaoLib *instance = nullptr;
@@ -19,41 +46,58 @@ bool ABMDaoLib::createDataBase(const std::string &name) {
   return sql_->createDatabase(name);
 }
 
-ABMDaoLib::~ABMDaoLib() {
+ABMDaoLib::~ABMDaoLib(){
+  if (_impl) delete _impl;
 }
 
-ABMDaoLib::ABMDaoLib() {
+ABMDaoLib::ABMDaoLib(): _impl(nullptr)  {
+  _impl = new ABMDaoLibPrivate();
 }
 
-std::shared_ptr<SqlUtils> ABMDaoLib::getSqlUtils() const {
+std::shared_ptr<SqlUtils> ABMDaoLibPrivate::getSqlUtils() const {
   return m_sqlUtils;
 }
 
-void ABMDaoLib::setSqlUtils(const std::shared_ptr<SqlUtils> &sqlUtils) {
+void ABMDaoLibPrivate::setSqlUtils(const std::shared_ptr<SqlUtils> &sqlUtils) {
   m_sqlUtils = sqlUtils;
 }
 
-std::shared_ptr<SqlUtils> ABMDaoLib::getWellSqlUtils() const {
+std::shared_ptr<SqlUtils> ABMDaoLibPrivate::getWellSqlUtils() const {
   return m_wellUtils;
 }
 
-std::shared_ptr<SqlUtils> ABMDaoLib::getRunSqlUtils() const {
+std::shared_ptr<SqlUtils> ABMDaoLibPrivate::getRunSqlUtils() const {
   return m_runUtils;
 }
 
-void ABMDaoLib::setRunSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils) {
+void ABMDaoLibPrivate::setRunSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils) {
   m_runUtils = sqlUtils;
 }
 
-void ABMDaoLib::setWellSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils) {
+void ABMDaoLibPrivate::setWellSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils) {
   m_wellUtils = sqlUtils;
 }
 
+
 std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getJsonInterface() {
+  return _impl->getJsonInterface();
+}
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getWellJsonInterface() {
+  return _impl->getWellJsonInterface();
+}
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getRunJsonInterface() {
+  return _impl->getRunJsonInterface();
+}
+bool ABMDaoLib::open(const std::string well, const std::string run, const std::string userName, const std::string password, const std::string host) {
+  return _impl->open(well, run, userName, password, host);
+}
+
+
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLibPrivate::getJsonInterface() {
   return getWellJsonInterface();
 }
 
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getRunJsonInterface() {
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLibPrivate::getRunJsonInterface() {
   static std::shared_ptr<WellDaoJsonInterface> jsonDaoInterface = nullptr;
   if(jsonDaoInterface == nullptr) {
     jsonDaoInterface = WellDaoJsonInterface::create(m_runUtils);
@@ -61,7 +105,7 @@ std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getRunJsonInterface() {
   return jsonDaoInterface;
 }
 
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getWellJsonInterface() {
+std::shared_ptr<WellDaoJsonInterface> ABMDaoLibPrivate::getWellJsonInterface() {
   static std::shared_ptr<WellDaoJsonInterface> jsonDaoInterface = nullptr;
   if(jsonDaoInterface == nullptr) {
     jsonDaoInterface = WellDaoJsonInterface::create(m_wellUtils);
@@ -69,7 +113,7 @@ std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getWellJsonInterface() {
   return jsonDaoInterface;
 }
 
-bool ABMDaoLib::open(const std::string well, const std::string run, const std::string userName, const std::string password, const std::string host) {
+bool ABMDaoLibPrivate::open(const std::string well, const std::string run, const std::string userName, const std::string password, const std::string host) {
   m_wellUtils = SqlUtils::create(SqlLocationType::SqlWell, well.c_str(), userName.c_str(), password.c_str(), host.c_str());
   m_runUtils = SqlUtils::create(SqlLocationType::SqlRun, (well + "_" + run).c_str(), userName.c_str(), password.c_str(), host.c_str());
   bool res = true;
@@ -80,16 +124,4 @@ bool ABMDaoLib::open(const std::string well, const std::string run, const std::s
       res &= m_runUtils->connectDatabase();
   else return false;
   return res;
-}
-
-void ABMDaoLib::close() {
-  if (m_wellUtils) {
-    m_wellUtils->disconnect();
-    m_wellUtils = nullptr;
-  }
-
-  if (m_runUtils) {
-    m_runUtils->disconnect();
-    m_runUtils = nullptr;
-  }
 }

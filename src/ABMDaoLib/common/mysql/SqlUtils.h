@@ -1,7 +1,6 @@
 ﻿#ifndef SQLUTILS_H
 #define SQLUTILS_H
 
-#include "../../ABMDaoLib_global.h"
 #include <QObject>
 #include <QVector>
 #include <QMap>
@@ -13,6 +12,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QDebug>
+#include "../../windllsupport.h"
 
 /**
  * @brief The SQL_PAGE struct 分页查询返回结构体
@@ -62,7 +62,7 @@ enum SqlLikeType{
 Q_DECLARE_METATYPE(SqlLikeType)
 
 
-struct ABMDAOLIB_EXPORT SqlCondition{
+struct CLASS_DECLSPEC SqlCondition{
   SqlOperator sqlOperator;  //操作符
   QString     key;          //字段名
   QVariant    value;        //值

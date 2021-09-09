@@ -9,9 +9,9 @@
 #include "dialogdepthconfiguration.h"
 #include "dialogactivatysettings.h"
 #include "dialogdepthcalibration.h"
+#include "parameterserver.h"
 #include "dialogdepthctrl.h"
 #include "abmdaolib.h"
-#include "parameterserver.h"
 #include "easylogging++.h"
 #include <QSql>
 #include <QToolBar>
@@ -39,8 +39,6 @@ DepthWindow::DepthWindow(QWidget *parent) :
 
   bool res = ABMDaoLib::getInstance()->open(well_name.c_str(), run_name.c_str());
   if (res) LOG(INFO) << "well: " << well_name << "--run: " << run_name << " success";
-
-//  ABMDaoLib::getInstance()->getRunJsonInterface();
 
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql_table_current = {{"target_table", {
@@ -118,7 +116,6 @@ ui->y->setText(QString::number(static_cast<double>(cur_##y)));
 DepthWindow::~DepthWindow() {
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
   ctr.erase("Depth");
-  ABMDaoLib::getInstance()->close();
   delete ui;
 }
 

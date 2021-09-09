@@ -17,7 +17,7 @@
 #define WINDLLSUPPORT_H
 
 #ifdef OS_WIN
-#ifdef _WIN_PARAM_SERV_EXPORTING
+#ifdef _WIN_ADBM_EXPORTING
 #define CLASS_DECLSPEC __declspec(dllexport)
 #else
 #define CLASS_DECLSPEC __declspec(dllimport)

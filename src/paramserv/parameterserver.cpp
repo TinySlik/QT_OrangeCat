@@ -123,6 +123,39 @@ static char cache[CACHE_MAX_SIZE];
 *exp ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+configuru::Config &ParameterServer::GetCfgStatusRoot() {
+  if (_root_nodes.size() == 0) {
+    _cfgRoot.judge_or_create_key("dev_status");
+    return _cfgRoot["dev_status"];
+  } else {
+    return _root_nodes[_index].config.judge_with_create_key("dev_status");
+  }
+}
+configuru::Config &ParameterServer::GetCfgRoot() {
+  if (_root_nodes.size() == 0) {
+    return _cfgRoot;
+  } else {
+    return _root_nodes[_index].config;
+  }
+}
+configuru::Config &ParameterServer::GetCfgCtrlRoot() {
+  if (_root_nodes.size() == 0) {
+    _cfgRoot.judge_or_create_key("dev_ctrl");
+    return _cfgRoot["dev_ctrl"];
+  } else {
+    return _root_nodes[_index].config.judge_with_create_key("dev_ctrl");
+  }
+}
+ParameterServer *ParameterServer::instance() {
+  static ParameterServer *_this = nullptr;
+  if (_this == nullptr) {
+    _this = new ParameterServer;
+    _this->init();
+    _this->start_server();
+  }
+  return _this;
+}
+
 bool ParameterServer::CreateNewRoot(const std::string &name,
     configuru::Config &&config) {
   if (_root_nodes.size() > MAX_ROOT_NODE_COUNT)

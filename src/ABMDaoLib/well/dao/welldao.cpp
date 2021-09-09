@@ -88,7 +88,7 @@ WellDaoJsonInterface::~WellDaoJsonInterface(){
 std::shared_ptr<WellDaoJsonInterface> WellDaoJsonInterface::create(std::shared_ptr<SqlUtils> util) {
   std::shared_ptr<WellDaoJsonInterface> res(new WellDaoJsonInterface());
   if (util == nullptr) {
-    res->_util = ABMDaoLib::getInstance()->getSqlUtils();
+    res->_util = nullptr;
   } else {
     res->_util = util;
   }

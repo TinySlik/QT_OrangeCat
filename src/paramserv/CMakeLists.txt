@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 include_directories(../log)
 
-add_definitions(-D_WIN_EXPORTING)
+add_definitions(-D_WIN_PARAM_SERV_EXPORTING)
 
 add_library(${PROJECT_NAME}  SHARED
                          mongoose.h

@@ -283,7 +283,11 @@ DisplayWidget::DisplayWidget(QWidget *parent)
 
   QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
   if (file_testcase.exists()) {
-    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", configuru::JSON)["gamma_test"];
+    auto jsonconfig = configuru::make_json_options();
+    jsonconfig.single_line_comments     = true;
+    jsonconfig.block_comments           = true;
+    jsonconfig.nesting_block_comments   = true;
+    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", jsonconfig)["gamma_test"];
     cfg_local << cfg;
     LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
   }

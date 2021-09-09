@@ -14,9 +14,9 @@ class ABMDaoLibPrivate {
   }
   std::shared_ptr<SqlUtils> getSqlUtils() const;
   void setSqlUtils(const std::shared_ptr<SqlUtils> &sqlUtils);
-  std::shared_ptr<WellDaoJsonInterface> getJsonInterface();
-  std::shared_ptr<WellDaoJsonInterface> getWellJsonInterface();
-  std::shared_ptr<WellDaoJsonInterface> getRunJsonInterface();
+  std::shared_ptr<WellDaoInterface> getJsonInterface();
+  std::shared_ptr<WellDaoInterface> getWellJsonInterface();
+  std::shared_ptr<WellDaoInterface> getRunJsonInterface();
   bool open(const std::string well, const std::string run, const std::string userName = "root", const std::string password = "123456", const std::string host = "192.168.1.171");
   void close();
   std::shared_ptr<SqlUtils> getWellSqlUtils() const;
@@ -75,13 +75,13 @@ void ABMDaoLibPrivate::setWellSqlUtils(const std::shared_ptr<SqlUtils> sqlUtils)
 }
 
 
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getJsonInterface() {
+std::shared_ptr<WellDaoInterface> ABMDaoLib::getJsonInterface() {
   return _impl->getJsonInterface();
 }
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getWellJsonInterface() {
+std::shared_ptr<WellDaoInterface> ABMDaoLib::getWellJsonInterface() {
   return _impl->getWellJsonInterface();
 }
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLib::getRunJsonInterface() {
+std::shared_ptr<WellDaoInterface> ABMDaoLib::getRunJsonInterface() {
   return _impl->getRunJsonInterface();
 }
 bool ABMDaoLib::open(const std::string well, const std::string run, const std::string userName, const std::string password, const std::string host) {
@@ -89,22 +89,22 @@ bool ABMDaoLib::open(const std::string well, const std::string run, const std::s
 }
 
 
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLibPrivate::getJsonInterface() {
+std::shared_ptr<WellDaoInterface> ABMDaoLibPrivate::getJsonInterface() {
   return getWellJsonInterface();
 }
 
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLibPrivate::getRunJsonInterface() {
-  static std::shared_ptr<WellDaoJsonInterface> jsonDaoInterface = nullptr;
+std::shared_ptr<WellDaoInterface> ABMDaoLibPrivate::getRunJsonInterface() {
+  static std::shared_ptr<WellDaoInterface> jsonDaoInterface = nullptr;
   if(jsonDaoInterface == nullptr) {
-    jsonDaoInterface = WellDaoJsonInterface::create(m_runUtils);
+    jsonDaoInterface = WellDaoInterface::create(m_runUtils);
   }
   return jsonDaoInterface;
 }
 
-std::shared_ptr<WellDaoJsonInterface> ABMDaoLibPrivate::getWellJsonInterface() {
-  static std::shared_ptr<WellDaoJsonInterface> jsonDaoInterface = nullptr;
+std::shared_ptr<WellDaoInterface> ABMDaoLibPrivate::getWellJsonInterface() {
+  static std::shared_ptr<WellDaoInterface> jsonDaoInterface = nullptr;
   if(jsonDaoInterface == nullptr) {
-    jsonDaoInterface = WellDaoJsonInterface::create(m_wellUtils);
+    jsonDaoInterface = WellDaoInterface::create(m_wellUtils);
   }
   return jsonDaoInterface;
 }

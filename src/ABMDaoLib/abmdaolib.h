@@ -12,6 +12,10 @@ class ABMDaoLibPrivate;
 #define ABMDAOLIB_HOST "192.168.1.171"
 
 /** dao interface demo
+ *
+
+#define CONFIGURU_IMPLEMENTATION 1 // call in cpp just once
+#include "configuru.hpp"
 
 // find
 auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
@@ -62,9 +66,9 @@ class CLASS_DECLSPEC ABMDaoLib {
   static bool createDataBase(const std::string &name);
   ~ABMDaoLib();
   ABMDaoLib();
-  std::shared_ptr<WellDaoJsonInterface> getJsonInterface();
-  std::shared_ptr<WellDaoJsonInterface> getWellJsonInterface();
-  std::shared_ptr<WellDaoJsonInterface> getRunJsonInterface();
+  std::shared_ptr<WellDaoInterface> getJsonInterface();
+  std::shared_ptr<WellDaoInterface> getWellJsonInterface();
+  std::shared_ptr<WellDaoInterface> getRunJsonInterface();
   bool open(const std::string well, const std::string run,
             const std::string userName = ABMDAOLIB_USER_NAME,
             const std::string password = ABMDAOLIB_PASSWORD,

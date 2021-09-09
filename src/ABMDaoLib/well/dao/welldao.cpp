@@ -80,14 +80,14 @@ SqlDataType configToForm(const configuru::Config &a) {
   }
 }
 
-WellDaoJsonInterface::WellDaoJsonInterface(){
+WellDaoInterface::WellDaoInterface(){
 }
 
-WellDaoJsonInterface::~WellDaoJsonInterface(){
+WellDaoInterface::~WellDaoInterface(){
 }
 
-std::shared_ptr<WellDaoJsonInterface> WellDaoJsonInterface::create(std::shared_ptr<SqlUtils> util) {
-  std::shared_ptr<WellDaoJsonInterface> res(new WellDaoJsonInterface());
+std::shared_ptr<WellDaoInterface> WellDaoInterface::create(std::shared_ptr<SqlUtils> util) {
+  std::shared_ptr<WellDaoInterface> res(new WellDaoInterface());
   if (util == nullptr) {
     res->_util = nullptr;
   } else {
@@ -96,7 +96,7 @@ std::shared_ptr<WellDaoJsonInterface> WellDaoJsonInterface::create(std::shared_p
   return res;
 }
 
-bool WellDaoJsonInterface::add(const std::string &json) {
+bool WellDaoInterface::add(const std::string &json) {
   auto data = configuru::parse_string(json.c_str(), configuru::JSON, "null");
   bool res = false;
   _mutex.lock();
@@ -115,7 +115,7 @@ bool WellDaoJsonInterface::add(const std::string &json) {
   return res;
 }
 
-bool WellDaoJsonInterface::createTable(const std::string &content) {
+bool WellDaoInterface::createTable(const std::string &content) {
   auto data = configuru::parse_string(content.c_str(), configuru::JSON, "null");
   bool res = false;
   _mutex.lock();
@@ -136,11 +136,11 @@ bool WellDaoJsonInterface::createTable(const std::string &content) {
   return res;
 }
 
-bool WellDaoJsonInterface::createDatabase(const std::string &name) {
+bool WellDaoInterface::createDatabase(const std::string &name) {
   return _util->createDatabase(name);
 }
 
-bool WellDaoJsonInterface::update(const std::string &json) {
+bool WellDaoInterface::update(const std::string &json) {
   auto data = configuru::parse_string(json.c_str(), configuru::JSON, "null");
   _mutex.lock();
   bool res = false;
@@ -168,7 +168,7 @@ bool WellDaoJsonInterface::update(const std::string &json) {
   return res;
 }
 
-std::string WellDaoJsonInterface::find(const std::string &json) {
+std::string WellDaoInterface::find(const std::string &json) {
   auto data = configuru::parse_string(json.c_str(), configuru::JSON, "null");
   _mutex.lock();
   configuru::Config res = configuru::Config::object();

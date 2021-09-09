@@ -3,12 +3,12 @@
 #include "jsoninterface.h"
 
 #include "../entity/wellinfodepthstatus.h"
-#include "../../common/mysql/SqlUtils.h"
 #include "../../windllsupport.h"
 #include <vector>
 #include <memory>
 #include <mutex>
 #include <string>
+class SqlUtils;
 
 class CLASS_DECLSPEC WellDaoJsonInterface: public jsonInterface, public std::enable_shared_from_this<WellDaoJsonInterface> {
 

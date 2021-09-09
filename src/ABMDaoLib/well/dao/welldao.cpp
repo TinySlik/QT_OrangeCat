@@ -1,13 +1,13 @@
 #include "welldao.h"
 #define CONFIGURU_IMPLEMENTATION 1
 #include "configuru.hpp"
-
+#include <QVariant>
 //#include "../entity/wellinfodepthstatus.h"
+#include "../../common/mysql/SqlUtils.h"
 #include <iostream>
 #include <string>
 #include "../../abmdaolib.h"
 #include "common/log/easylogging++.h"
-
 
 QVariant configToQval(const configuru::Config &a) {
   QVariant res = NULL;
@@ -26,6 +26,7 @@ QVariant configToQval(const configuru::Config &a) {
   }
   return res;
 }
+
 const configuru::Config qvalToConfig(const QVariant &a) {
 /**
   Bool = QMetaType::Bool,
@@ -153,7 +154,7 @@ bool WellDaoJsonInterface::update(const std::string &json) {
     QVector<SqlCondition> conditions;
     QMap<QString, QVariant> resultData;
     for (auto& p : data["index_val"].as_object()) {
-        auto st = (std::string)(p.key());
+        auto st = static_cast<std::string>(p.key());
         QString a = st.c_str();
         conditions.append(SqlCondition(SqlEqual, a, configToQval(p.value())));
     }
@@ -181,7 +182,7 @@ std::string WellDaoJsonInterface::find(const std::string &json) {
     QMap<QString,QVariant> resultData;
     for (auto& p : local_table.as_object()) {
       if (p.key() == "name") continue;
-      auto st = (std::string)(p.key());
+      auto st = static_cast<std::string>(p.key());
       QString a = st.c_str();
       conditions.append(SqlCondition(SqlEqual, a, configToQval(p.value())));
     }

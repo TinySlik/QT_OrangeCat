@@ -11,7 +11,6 @@ class ABMDaoLibPrivate;
 #define ABMDAOLIB_PASSWORD "123456"
 #define ABMDAOLIB_HOST "192.168.1.171"
 
-
 /** dao interface demo
 
 // find
@@ -31,7 +30,6 @@ configuru::Config updateval = {
   {"update_val", res},
   {"index_val", {{"wellId", res["wellId"]}}}
 };
-
 jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
 
 // insert
@@ -41,7 +39,6 @@ configuru::Config insertval = {
   {"insert_val", res},
 };
 jsonInterface->add(dump_string(insertval, configuru::JSON).c_str());
-
 
 // create table
 configuru::Config cfg_create_table_sample = {

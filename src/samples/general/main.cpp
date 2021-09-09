@@ -29,6 +29,15 @@
 INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char **argv) {
+  el::Configurations defaultConf;
+  defaultConf.setToDefault();
+
+  defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
+  defaultConf.setGlobally(el::ConfigurationType::Filename, "display.log");
+  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
+  // default logger uses default configurations
+  el::Loggers::reconfigureLogger("default", defaultConf);
+
   ParameterServer::instance()->CreateNewRoot("base", {
                                                   {"dev_ctrl", {
                                                   }},

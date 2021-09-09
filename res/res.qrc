@@ -25,5 +25,6 @@
         <file>svg/wait.svg</file>
         <file>svg/what.svg</file>
         <file>svg/wrong.svg</file>
+        <file>conf/ezlog.conf</file>
     </qresource>
 </RCC>

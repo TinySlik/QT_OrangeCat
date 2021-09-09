@@ -453,6 +453,14 @@ ParameterServer::ParameterServer() :
 m_ServerThreadContext(nullptr),
 m_ServerThread(nullptr),
 _index(0) {
+  el::Configurations defaultConf;
+  defaultConf.setToDefault();
+
+  defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
+  defaultConf.setGlobally(el::ConfigurationType::Filename, "param_server.log");
+  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
+  // default logger uses default configurations
+  el::Loggers::reconfigureLogger("default", defaultConf);
   m_ServerThreadContext = std::make_shared<ServerThread>(0);
   m_ServerThread = std::make_shared<Thread>(m_ServerThreadContext);
 #ifdef WITH_HTTP_PAGE

@@ -1,4 +1,7 @@
 ﻿#include "SqlUtils.h"
+#include "easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
 
 SqlUtils::SqlUtils(QString databaseName,QString userName,QString password,
                    QString host,int port,QObject *parent) :
@@ -67,7 +70,7 @@ SqlUtils::~SqlUtils()
 bool SqlUtils::connectDatabase()
 {
   if (!m_database.open()){
-    qDebug() << "Error: Failed to connect database." << m_database.lastError();
+//    LOG(ERROR) << "Error: Failed to connect database." << std::string(m_database.lastError().text().toLatin1().data());
     return false;
   } else {
     m_sqlQuery = new QSqlQuery(m_database);
@@ -336,12 +339,12 @@ QString SqlUtils::conditionsToString(const QVector<SqlCondition> &conditions)
 
 bool SqlUtils::execSql(const QString &sqlStr)
 {
-  qDebug() << sqlStr;
+  LOG(INFO) << std::string(sqlStr.toLatin1().data());
   m_sqlQuery->prepare(sqlStr);
 
   if(!m_sqlQuery->exec())
   {
-    qDebug() << "Error: Fail to create table." << m_sqlQuery->lastError();
+    LOG(ERROR) << "Error: Fail to create table." << std::string(m_sqlQuery->lastError().text().toLatin1().data());
     return false;
   }
   return true;
@@ -370,7 +373,7 @@ QString SqlUtils::judgeUpdateValue(QString key,QVariant value)
     switch (value.type()) {
       case QVariant::String:{
         if(value.isNull()){
-//          qDebug() << key;
+          LOG(WARNING) << std::string(key.toLatin1().data());
           return nullptr;
         }
         return QString(" `%1` = '%2' ").arg(key).arg(value.toString());

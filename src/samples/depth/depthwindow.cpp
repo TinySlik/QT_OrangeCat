@@ -127,6 +127,7 @@ void DepthWindow::updateFromDao() {
       {"wellId", targetTable.c_str()}
     }}
   };
+
   auto js = jsonInterface->find(dump_string(cfg, configuru::JSON).c_str());
   auto ctr = ParameterServer::instance()->GetCfgCtrlRoot();
   auto stu = ParameterServer::instance()->GetCfgStatusRoot();

@@ -123,7 +123,7 @@ TiniMsgDecoderv1::~TiniMsgDecoderv1() {
 }
 
 bool TiniMsgDecoderv1::decode(const bool &value) {
-  data_.push_back(value? '1' : '0');
+  data_.push_back(value ? '1' : '0');
   if (data_.size() > MAX_BIT_COUNT) {
     LOG(ERROR) << "data out of range";
     data_.clear();

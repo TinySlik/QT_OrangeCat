@@ -1,7 +1,7 @@
 QT += core gui sql
 
 TEMPLATE = lib
-DEFINES += ABMDAOLIB_LIBRARY
+DEFINES += _WIN_ADBM_EXPORTING
 
 CONFIG += c++11
 
@@ -54,42 +54,13 @@ SOURCES += \
     common/json/jsonutils.cpp \
     common/log/easylogging++.cc \
     common/mysql/SqlUtils.cpp \
-    pulse/dao/pospulserdao.cpp \
-    pulse/entity/pospulser.cpp \
-    runinfo/dao/runinfodesdao.cpp \
-    runinfo/dao/runinfodrillstatsdao.cpp \
-    runinfo/dao/runinfogeneraldao.cpp \
-    runinfo/dao/runinfomatchedsystemstrackingdao.cpp \
-    runinfo/dao/runinfomudstatsdao.cpp \
-    runinfo/dao/runinfomwdstatsdao.cpp \
-    runinfo/dao/runinforeliabilitydao.cpp \
-    runinfo/entity/runinfodes.cpp \
-    runinfo/entity/runinfodrillstats.cpp \
-    runinfo/entity/runinfogeneral.cpp \
-    runinfo/entity/runinfomatchedsystemstracking.cpp \
-    runinfo/entity/runinfomudstats.cpp \
-    runinfo/entity/runinfomwdstats.cpp \
-    runinfo/entity/runinforeliability.cpp \
-    well/dao/wellinfodao.cpp \
-    well/dao/wellinfodistancesdao.cpp \
-    well/dao/wellinfoformationdao.cpp \
-    well/dao/wellinfogeneraldao.cpp \
-    well/dao/wellinfolocationdao.cpp \
-    well/dao/wellinfomatchedsystemstrackingdao.cpp \
-    well/dao/wellinfopersonneldao.cpp \
-    well/dao/wellinfosurveyinfodao.cpp \
-    well/entity/wellinfo.cpp \
-    well/entity/wellinfodistances.cpp \
-    well/entity/wellinfoformation.cpp \
-    well/entity/wellinfogeneral.cpp \
-    well/entity/wellinfolocation.cpp \
-    well/entity/wellinfomatchedsystemstracking.cpp \
-    well/entity/wellinfopersonnel.cpp \
-    well/entity/wellinfosurveyinfo.cpp
+    well/dao/welldao.cpp \
+    well/dao/jsoninterface.cpp
+
 
 
 HEADERS += \
-    ABMDaoLib_global.h \
+    windllsupport.h \
     abmdaolib.h \
     common/base/basecommon.h \
     common/base/baseentity.h \
@@ -97,39 +68,9 @@ HEADERS += \
     common/json/jsonutils.h \
     common/log/easylogging++.h \
     common/mysql/SqlUtils.h \
-    pulse/dao/pospulserdao.h \
-    pulse/entity/pospulser.h \
-    runinfo/dao/runinfodesdao.h \
-    runinfo/dao/runinfodrillstatsdao.h \
-    runinfo/dao/runinfogeneraldao.h \
-    runinfo/dao/runinfomatchedsystemstrackingdao.h \
-    runinfo/dao/runinfomudstatsdao.h \
-    runinfo/dao/runinfomwdstatsdao.h \
-    runinfo/dao/runinforeliabilitydao.h \
-    runinfo/entity/runinfodes.h \
-    runinfo/entity/runinfodrillstats.h \
-    runinfo/entity/runinfogeneral.h \
-    runinfo/entity/runinfomatchedsystemstracking.h \
-    runinfo/entity/runinfomudstats.h \
-    runinfo/entity/runinfomwdstats.h \
-    runinfo/entity/runinforeliability.h \
-    well/dao/wellinfodao.h \
-    well/dao/wellinfodistancesdao.h \
-    well/dao/wellinfoformationdao.h \
-    well/dao/wellinfogeneraldao.h \
-    well/dao/wellinfolocationdao.h \
-    well/dao/wellinfomatchedsystemstrackingdao.h \
-    well/dao/wellinfopersonneldao.h \
-    well/dao/wellinfosurveyinfodao.h \
-    well/entity/wellinfo.h \
-    well/entity/wellinfodistances.h \
-    well/entity/wellinfoformation.h \
-    well/entity/wellinfogeneral.h \
-    well/entity/wellinfolocation.h \
-    well/entity/wellinfomatchedsystemstracking.h \
-    well/entity/wellinfopersonnel.h \
-    well/entity/wellinfosurveyinfo.h
-
+    well/dao/welldao.h \
+    well/dao/jsoninterface.h \
+    well/dao/configuru.hpp
 # Default rules for deployment.
 unix {
     target.path = /usr/lib

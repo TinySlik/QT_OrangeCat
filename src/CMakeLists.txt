@@ -154,53 +154,10 @@ set(SOURCE_ABMDAO_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/common/base/baseentity.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/common/file/fileutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/common/json/jsonutils.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/common/log/easylogging++.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/common/mysql/SqlUtils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/config/config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/config/dao/currentdatadao.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/config/entity/currentdata.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfodesdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfodrillstatsdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfogeneraldao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfomatchedsystemstrackingdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfomudstatsdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfomwdstatsdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinforeliabilitydao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfodes.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfodrillstats.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfogeneral.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfomatchedsystemstracking.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfomudstats.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfomwdstats.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinforeliability.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/abidao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/dgrdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/hcimdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/pcddao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/pospulserdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/toolparametersdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/abi.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/dgr.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/hcim.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/pcd.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/pospulser.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/toolparameters.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfodao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfodistancesdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfoformationdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfogeneraldao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfolocationdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfomatchedsystemstrackingdao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfopersonneldao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfosurveyinfodao.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfo.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodistances.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfoformation.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfogeneral.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfolocation.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfomatchedsystemstracking.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfopersonnel.cpp
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfosurveyinfo.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/windllsupport.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/abmdaolib.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/common/base/basecommon.h
@@ -212,48 +169,6 @@ set(SOURCE_ABMDAO_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/config/config.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/config/dao/currentdatadao.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/config/entity/currentdata.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfodesdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfodrillstatsdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfogeneraldao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfomatchedsystemstrackingdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfomudstatsdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinfomwdstatsdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/dao/runinforeliabilitydao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfodes.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfodrillstats.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfogeneral.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfomatchedsystemstracking.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfomudstats.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinfomwdstats.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/runinfo/entity/runinforeliability.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/abidao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/dgrdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/hcimdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/pcddao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/pospulserdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/dao/toolparametersdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/abi.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/dgr.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/hcim.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/pcd.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/pospulser.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/toolParam/entity/toolparameters.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfodao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfodistancesdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfoformationdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfogeneraldao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfolocationdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfomatchedsystemstrackingdao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfopersonneldao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/wellinfosurveyinfodao.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfo.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodistances.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfoformation.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfogeneral.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfolocation.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfomatchedsystemstracking.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfopersonnel.h
-#  ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfosurveyinfo.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/configuru.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/welldao.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/dao/welldao.h
@@ -272,6 +187,7 @@ include_directories(../3rdparty/libcdf/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib)
 
 add_definitions(-D_WIN_ADBM_EXPORTING)
+#add_definitions(-DAUTO_INITIALIZE_EASYLOGGINGPP)
 
 add_library(ABMDaoLib ${SOURCE_ABMDAO_FILES})
 target_link_libraries(ABMDaoLib PRIVATE Qt5::Widgets Qt5::Sql)

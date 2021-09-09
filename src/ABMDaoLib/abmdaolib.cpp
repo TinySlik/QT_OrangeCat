@@ -1,10 +1,10 @@
 ﻿#include "abmdaolib.h"
+
 #include "common/log/easylogging++.h"
 #include <memory>
 #include <QtCore/qglobal.h>
 #include "common/mysql/SqlUtils.h"
 #pragma execution_character_set("utf-8")
-INITIALIZE_EASYLOGGINGPP
 
 class ABMDaoLibPrivate {
  public:
@@ -32,6 +32,14 @@ class ABMDaoLibPrivate {
 ABMDaoLib *ABMDaoLib::getInstance() {
   static ABMDaoLib *instance = nullptr;
   if (instance == nullptr) {
+    el::Configurations defaultConf;
+    defaultConf.setToDefault();
+
+    defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
+    defaultConf.setGlobally(el::ConfigurationType::Filename, "dao.log");
+    defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
+    // default logger uses default configurations
+    el::Loggers::reconfigureLogger("default", defaultConf);
     instance = new ABMDaoLib();
   }
   return instance;

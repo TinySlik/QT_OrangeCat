@@ -37,13 +37,14 @@ DepthWindow::DepthWindow(QWidget *parent) :
   std::string well_name = "well001";
   std::string run_name = "run0100";
 
+
   bool res = ABMDaoLib::getInstance()->open(well_name.c_str(), run_name.c_str());
   if (res) LOG(INFO) << "well: " << well_name << "--run: " << run_name << " success";
 
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql_table_current = {{"target_table", {
       {"name", "u_current_data"},
-      {"key", "wellId"}
+      {"key", "well_id"}
     }}
   };
   auto js_sql_table = jsonInterface->find(dump_string(cfg_sql_table_current, configuru::JSON).c_str());
@@ -53,7 +54,7 @@ DepthWindow::DepthWindow(QWidget *parent) :
   targetTable = std::string(cfg_sql_table["value"]);
   configuru::Config cfg_sql = {{"target_table", {
       {"name", "u_well_depth_status"},
-      {"wellId", cfg_sql_table["value"]}
+      {"well_id", cfg_sql_table["value"]}
     }}
   };
 
@@ -69,7 +70,7 @@ DepthWindow::DepthWindow(QWidget *parent) :
     configuru::Config updateval = {
       {"target_table", "u_well_depth_status"},
       {"update_val", b},
-      {"index_val", {{"wellId", b["wellId"]}}}
+      {"index_val", {{"well_id", b["well_id"]}}}
     };
     jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
     return true;
@@ -93,24 +94,25 @@ DepthWindow::DepthWindow(QWidget *parent) :
 float cur_##y = static_cast<float>(stu[x]);\
 ui->y->setText(QString::number(static_cast<double>(cur_##y)));
 
-  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("T_DActivity", label_internal_status)
-  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("bottomStatus", label_bottom_status)
-  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("slipSatus", label_slips_status)
-  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("bitDepth", label_5)
+  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("t_d_activity", label_internal_status)
+  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("bottom_status", label_bottom_status)
+  STR_DISPLAY_LABEL_REGISTER_WITH_INIT("slip_satus", label_slips_status)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("bit_depth", label_5)
   NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("block", label_9)
   NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("compenstr", label_10)
-  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("depthOnJoint", label_7)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("depth_on_joint", label_7)
   NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("factor", label_13)
-  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("holeDepth", label_4)
-  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("hookLoad", label_12)
-  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("lagDepth", label_6)
-  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("offBottomDist", label_8)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("hole_depth", label_4)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("hook_load", label_12)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("lag_depth", label_6)
+  NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("off_bottom_dist", label_8)
   NUM_DISPLAY_LABEL_REGISTER_WITH_INIT("riser", label_11)
 #undef STR_DISPLAY_LABEL_REGISTER_WITH_INIT
 #undef NUM_DISPLAY_LABEL_REGISTER_WITH_INIT
 
   connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateFromDao()));
   m_timer.start(1000);
+//  LOG(INFO) << "compelete.";
 }
 
 DepthWindow::~DepthWindow() {
@@ -124,7 +126,7 @@ void DepthWindow::updateFromDao() {
   auto jsonRecordInterface = ABMDaoLib::getInstance()->getRunJsonInterface();
   configuru::Config cfg = {{"target_table", {
       {"name", "u_well_depth_status"},
-      {"wellId", targetTable.c_str()}
+      {"well_id", targetTable.c_str()}
     }}
   };
 
@@ -133,9 +135,9 @@ void DepthWindow::updateFromDao() {
   auto stu = ParameterServer::instance()->GetCfgStatusRoot();
 
   configuru::Config tmp = configuru::parse_string(js.c_str(), configuru::JSON, "null");
-  ctr["Depth"]["holeDepth"] << tmp["blockHeight"];
+  ctr["Depth"]["hole_depth"] << tmp["block_height"];
   auto cur_count = static_cast<int>(tmp["count"]);
-  float length = static_cast<float>(tmp["blockHeightZero"]);
+  float length = static_cast<float>(tmp["block_height_zero"]);
   std::string hh = static_cast<std::string>(tmp["calibration"]);
   configuru::Config calibration = configuru::parse_string(hh.c_str(), configuru::JSON, "null");
   auto factor = static_cast<float>(calibration[0]["factor"]);
@@ -155,19 +157,19 @@ void DepthWindow::updateFromDao() {
       factor = static_cast<float>(calibration[i + 1]["factor"]);
     }
   }
-  auto height = float(tmp["blockHeight"]);
+  auto height = float(tmp["block_height"]);
   const float EPSINON = 0.01f;
 
   if (((height-length) < - EPSINON) || ((height-length) > EPSINON)) {
     LOG(INFO) << calibration;
     configuru::Config a = configuru::Config::object();
-    a["blockHeight"] = length;
+    a["block_height"] = length;
 
-    LOG(INFO) << "update blockHeight "<< length <<" to SQL";
+    LOG(INFO) << "update block_height "<< length <<" to SQL";
     configuru::Config updateval = {
       {"target_table", "u_well_depth_status"},
       {"update_val", a},
-      {"index_val", {{"wellId", targetTable.c_str()}}}
+      {"index_val", {{"well_id", targetTable.c_str()}}}
     };
     jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
   }
@@ -177,9 +179,9 @@ void DepthWindow::updateFromDao() {
   static int count = 0;
   if (count ++ > 3) {
     configuru::Config insertval = {
-      {"btmstatus",          tmp["bottomStatus"]},
+      {"btmstatus",          tmp["bottom_status"]},
       {"depth",              height},
-      {"t_d_activitystatus", tmp["T_DActivity"]},
+      {"t_d_activitystatus", tmp["t_d_activity"]},
       {"time",               std::string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz").toLatin1().data()).c_str()}
     };
 
@@ -191,6 +193,7 @@ void DepthWindow::updateFromDao() {
     count = 0;
   }
   stu << tmp;
+
 }
 
 void DepthWindow::DepthCtrlUpdate() {

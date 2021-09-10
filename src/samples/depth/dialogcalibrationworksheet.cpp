@@ -36,7 +36,7 @@ DialogCalibrationWorksheet::DialogCalibrationWorksheet(QWidget *parent) :
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql_table_current = {{"target_table", {
       {"name", "u_current_data"},
-      {"key", "wellId"}
+      {"key", "well_id"}
     }}
   };
   auto js_sql_table = jsonInterface->find(dump_string(cfg_sql_table_current, configuru::JSON).c_str());
@@ -52,7 +52,7 @@ void DialogCalibrationWorksheet::updateFromDao() {
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql = {{"target_table", {
       {"name", "u_well_depth_status"},
-      {"wellId", m_targetTable}
+      {"well_id", m_targetTable}
     }}
   };
 
@@ -85,7 +85,7 @@ void DialogCalibrationWorksheet::on_pushButton_clicked() {
   int i = 0;
 
   auto stu = ParameterServer:: instance()->GetCfgStatusRoot();
-  float bp_ori = float(stu["blockHeightZero"]);
+  float bp_ori = float(stu["block_height_zero"]);
   res.push_back({
     {"factor", (bp[0] - bp_ori)/c[0]}
   });
@@ -109,7 +109,7 @@ void DialogCalibrationWorksheet::on_pushButton_clicked() {
   configuru::Config updateval = {
     {"target_table", "u_well_depth_status"},
     {"update_val", a},
-    {"index_val", {{"wellId", m_targetTable.c_str()}}}
+    {"index_val", {{"well_id", m_targetTable.c_str()}}}
   };
   jsonInterface->update(dump_string(updateval, configuru::JSON).c_str());
 

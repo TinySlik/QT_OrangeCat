@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 
   defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
   defaultConf.setGlobally(el::ConfigurationType::Filename, "depth.log");
-  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
+  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
   // default logger uses default configurations
   el::Loggers::reconfigureLogger("default", defaultConf);
 

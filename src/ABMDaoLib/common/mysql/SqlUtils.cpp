@@ -1,5 +1,5 @@
 ﻿#include "SqlUtils.h"
-#include "easylogging++.h"
+#include "../log/easylogging++.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -15,8 +15,6 @@ SqlUtils::SqlUtils(QString databaseName,QString userName,QString password,
   m_database.setPassword(password);
   m_database.setPort(port);
 }
-
-
 
 SqlUtils::SqlUtils(const SqlLocationType &type, QString databaseName,QString userName,QString password,
                    QString host,int port,QObject *parent) {

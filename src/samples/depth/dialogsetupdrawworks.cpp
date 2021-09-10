@@ -39,7 +39,7 @@ DialogSetupDrawworks::DialogSetupDrawworks(QWidget *parent) :
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql_table_current = {{"target_table", {
       {"name", "u_current_data"},
-      {"key", "wellId"}
+      {"key", "well_id"}
     }}
   };
   auto js_sql_table = jsonInterface->find(dump_string(cfg_sql_table_current, configuru::JSON).c_str());
@@ -55,15 +55,15 @@ void DialogSetupDrawworks::updateFromDao() {
   auto jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg_sql = {{"target_table", {
       {"name", "u_well_depth_status"},
-      {"wellId", m_targetTable}
+      {"well_id", m_targetTable}
     }}
   };
 
   auto js = jsonInterface->find(dump_string(cfg_sql, configuru::JSON).c_str());
   configuru::Config cfg = configuru::parse_string(js.c_str(), configuru::JSON, "null");
   ui->label_14->setText(QString::number(static_cast<int>(cfg["count"])));
-  ui->label_15->setText(QString::number(static_cast<float>(cfg["blockHeight"])));
-  ui->lineEdit_zero_height->setText(QString::number(static_cast<float>(cfg["blockHeightZero"])));
+  ui->label_15->setText(QString::number(static_cast<float>(cfg["block_height"])));
+  ui->lineEdit_zero_height->setText(QString::number(static_cast<float>(cfg["block_height_zero"])));
   std::string hh = static_cast<std::string>(cfg["calibration"]);
   configuru::Config calibration = configuru::parse_string(hh.c_str(), configuru::JSON, "null");
 //  LOG(INFO) << calibration;

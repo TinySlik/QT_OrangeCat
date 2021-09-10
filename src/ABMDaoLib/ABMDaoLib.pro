@@ -52,7 +52,6 @@ SOURCES += \
     common/base/baseentity.cpp \
     common/file/fileutils.cpp \
     common/json/jsonutils.cpp \
-    common/log/easylogging++.cc \
     common/mysql/SqlUtils.cpp \
     well/dao/welldao.cpp \
     well/dao/jsoninterface.cpp

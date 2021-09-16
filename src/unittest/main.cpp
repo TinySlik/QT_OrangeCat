@@ -117,7 +117,6 @@ TEST_F(DBTest, find_record) {
   EXPECT_TRUE(test_db_find());
 }
 
-
 int main(int argc, char **argv) {
 
   LOG(INFO) << "unit test start:";

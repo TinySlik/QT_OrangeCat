@@ -94,7 +94,6 @@ bool test_db_find() {
   if (res) LOG(INFO) << "well: " << well_name << "--run: " << run_name << " success";
   if (!res) return false;
 
-
   // 查找 find
   std::shared_ptr<WellDaoInterface> jsonInterface = ABMDaoLib::getInstance()->getJsonInterface();
   configuru::Config cfg = {{"target_table", {
@@ -118,7 +117,6 @@ TEST_F(DBTest, find_record) {
 }
 
 int main(int argc, char **argv) {
-
   LOG(INFO) << "unit test start:";
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

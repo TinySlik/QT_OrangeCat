@@ -220,12 +220,12 @@
   },
   "test_msg_decoder": {
     "lineThickness": 0.005,
-    "compute1_switch": false,
+    "compute1_switch": true,
     "test_switch": 3,
     "display_switch": 2,
     // "test_file_path": "D:/develop/wavearch/wavearch/WaveArch1/Default.000",
-    // "test_file_path": "D:/data/wavearch/WaveArch/Default.010",
-    "test_file_path": "D:/Users/dell-a6/Desktop/work/Default.010",
+    "test_file_path": "D:/data/wavearch/WaveArch/Default.010",
+    // "test_file_path": "D:/Users/dell-a6/Desktop/work/Default.010",
     // "test_file_path": "D:/Users/dell-a6/Desktop/8.31/PPDet/WaveArch/Default.001",
 
     // "cdf": "D:/Users/dell-a6/Desktop/work/lwd_20141224.cdf",
@@ -241,34 +241,16 @@
     "m_samplingSpeed": 2,
     "m_decoder": "PersonificationDecoderV2",
     // "m_msg_decoder": "TiniMsgDecoderv1",
-    "m_msg_decoder": "TiniMsgDecoderv1",
+    "m_msg_decoder": "empty",
     "m_decoder_unsigned": true,
     "adlink_card_ID": 256,
     "adlink_card_enable": false,
     "front_color": "#ffad00",
     "background_color": "#303afd",
-    // "transform": {
-    //   "m_translate": {
-    //     "x": -0.00021201372,
-    //     "y": -2.5000811,
-    //     "z": -1
-    //   },
-    //   "m_rotate": {
-    //     "x": 0,
-    //     "y": 0,
-    //     "z": 1
-    //   },
-    //   "m_angle": 180,
-    //   "m_scale": {
-    //     "x": 0.5,
-    //     "y": 3,
-    //     "z": 1
-    //   }
-    // }
     "transform": {
       "m_translate": {
-        "x": -0.0031417012,
-        "y": 2.3280439,
+        "x": -0.0011885762,
+        "y": -0.62508106,
         "z": -1
       },
       "m_rotate": {
@@ -283,6 +265,24 @@
         "z": 1
       }
     }
+    // "transform": {
+    //   "m_translate": {
+    //     "x": -0.0031417012,
+    //     "y": 2.3280439,
+    //     "z": -1
+    //   },
+    //   "m_rotate": {
+    //     "x": 0,
+    //     "y": 0,
+    //     "z": 1
+    //   },
+    //   "m_angle": 180,
+    //   "m_scale": {
+    //     "x": 0.5,
+    //     "y": 3,
+    //     "z": 1
+    //   }
+    // }
     // "transform": {
     //   "m_translate": {
     //     "x": 0,

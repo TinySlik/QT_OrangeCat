@@ -778,16 +778,12 @@ void DataProcessWidget::paintGL() {
           _decoder = _decoders[static_cast<size_t>(_decoder_active_index)].object;
       auto task_cpu = async::spawn([this, _decoder] {
         if (_decoder) _decoder->decodeBeforeWait(m_tex_tmp_ptr);
-        auto res = _decoder->getCurrentResualt();
-        if (res == -1) {
-          // todo
-        } else {
-          if (_msgdecoder) {
-            if (res == '0')
-              _msgdecoder->decode(false);
-            else if(res == '1')
-              _msgdecoder->decode(true);
-          }
+        if (_msgdecoder) {
+          auto res = _decoder->getCurrentResualt();
+          if (res == '0')
+            _msgdecoder->decode(false);
+          else if(res == '1')
+            _msgdecoder->decode(true);
         }
       });
 

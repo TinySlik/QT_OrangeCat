@@ -463,7 +463,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
               res.push_back(value);
               cur += 4;
             }
-            getData(std::make_shared<std::vector<float>>(res));
+             getData(std::make_shared<std::vector<float>>(res));
           });
         } else {
           adlink::instance()->stopAI();

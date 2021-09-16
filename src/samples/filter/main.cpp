@@ -113,5 +113,8 @@ int main(int argc, char **argv) {
   window->show();
   window->tabWidget()->setUrl(url);
 #endif
+//  app.exec();
+//  ::testing::InitGoogleTest(&argc, argv);
+//  return RUN_ALL_TESTS();
   return app.exec();
 }

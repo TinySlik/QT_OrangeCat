@@ -178,19 +178,28 @@ set(SOURCE_ABMDAO_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodepthstatus.h
 )
 
+set(SOURCE_TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/unittest/main.cpp
+)
+
 include_directories(log)
 include_directories(paramserv)
 include_directories(../3rdparty/asyncplusplus/include)
 include_directories(../3rdparty/ADlink/include)
 include_directories(../3rdparty/liblas/include)
 include_directories(../3rdparty/libcdf/include)
+include_directories(../3rdparty/gtest/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib)
 
+link_directories(../3rdparty/gtest/lib)
+#QTest，QtCore，QtGui
 add_definitions(-D_WIN_ADBM_EXPORTING)
 #add_definitions(-DAUTO_INITIALIZE_EASYLOGGINGPP)
 
 add_library(ABMDaoLib ${SOURCE_ABMDAO_FILES})
 target_link_libraries(ABMDaoLib PRIVATE Qt5::Widgets Qt5::Sql)
+
+add_executable(unittest ${SOURCE_TEST_FILES})
+target_link_libraries(unittest PRIVATE ABMDaoLib gtest)
 
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
 add_executable(sample ${SOURCE_FILTER_FILES})

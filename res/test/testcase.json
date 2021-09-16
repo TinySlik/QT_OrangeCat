@@ -220,12 +220,17 @@
   },
   "test_msg_decoder": {
     "lineThickness": 0.005,
-    "compute1_switch": true,
+    "compute1_switch": false,
     "test_switch": 3,
     "display_switch": 2,
-    "test_file_path": "D:/Users/dell-a6/Desktop/8.31/PPDet/WaveArch/Default.010",
-    // D:/Users/dell-a6/Desktop/CDSFiles/PCD001_100_HCIM_PCD_1.cdf
-    "cdf": "D:/Users/dell-a6/Desktop/CDSFiles/PCD001_100_HCIM_PCD_1.cdf",
+    // "test_file_path": "D:/develop/wavearch/wavearch/WaveArch1/Default.000",
+    // "test_file_path": "D:/data/wavearch/WaveArch/Default.010",
+    "test_file_path": "D:/Users/dell-a6/Desktop/work/Default.010",
+    // "test_file_path": "D:/Users/dell-a6/Desktop/8.31/PPDet/WaveArch/Default.001",
+
+    // "cdf": "D:/Users/dell-a6/Desktop/work/lwd_20141224.cdf",
+    // "cdf": "D:/Users/dell-a6/Desktop/CDSFiles/PCD001_100_HCIM_PCD_1.cdf",
+    "cdf": "D:/Users/dell-a6/Desktop/work/lwd_20141224.cdf",
     "svg_background_path": "empty",
     "file_load_location": 1713,
     "fft_level": 1024,
@@ -235,17 +240,35 @@
     "m_fft_display_scale": 0.05,
     "m_samplingSpeed": 2,
     "m_decoder": "PersonificationDecoderV2",
-    // TiniMsgDecoderv1
+    // "m_msg_decoder": "TiniMsgDecoderv1",
     "m_msg_decoder": "TiniMsgDecoderv1",
     "m_decoder_unsigned": true,
     "adlink_card_ID": 256,
     "adlink_card_enable": false,
     "front_color": "#ffad00",
     "background_color": "#303afd",
+    // "transform": {
+    //   "m_translate": {
+    //     "x": -0.00021201372,
+    //     "y": -2.5000811,
+    //     "z": -1
+    //   },
+    //   "m_rotate": {
+    //     "x": 0,
+    //     "y": 0,
+    //     "z": 1
+    //   },
+    //   "m_angle": 180,
+    //   "m_scale": {
+    //     "x": 0.5,
+    //     "y": 3,
+    //     "z": 1
+    //   }
+    // }
     "transform": {
       "m_translate": {
-        "x": 0,
-        "y": -0.5,
+        "x": -0.0031417012,
+        "y": 2.3280439,
         "z": -1
       },
       "m_rotate": {
@@ -260,5 +283,23 @@
         "z": 1
       }
     }
+    // "transform": {
+    //   "m_translate": {
+    //     "x": 0,
+    //     "y": -0.5,
+    //     "z": -1
+    //   },
+    //   "m_rotate": {
+    //     "x": 0,
+    //     "y": 0,
+    //     "z": 1
+    //   },
+    //   "m_angle": 180,
+    //   "m_scale": {
+    //     "x": 0.5,
+    //     "y": 3,
+    //     "z": 1
+    //   }
+    // }
   }
 }

@@ -91,7 +91,6 @@ bool test_db_find() {
   std::string well_name = "well001";
   std::string run_name = "run0100";
   bool res = ABMDaoLib::getInstance()->open(well_name.c_str(), run_name.c_str());
-  if (res) LOG(INFO) << "well: " << well_name << "--run: " << run_name << " success";
   if (!res) return false;
 
   // 查找 find

@@ -125,7 +125,7 @@ TiniMsgDecoderv1::~TiniMsgDecoderv1() {
 bool TiniMsgDecoderv1::decode(const bool &value) {
   data_.push_back(value ? '1' : '0');
   if (data_.size() > MAX_BIT_COUNT) {
-    LOG(ERROR) << "data out of range";
+    LOG(WARNING) << "data out of range";
     data_.clear();
     return false;
   }
@@ -134,14 +134,16 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
   char *data = data_.data();
   if (sz > 6 && memcmp(data + sz - 7 , "1111110", 7) == 0) {
     if (start_tag) {
-      data_.pop_back();
-      data_.pop_back();
-      data_.pop_back();
-      data_.pop_back();
-      data_.pop_back();
-      data_.pop_back();
-      data_.pop_back();
-      data_.pop_back();
+      if(data_.size() > 8) {
+        data_.pop_back();
+        data_.pop_back();
+        data_.pop_back();
+        data_.pop_back();
+        data_.pop_back();
+        data_.pop_back();
+        data_.pop_back();
+        data_.pop_back();
+      }
       status["list_current_target"] << "NULL";
       auto index = static_cast<size_t>(cur_tag);
       auto queue = _decoders[index];

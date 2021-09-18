@@ -202,7 +202,7 @@ add_executable(unittest ${SOURCE_TEST_FILES})
 target_link_libraries(unittest PRIVATE ABMDaoLib gtest)
 
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
-add_executable(sample ${SOURCE_FILTER_FILES})
+add_executable(sample WIN32 ${SOURCE_FILTER_FILES})
 #target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
 if (ADLINK_32)
   target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ABMDaoLib ADlink)

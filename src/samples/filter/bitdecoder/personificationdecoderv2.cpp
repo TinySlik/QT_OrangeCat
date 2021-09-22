@@ -289,10 +289,10 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
           auto cur = r1;
           if (r1.confidence_level > r3.confidence_level) {
             cur = r3;
-            std::cout << "special case 3:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
+//            std::cout << "special case 3:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
           } else {
             cur = r1;
-            std::cout << "special case 1:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
+//            std::cout << "special case 1:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
           }
           std::cout.flush();
           return cur;

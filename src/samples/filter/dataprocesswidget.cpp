@@ -134,9 +134,13 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"compute1_switch", m_ComputeShaderSwitch},
       {"test_switch", m_TestSwitch},
       {"display_switch", m_DisplaySwitch},
-      {"test_file_path", "empty"},
+      {"static_file_info", {
+        {"test_file_path", "empty"},
+        {"file_load_location", m_file_find_index},
+        {"cdf", "empty"},
+        {"m_msg_decoder", "empty"},
+      }},
       {"svg_background_path", "empty"},
-      {"file_load_location", m_file_find_index},
       {"fft_level", m_fft_level},
       {"buffer_size", buffer_size},
       {"m_max_cut_filter", m_max_cut_filter},
@@ -144,7 +148,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       {"m_fft_display_scale", m_fft_display_scale},
       {"m_samplingSpeed", m_samplingSpeed},
       {"m_decoder", "empty"},
-      {"m_msg_decoder", "empty"},
       {"m_decoder_unsigned", m_decoder_unsigned},
 #ifdef ADLINK_32
       {"adlink_card_ID", m_adlink_card_current_ID},
@@ -152,7 +155,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 #endif
       {"front_color", color_format_int_to_string(m_color).c_str()},
       {"background_color", color_format_int_to_string(m_backgroundColor).c_str()},
-      {"cdf", "empty"},
       {"transform", {
         {
           "m_translate", {
@@ -210,7 +212,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return true;
   });
 
-  cfg_local["m_msg_decoder"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+  cfg_local["static_file_info"]["m_msg_decoder"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
     auto str1 = std::string(a);
     auto str2 = std::string(b);
@@ -289,7 +291,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return false;
   });
 
-  cfg_local["file_load_location"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
+  cfg_local["static_file_info"]["file_load_location"].add_callback([this](configuru::Config &, const configuru::Config &b)->bool {
     if (!b.is_int()) return false;
     auto tg = static_cast<int>(b);
     m_file_find_index = static_cast<size_t>(tg);
@@ -297,7 +299,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     LOG(INFO) << "File load location set to : " << m_file_find_index;
     return true;
   });
-  cfg_local["file_load_location"].set_hiden(true);
+  cfg_local["static_file_info"]["file_load_location"].set_hiden(true);
 
   cfg_local["svg_background_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
@@ -320,7 +322,7 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     else return false;
   });
 
-  cfg_local["test_file_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+  cfg_local["static_file_info"]["test_file_path"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
     auto tg = static_cast<std::string>(b);
     auto ora = static_cast<std::string>(a);
@@ -350,10 +352,35 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     return true;
   });
 
-  cfg_local["cdf"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
+  cfg_local["static_file_info"]["cdf"].add_callback([this](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_string()) return false;
     auto tg = static_cast<std::string>(b);
     auto ora = static_cast<std::string>(a);
+
+    if (tg == "default") {
+      if (m_fileMMap) {
+        auto head = m_fileMMap->data();
+        head += 512;
+//        for (int i = 0; i< 150;++i) {
+//            LOG(INFO) << (char)head[i];
+//          }
+        decode_info = cdf::cdfStringToInfoListJson_v1_0((char *)(head));
+        auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+        std::string class_obj_id = typeid(*this).name();
+        class_obj_id += std::to_string(reinterpret_cast<long>(this));
+        auto cfg_local = cfg[class_obj_id.c_str()];
+        if (std::string(cfg_local["static_file_info"]["m_msg_decoder"]) != "empty") {
+          for(auto it:_msg_decoders) {
+            if (it.name == std::string(cfg_local["static_file_info"]["m_msg_decoder"])) {
+                LOG(INFO) << "bingo";
+              _msgdecoder = it.create(decode_info);
+            }
+          }
+        }
+      }
+      return true;
+    }
+
     if (tg == "empty") {
       if (ora != "empty" && m_fileCdfMMap) {
         LOG(INFO) << "cdf file name: " << ora << " closed";
@@ -381,13 +408,22 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     std::string class_obj_id = typeid(*this).name();
     class_obj_id += std::to_string(reinterpret_cast<long>(this));
     auto cfg_local = cfg[class_obj_id.c_str()];
-    if (std::string(cfg_local["m_msg_decoder"]) != "empty") {
+    if (std::string(cfg_local["static_file_info"]["m_msg_decoder"]) != "empty") {
       for(auto it:_msg_decoders) {
-        if (it.name == std::string(cfg_local["m_msg_decoder"])) {
+        if (it.name == std::string(cfg_local["static_file_info"]["m_msg_decoder"])) {
           _msgdecoder = it.create(decode_info);
         }
       }
     }
+    return true;
+  });
+
+  cfg_local["static_file_info"].add_callback([](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_object()) return false;
+    a["test_file_path"] << b["test_file_path"];
+    a["cdf"] << b["cdf"];
+    a["m_msg_decoder"] << b["m_msg_decoder"];
+    a["file_load_location"] << b["file_load_location"];
     return true;
   });
 

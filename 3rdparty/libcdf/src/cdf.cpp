@@ -107,7 +107,14 @@ std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
               });
         cur_index++;
       } else if (val == 0x46) {
-        res[static_cast<size_t>(cur_index)]["array"].push_back("PU");
+          res.push_back(
+                {
+                  {"name", cur_list_name.c_str()},
+                  {"array", configuru::Config::array({"PU"})}
+                }
+                );
+          cur_index++;
+//        res[static_cast<size_t>(cur_index)]["array"].push_back("PU");
       } else if (val == 0x3e) {
         if (cur_list_name == "Alarm") cur_list_name = "List1Preamble";
         else if (cur_list_name == "List1Preamble") cur_list_name = "List2Preamble";
@@ -153,7 +160,14 @@ std::string cdf::cdfStringToInfoListJson_v1_0(const std::string &src) {
               );
         cur_index++;
       } else if (val == 0x66 || val == 0x7c) {
-        res[static_cast<size_t>(cur_index)]["array"].push_back("PD");
+          res.push_back(
+                {
+                  {"name", cur_list_name.c_str()},
+                  {"array", configuru::Config::array({"PD"})}
+                }
+                );
+          cur_index++;
+//        res[static_cast<size_t>(cur_index)]["array"].push_back("PD");
       }
     } else {
       switch (val) {

@@ -23,6 +23,7 @@ class TiniMsgDecoderv1 : public MsgDecoder {
   size_t tag_bit;
   int cur_tag;
   bool start_tag;
+  bool _process_init_wait_tag;
 };
 
 #endif // TINIMSGDECODERV1_H

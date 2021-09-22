@@ -1,5 +1,6 @@
 #include "tinimsgdecoderv1.h"
 #include "easylogging++.h"
+#include <bitset>
 #define MAX_BIT_COUNT (1024)
 
 struct decode_tempalete_unit {
@@ -11,18 +12,38 @@ struct decode_tempalete_unit {
 
 configuru::Config DefaultProcess(std::vector<char> data) {
   data.push_back('\0');
-  LOG(INFO) << "  content: " << data.data();
-  return data.data();
+  configuru::Config res = data.data();
+//  LOG(INFO) << data.data();
+  return res;
 }
 
 int charArrayToInt(std::vector<char> data) {
   int res = 0;
-//  for(size_t i = 0; i < data.size(); ++i) {
-//    int tmp = data[i] == '1' ? 1 : 0;
-//    if (i == 0 && tmp == 1) res = 0xffffffff
-//    res += data[i] == '1' ? 1 : 0;
-//    res <<= 1;
-//  }
+//  data.push_back('\0');
+  std::bitset<32> b(data.data());
+  res = b.to_ulong();
+//  LOG(INFO) << "res" << res;
+  return res;
+}
+
+unsigned int charArrayToUInt(std::vector<char> data) {
+  unsigned int res = 0;
+//  data.push_back('\0');
+  std::bitset<32> b(data.data());
+  res = b.to_ulong();
+//  LOG(INFO) << "res" << res;
+  return res;
+}
+
+configuru::Config GAProcess(std::vector<char> data) {
+  data.push_back('\0');
+  configuru::Config res = charArrayToUInt(data);
+  return res;
+}
+
+configuru::Config GBProcess(std::vector<char> data) {
+  data.push_back('\0');
+  configuru::Config res = charArrayToUInt(data);
   return res;
 }
 
@@ -48,9 +69,9 @@ const struct decode_tempalete_unit decode_tempalete_table[] = {
   {"CV",  0, 1,   DefaultProcess},
   {"SC",  1, 12,  DefaultProcess},
   {"LC",  1, 12,  DefaultProcess},
-  {"GA",  1, 9,   DefaultProcess},
-  {"GB",  1, 9,   DefaultProcess},
-  {"ABI", 1, 13,  DefaultProcess},
+  {"GA",  1, 9,   GAProcess},
+  {"GB",  1, 9,   GBProcess},
+  {"ABI", 1, 9,   DefaultProcess},
   {"ABS", 1, 9,   DefaultProcess},
 };
 
@@ -58,7 +79,8 @@ TiniMsgDecoderv1::TiniMsgDecoderv1(const std::string &decode_info):
 MsgDecoder(decode_info),
 tag_bit(0),
 cur_tag(-1),
-start_tag(false) {
+start_tag(false),
+_process_init_wait_tag(false) {
   LOG(INFO) << __FUNCTION__ << decode_info_;
   auto list_count = decode_info_.as_array().size();
   unsigned int res_log = 1;
@@ -105,12 +127,14 @@ start_tag(false) {
           res_check ^= res[k] == '1' ? 1 : 0;
         }
         if (res_check == 0) {
-          decode_tempalete_table[k].func(res);
+          if (decode_tempalete_table[k].func)
+              LOG(INFO) << decode_tempalete_table[k].func(res);
         } else {
           LOG(INFO) << "check bit error";
         }
       } else {
-        decode_tempalete_table[k].func(res);
+        if (decode_tempalete_table[k].func)
+            LOG(INFO) << decode_tempalete_table[k].func(res);
       }
       return true;
       }
@@ -132,48 +156,66 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
   auto status = ParameterServer::instance()->GetCfgStatusRoot();
   size_t sz = data_.size();
   char *data = data_.data();
-  if (sz > 6 && memcmp(data + sz - 7 , "1111110", 7) == 0) {
-    if (start_tag) {
-      if(data_.size() > 8) {
-        data_.pop_back();
-        data_.pop_back();
-        data_.pop_back();
-        data_.pop_back();
-        data_.pop_back();
-        data_.pop_back();
-        data_.pop_back();
-        data_.pop_back();
-      }
-      status["list_current_target"] << "NULL";
-      auto index = static_cast<size_t>(cur_tag);
-      auto queue = _decoders[index];
-      size_t leg = tag_bit;
-      for (size_t k = 0; k < queue.size(); ++k) {
-        leg += queue[k].size;
-      }
-      if (leg == data_.size()) {
-        LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
-        status["last_msg_completeness_check"] = "Credible";
-      } else {
-        LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
-        status["last_msg_completeness_check"] = "Undependable";
-        start_tag = false;
-      }
-    } else {
-      start_tag = true;
-    }
+  static bool _skip_for_five_1_tag_start_protect_tag = false;
 
-    data_ = {'0', '1', '1', '1', '1', '1', '1', '0'};
-    cur_tag = -1;
-    if (status.has_key("list_name")) {
-      status["last_name"] = status["list_name"];
-      status.erase("list_name");
+  if (_process_init_wait_tag && sz > 6 && memcmp(data + sz - 7 , "0111110", 7) == 0) {
+    _skip_for_five_1_tag_start_protect_tag = true;
+    data_.pop_back();
+//    LOG(INFO) << "found five 1 case;";
+    return true;
+  }
+
+  if (sz > 6 && memcmp(data + sz - 7 , "1111110", 7) == 0) {
+    if (!_process_init_wait_tag) _process_init_wait_tag = true;
+    auto index = static_cast<size_t>(cur_tag);
+    auto queue = _decoders[index];
+    size_t leg = tag_bit;
+    for (size_t k = 0; k < queue.size(); ++k) {
+      leg += queue[k].size;
     }
-    if (status.has_key("list_content")) {
-      status["last_content"] = status["list_content"];
-      status.erase("list_content");
+    if (_skip_for_five_1_tag_start_protect_tag && leg > data_.size()) {
+      _skip_for_five_1_tag_start_protect_tag = false;
+//      LOG(INFO) << "process five 1 case protected;";
+    } else {
+      _skip_for_five_1_tag_start_protect_tag = false;
+      if (start_tag) {
+        if(data_.size() > 8) {
+          data_.pop_back();
+          data_.pop_back();
+          data_.pop_back();
+          data_.pop_back();
+          data_.pop_back();
+          data_.pop_back();
+          data_.pop_back();
+          data_.pop_back();
+        }
+        status["list_current_target"] << "NULL";
+        if (leg == data_.size()) {
+          LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
+          status["last_msg_completeness_check"] = "Credible";
+        } else {
+          LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
+          status["last_msg_completeness_check"] = "Undependable";
+        }
+      } else {
+        start_tag = true;
+      }
+
+      data_ = {'0', '1', '1', '1', '1', '1', '1', '0'};
+      cur_tag = -1;
+      if (status.has_key("list_name")) {
+        status["last_name"] = status["list_name"];
+        status.erase("list_name");
+      }
+      if (status.has_key("list_content")) {
+        status["last_content"] = status["list_content"];
+        status.erase("list_content");
+      }
     }
   }
+
+  if (!_process_init_wait_tag) return true;
+
   std::vector<char> data__ = data_;
   data__.push_back('\0');
 

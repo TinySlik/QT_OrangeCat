@@ -1,18 +1,18 @@
-#ifndef TINIMSGDECODERV1_H
-#define TINIMSGDECODERV1_H
+#ifndef TINIMSGDECODERV2_H
+#define TINIMSGDECODERV2_H
 
 #include "msgdecoder.h"
 #include <vector>
 
-class TiniMsgDecoderv1 : public MsgDecoder {
+class TiniMsgDecoderv2 : public MsgDecoder {
   typedef struct decode_unit{
     std::string name;
     size_t size;
     std::function<bool(const std::vector<char>)> func;
   } DECODE_UNIT;
-  explicit TiniMsgDecoderv1(const std::string &decode_info);
+  explicit TiniMsgDecoderv2(const std::string &decode_info);
  public:
-  virtual ~TiniMsgDecoderv1() override;
+  virtual ~TiniMsgDecoderv2() override;
   virtual bool decode(const bool &value) override;
   virtual configuru::Config defaultParams() override;
   virtual bool reset() override;
@@ -26,4 +26,4 @@ class TiniMsgDecoderv1 : public MsgDecoder {
   bool _process_init_wait_tag;
 };
 
-#endif // TINIMSGDECODERV1_H
+#endif // TINIMSGDECODERV2_H

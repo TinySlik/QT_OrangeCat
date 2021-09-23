@@ -40,6 +40,7 @@
 #include "bitdecoder/highfrequencysensivitydecoder.h"
 
 #include "msgdecoder/tinimsgdecoderv1.h"
+#include "msgdecoder/tinimsgdecoderv2.h"
 
 #define DEFAULT_COMPUTE_SHADER_PATH ":/shader/filter_c.glsl"
 #define DEFAULT_VERT_SHADER_PATH ":/shader/general_v.glsl"
@@ -115,7 +116,8 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
   PLUG_MSG_PROCESS_UNIT msg_register_table[] = {
     {"EmptyDefault",                              EmptyMsgDecoder::create                  },
-    {"TiniMsgDecoderv1",                          TiniMsgDecoderv1::create                 }
+    {"TiniMsgDecoderv1",                          TiniMsgDecoderv1::create                 },
+    {"TiniMsgDecoderv2",                          TiniMsgDecoderv2::create                 }
   };
 
   for (size_t i = 0; i < sizeof(msg_register_table) / sizeof(PLUG_MSG_PROCESS_UNIT); ++i) {

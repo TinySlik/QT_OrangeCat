@@ -1,9 +1,10 @@
-#include "tinimsgdecoderv1.h"
+#include "tinimsgdecoderv2.h"
 #include "easylogging++.h"
 #include <bitset>
 #define MAX_BIT_COUNT (1024)
 
-namespace v1 {
+namespace v2 {
+
 struct decode_tempalete_unit {
   const char *name;
   size_t check;
@@ -129,11 +130,11 @@ const struct decode_tempalete_unit decode_tempalete_table[] = {
   {"ABI", 1, 9,   DefaultProcess},
   {"ABS", 1, 9,   DefaultProcess},
 };
-}  // namespace v1
+}
 
-using namespace v1;
+using namespace v2;
 
-TiniMsgDecoderv1::TiniMsgDecoderv1(const std::string &decode_info):
+TiniMsgDecoderv2::TiniMsgDecoderv2(const std::string &decode_info):
 MsgDecoder(decode_info),
 tag_bit(0),
 cur_tag(-1),
@@ -189,7 +190,7 @@ _process_init_wait_tag(false) {
           if (decode_tempalete_table[k].func) {
             status["list_last_decode_target"] = a;
             status["list_last_decode_value"] = decode_tempalete_table[k].func(res);
-            LOG(INFO) << status["list_last_decode_value"];
+            LOG(INFO) << status["list_last_decode_target"];
 //            LOG(INFO) << decode_tempalete_table[k].func(res);
           }
         } else {
@@ -199,7 +200,7 @@ _process_init_wait_tag(false) {
         if (decode_tempalete_table[k].func) {
           status["list_last_decode_target"] = a;
           status["list_last_decode_value"] = decode_tempalete_table[k].func(res);
-          LOG(INFO) << status["list_last_decode_value"];
+          LOG(INFO) << status["list_last_decode_target"];
 //          LOG(INFO) << decode_tempalete_table[k].func(res);
         }
       }
@@ -210,10 +211,10 @@ _process_init_wait_tag(false) {
   });
 }
 
-TiniMsgDecoderv1::~TiniMsgDecoderv1() {
+TiniMsgDecoderv2::~TiniMsgDecoderv2() {
 }
 
-bool TiniMsgDecoderv1::decode(const bool &value) {
+bool TiniMsgDecoderv2::decode(const bool &value) {
   data_.push_back(value ? '1' : '0');
   if (data_.size() > MAX_BIT_COUNT) {
     LOG(WARNING) << "data out of range";
@@ -226,15 +227,10 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
   static bool _skip_for_five_1_tag_start_protect_tag = false;
 
   if (_process_init_wait_tag && sz > 6 && memcmp(data + sz - 7 , "0111110", 7) == 0) {
-    if (_skip_for_five_1_tag_start_protect_tag) {
-      _skip_for_five_1_tag_start_protect_tag = false;
-//      LOG(INFO) << "process five 1 case protected;";
-    } else {
-      _skip_for_five_1_tag_start_protect_tag = true;
-      data_.pop_back();
-//      LOG(INFO) << "found five 1 case;";
-      return true;
-    }
+    _skip_for_five_1_tag_start_protect_tag = true;
+    data_.pop_back();
+    LOG(INFO) << "found five 1 case;";
+    return true;
   }
   if (sz > 6 && memcmp(data + sz - 7 , "1111110", 7) == 0) {
     if (!_process_init_wait_tag) {
@@ -254,7 +250,7 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
 
     if (_skip_for_five_1_tag_start_protect_tag && leg > data_.size()) {
       _skip_for_five_1_tag_start_protect_tag = false;
-//      LOG(INFO) << "process five 1 case protected;";
+      LOG(INFO) << "process five 1 case protected;";
     } else {
       _skip_for_five_1_tag_start_protect_tag = false;
       if (start_tag) {
@@ -328,15 +324,15 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
   return true;
 }
 
-bool TiniMsgDecoderv1::reset() {
+bool TiniMsgDecoderv2::reset() {
   return false;
 }
 
-std::shared_ptr<MsgDecoder> TiniMsgDecoderv1::create(const std::string &decode_info) {
-  std::shared_ptr<TiniMsgDecoderv1> res(new TiniMsgDecoderv1(decode_info));
+std::shared_ptr<MsgDecoder> TiniMsgDecoderv2::create(const std::string &decode_info) {
+  std::shared_ptr<TiniMsgDecoderv2> res(new TiniMsgDecoderv2(decode_info));
   return res;
 }
 
-configuru::Config TiniMsgDecoderv1::defaultParams() {
+configuru::Config TiniMsgDecoderv2::defaultParams() {
   return {};
 }

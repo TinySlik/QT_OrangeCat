@@ -422,10 +422,14 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
 
   cfg_local["static_file_info"].add_callback([](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_object()) return false;
-    a["test_file_path"] << b["test_file_path"];
-    a["cdf"] << b["cdf"];
-    a["m_msg_decoder"] << b["m_msg_decoder"];
-    a["file_load_location"] << b["file_load_location"];
+    if (a.has_key("test_file_path"))
+        a["test_file_path"] << b["test_file_path"];
+    if (a.has_key("cdf"))
+        a["cdf"] << b["cdf"];
+    if (a.has_key("m_msg_decoder"))
+        a["m_msg_decoder"] << b["m_msg_decoder"];
+    if (a.has_key("file_load_location"))
+        a["file_load_location"] << b["file_load_location"];
     return true;
   });
 
@@ -603,7 +607,7 @@ void DataProcessWidget::getData(std::shared_ptr<std::vector<float>> data) {
         std::string class_obj_id = typeid(*this).name();
         class_obj_id += std::to_string(reinterpret_cast<long>(this));
         auto cfg_local = cfg[class_obj_id.c_str()];
-        cfg_local["file_load_location"] = m_file_find_index;
+        cfg_local["static_file_info"]["file_load_location"] = m_file_find_index;
       }
 
       auto cur_index = FILE_FORMAT_LOCATION_FIX + m_file_find_index ;
@@ -702,7 +706,8 @@ void DataProcessWidget::initializeGL() {
 
   m_vao.release();
 
-  connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+//  connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+  connect(&timer, SIGNAL(timeout()), this, SLOT(paintGLSLOT()));
   timer.start(10);
   m_CcomputeProgram->release();
   m_CrenderProgram->release();

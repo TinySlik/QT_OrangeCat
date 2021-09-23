@@ -67,6 +67,11 @@ class DataProcessWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_C
 
  signals:
   void TitelChanged(const QString &title);
+ public Q_SLOTS:
+  inline void paintGLSLOT() {
+    this -> paintEvent(nullptr);
+    this -> update();
+  }
 
  protected:
   void initializeGL() override;

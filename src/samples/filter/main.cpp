@@ -52,6 +52,9 @@ int main(int argc, char **argv) {
                                                 });
   ParameterServer::instance()->SetCurrentRoot("base");
 
+
+
+
   QCoreApplication::setOrganizationName("QtExamples");
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -104,6 +107,21 @@ int main(int argc, char **argv) {
       mainWindow.show();
   else
       mainWindow.showMaximized();
+
+  auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
+  cfg["show"] = true;
+  cfg["show"].add_callback([&mainWindow](configuru::Config &a, const configuru::Config &b)->bool {
+    if (!b.is_bool()) return false;
+    bool rk = bool(b);
+    bool rk_ = bool(a);
+    if (rk == rk_) return false;
+    if (rk) {
+      mainWindow.show();
+    } else {
+      mainWindow.hide();
+    }
+    return true;
+  });
 //#define TEST_QTWEB
 #ifdef TEST_QTWEB
   QUrl url = commandLineUrlArgument();

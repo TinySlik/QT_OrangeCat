@@ -267,7 +267,8 @@
         "y": 3,
         "z": 1
       }
-    }
+    },
+    "hiden": true
     // "transform": {
     //   "m_translate": {
     //     "x": -0.0031417012,

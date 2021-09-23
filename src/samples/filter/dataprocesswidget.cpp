@@ -550,9 +550,9 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
     jsonconfig.single_line_comments     = true;
     jsonconfig.block_comments           = true;
     jsonconfig.nesting_block_comments   = true;
-    auto cfg = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", jsonconfig)["test_msg_decoder"];
+    auto cfg_ = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", jsonconfig)["test_msg_decoder"];
     LOG(INFO) << __FUNCTION__ << "load config: " << cfg;
-    cfg_local << cfg;
+    cfg_local << cfg_;
   }
 }
 

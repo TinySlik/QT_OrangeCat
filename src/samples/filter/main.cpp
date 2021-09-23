@@ -31,6 +31,7 @@
 
 #include <QGuiApplication>
 #include "easylogging++.h"
+#include <QFile>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -109,16 +110,16 @@ int main(int argc, char **argv) {
       mainWindow.showMaximized();
 
   auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
-  cfg["show"] = true;
-  cfg["show"].add_callback([&mainWindow](configuru::Config &a, const configuru::Config &b)->bool {
+  cfg["hiden"] = false;
+  cfg["hiden"].add_callback([&mainWindow](configuru::Config &a, const configuru::Config &b)->bool {
     if (!b.is_bool()) return false;
     bool rk = bool(b);
     bool rk_ = bool(a);
     if (rk == rk_) return false;
     if (rk) {
-      mainWindow.show();
-    } else {
       mainWindow.hide();
+    } else {
+      mainWindow.show();
     }
     return true;
   });
@@ -131,8 +132,17 @@ int main(int argc, char **argv) {
   window->show();
   window->tabWidget()->setUrl(url);
 #endif
-//  app.exec();
-//  ::testing::InitGoogleTest(&argc, argv);
-//  return RUN_ALL_TESTS();
+  QFile file_testcase("D:/develop/OIL/res/test/testcase.json");
+  if (file_testcase.exists()) {
+    auto jsonconfig = configuru::make_json_options();
+    jsonconfig.single_line_comments     = true;
+    jsonconfig.block_comments           = true;
+    jsonconfig.nesting_block_comments   = true;
+    auto cfg_ = configuru::parse_file("D:/develop/OIL/res/test/testcase.json", jsonconfig)["test_msg_decoder"];
+    if (cfg_.has_key("hiden")) {
+      auto kkk = ParameterServer::instance()->GetCfgCtrlRoot();
+      kkk["hiden"] << cfg_["hiden"];
+    }
+  }
   return app.exec();
 }

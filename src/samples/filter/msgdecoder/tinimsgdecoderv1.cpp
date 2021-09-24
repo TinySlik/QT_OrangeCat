@@ -2,6 +2,7 @@
 #include "easylogging++.h"
 #include <bitset>
 #define MAX_BIT_COUNT (1024)
+#define LENGTH_OF_PU 8
 
 namespace v1 {
 struct decode_tempalete_unit {
@@ -103,8 +104,8 @@ configuru::Config HSProcess(std::vector<char> data) {
 }
 
 const struct decode_tempalete_unit decode_tempalete_table[] = {
-  {"PU",  0, 8,   nullptr},
-  {"PD",  0, 8,   nullptr},
+  {"PU",  0, LENGTH_OF_PU,   nullptr},
+  {"PD",  0, LENGTH_OF_PU,   nullptr},
   {"GX",  1, 13,  GProcess},
   {"GY",  1, 13,  GProcess},
   {"GZ",  1, 13,  GProcess},
@@ -258,16 +259,18 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
     } else {
       _skip_for_five_1_tag_start_protect_tag = false;
       if (start_tag) {
-        if(data_.size() > 8)
-            for (size_t l = 0; l < 8 ; l++)
+        if(data_.size() > LENGTH_OF_PU)
+            for (size_t l = 0; l < LENGTH_OF_PU ; l++)
                 data_.pop_back();
         status["list_current_target"] << "NULL";
         if (leg == data_.size()) {
-          LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
+//          LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
           status["last_msg_completeness_check"] = "Credible";
+          LOG(INFO) << "------------------------------------";
         } else {
-          LOG(INFO) << "expect length: " << leg << "--" << "real length: " << data_.size();
+          LOG(INFO) << "unstable, length check: " << leg << "-" << data_.size();
           status["last_msg_completeness_check"] = "Undependable";
+          LOG(INFO) << "------------------------------------";
         }
       } else {
         start_tag = true;
@@ -286,17 +289,25 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
     }
   }
   if (!_process_init_wait_tag) return true;
-
   std::vector<char> data__ = data_;
   data__.push_back('\0');
   std::string bits = data__.data();
   auto length = bits.length();
   status["bits"] = bits;
-  if (length == (8 + tag_bit)) {
+  if (length == (LENGTH_OF_PU + tag_bit)) {
     unsigned char res = 0;
     for (size_t j = 0; j < tag_bit; ++j)
-        res += bits.c_str()[8 + tag_bit - j - 1] == '1' ? 1 << j : 0;
+        res += bits.c_str()[LENGTH_OF_PU + tag_bit - j - 1] == '1' ? 1 << j : 0;
     cur_tag = static_cast<int>(res);
+    if (cur_tag >= decode_info_.as_array().size()) {
+      cur_tag = decode_info_.as_array().size();
+      LOG(WARNING) << "list tag out of range. reset now.";
+      _process_init_wait_tag = false;
+      data_.clear();
+      cur_tag = -1;
+      start_tag = false;
+      return false;
+    }
     status["list_name"] = decode_info_[static_cast<size_t>(cur_tag)]["name"];
     std::string res_list_content = "";
     for (auto& vi: decode_info_[static_cast<size_t>(cur_tag)]["array"].as_array()) {
@@ -340,3 +351,5 @@ std::shared_ptr<MsgDecoder> TiniMsgDecoderv1::create(const std::string &decode_i
 configuru::Config TiniMsgDecoderv1::defaultParams() {
   return {};
 }
+
+#undef LENGTH_OF_PU

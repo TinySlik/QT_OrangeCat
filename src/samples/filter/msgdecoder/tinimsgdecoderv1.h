@@ -13,6 +13,7 @@ class TiniMsgDecoderv1 : public MsgDecoder {
   explicit TiniMsgDecoderv1(const std::string &decode_info);
  public:
   virtual ~TiniMsgDecoderv1() override;
+  TiniMsgDecoderv1(const TiniMsgDecoderv1 &other) = delete;
   virtual bool decode(const bool &value) override;
   virtual configuru::Config defaultParams() override;
   virtual bool reset() override;

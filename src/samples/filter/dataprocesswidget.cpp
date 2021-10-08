@@ -363,9 +363,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
       if (m_fileMMap) {
         auto head = m_fileMMap->data();
         head += 512;
-//        for (int i = 0; i< 150;++i) {
-//            LOG(INFO) << (char)head[i];
-//          }
         decode_info = cdf::cdfStringToInfoListJson_v1_0((char *)(head));
         auto cfg = ParameterServer::instance()->GetCfgCtrlRoot();
         std::string class_obj_id = typeid(*this).name();
@@ -374,7 +371,6 @@ DataProcessWidget::DataProcessWidget(QWidget *parent)
         if (std::string(cfg_local["static_file_info"]["m_msg_decoder"]) != "empty") {
           for(auto it:_msg_decoders) {
             if (it.name == std::string(cfg_local["static_file_info"]["m_msg_decoder"])) {
-                LOG(INFO) << "bingo";
               _msgdecoder = it.create(decode_info);
             }
           }

@@ -15,7 +15,6 @@ struct decode_tempalete_unit {
 configuru::Config DefaultProcess(std::vector<char> data) {
   data.push_back('\0');
   configuru::Config res = data.data();
-//  LOG(INFO) << data.data();
   return res;
 }
 
@@ -104,31 +103,31 @@ configuru::Config HSProcess(std::vector<char> data) {
 }
 
 const struct decode_tempalete_unit decode_tempalete_table[] = {
-  {"PU",  0, LENGTH_OF_PU,   nullptr},
-  {"PD",  0, LENGTH_OF_PU,   nullptr},
-  {"GX",  1, 13,  GProcess},
-  {"GY",  1, 13,  GProcess},
-  {"GZ",  1, 13,  GProcess},
-  {"BX",  1, 13,  BProcess},
-  {"BY",  1, 13,  BProcess},
-  {"BZ",  1, 13,  BProcess},
-  {"IN",  1, 12,  ABI_SC_IN_LCProcess},
-  {"GT",  1, 8,   DefaultProcess},
-  {"TM",  1, 7,   TMProcess},
-  {"RM",  1, 9,   RMProcess},
-  {"HS",  1, 9,   HSProcess},
-  {"BM",  1, 13,  BM_BCProcess},
-  {"BC",  1, 13,  BM_BCProcess},
-  {"BS",  1, 8,   DefaultProcess},
-  {"TS",  0, 1,   TSProcess},
-  {"TF",  1, 7,   TFProcess},
-  {"CV",  0, 1,   DefaultProcess},
-  {"SC",  1, 12,  ABI_SC_IN_LCProcess},
-  {"LC",  1, 12,  ABI_SC_IN_LCProcess},
-  {"GA",  1, 9,   GAProcess},
-  {"GB",  1, 9,   GBProcess},
-  {"ABI", 1, 9,   DefaultProcess},
-  {"ABS", 1, 9,   DefaultProcess},
+  {"PU",  0, LENGTH_OF_PU,    nullptr},
+  {"PD",  0, LENGTH_OF_PU,    nullptr},
+  {"GX",  1, 13,              GProcess},
+  {"GY",  1, 13,              GProcess},
+  {"GZ",  1, 13,              GProcess},
+  {"BX",  1, 13,              BProcess},
+  {"BY",  1, 13,              BProcess},
+  {"BZ",  1, 13,              BProcess},
+  {"IN",  1, 12,              ABI_SC_IN_LCProcess},
+  {"GT",  1, 8,               DefaultProcess},
+  {"TM",  1, 7,               TMProcess},
+  {"RM",  1, 9,               RMProcess},
+  {"HS",  1, 9,               HSProcess},
+  {"BM",  1, 13,              BM_BCProcess},
+  {"BC",  1, 13,              BM_BCProcess},
+  {"BS",  1, 8,               DefaultProcess},
+  {"TS",  0, 1,               TSProcess},
+  {"TF",  1, 7,               TFProcess},
+  {"CV",  0, 1,               DefaultProcess},
+  {"SC",  1, 12,              ABI_SC_IN_LCProcess},
+  {"LC",  1, 12,              ABI_SC_IN_LCProcess},
+  {"GA",  1, 9,               GAProcess},
+  {"GB",  1, 9,               GBProcess},
+  {"ABI", 1, 13,              DefaultProcess},
+  {"ABS", 1, 9,               DefaultProcess},
 };
 }  // namespace v1
 
@@ -259,7 +258,7 @@ bool TiniMsgDecoderv1::decode(const bool &value) {
     } else {
       _skip_for_five_1_tag_start_protect_tag = false;
       if (start_tag) {
-        if(data_.size() > LENGTH_OF_PU)
+        if (data_.size() > LENGTH_OF_PU)
             for (size_t l = 0; l < LENGTH_OF_PU ; l++)
                 data_.pop_back();
         status["list_current_target"] << "NULL";

@@ -17,6 +17,8 @@
 #include "easylogging++.h"
 #include "async++.h"
 
+#define SD_THRESHOLD 0.1
+
 PersonificationDecoderV2::PersonificationDecoderV2():
   code_step1_trust_count(0),
   m_code_step1_tmp_start_tag(false),
@@ -178,316 +180,327 @@ bool PersonificationDecoderV2::decodeBeforeWait(std::shared_ptr<std::vector<floa
     average += (*data)[static_cast<size_t>(i)] / sz;
   }
 
+  double theta = .0;
+
+  for(int i = 0; i < sz; i++) {
+    theta += pow((average - (*data)[static_cast<size_t>(i)]), 2.0);
+  }
+  theta = sqrt(theta);
+
+//  LOG(INFO) << "theta: " << theta;
+
   bool tg = ++_samplingIndex >= m_samplingRate;
   if (tg) _samplingIndex = 0;
 
   std::string tp = "";
+  if (theta > SD_THRESHOLD) {
+    if (tg && !m_code_step1_tmp_start_tag ) {
+      // init code
+      bool status_change_tag = (*data)[0] > average;
+      std::vector<int> tm;
+      for(int i = 0; i < sz; i++) {
+        static int count_i = 0;
+        if ((*data)[static_cast<size_t>(i)] > average) {
+          cache[static_cast<size_t>(i)] = 1.f;
+          if (tg && !status_change_tag) {
+            int res = 4;
+            if (count_i > 150) {
+              res = 6;
+            } else if (count_i > 15) {
+              res = 5;
+            }
 
-  if (tg && !m_code_step1_tmp_start_tag ) {
-    // init code
-    bool status_change_tag = (*data)[0] > average;
-    std::vector<int> tm;
-    for(int i = 0; i < sz; i++) {
-      static int count_i = 0;
-      if ((*data)[static_cast<size_t>(i)] > average) {
-        cache[static_cast<size_t>(i)] = 1.f;
-        if (tg && !status_change_tag) {
-          int res = 4;
-          if (count_i > 150) {
-            res = 6;
-          } else if (count_i > 15) {
-            res = 5;
+            if (res == 4) {
+              return false;
+            }
+            if (i > 30 && i < (sz - 30)) {
+              tm.push_back(res);
+            }
+            count_i = 0;
+            status_change_tag = true;
           }
-
-          if (res == 4) {
-            return false;
+        } else {
+          cache[static_cast<size_t>(i)] = 0.f;
+          if (tg && status_change_tag) {
+            int res = 1;
+            if (count_i > 130) {
+              res = 3;
+            } else if (count_i > 15) {
+              res = 2;
+            }
+            if (res == 1) {
+              return false;
+            }
+            if (i > 30 && i < (sz - 30)) {
+              tm.push_back(res);
+            }
+            count_i = 0;
+            status_change_tag = false;
           }
-          if (i > 30 && i < (sz - 30)) {
-            tm.push_back(res);
-          }
-          count_i = 0;
-          status_change_tag = true;
         }
-      } else {
-        cache[static_cast<size_t>(i)] = 0.f;
-        if (tg && status_change_tag) {
-          int res = 1;
-          if (count_i > 130) {
-            res = 3;
-          } else if (count_i > 15) {
-            res = 2;
-          }
-          if (res == 1) {
-            return false;
-          }
-          if (i > 30 && i < (sz - 30)) {
-            tm.push_back(res);
-          }
-          count_i = 0;
-          status_change_tag = false;
+        count_i++;
+      }
+      if (tm.size() > 3) {
+        // before start
+        std::string tms="";
+        for (size_t h = tm.size() - 2; h > 0; h--) {
+          tms += std::to_string(tm[h]);
         }
-      }
-      count_i++;
-    }
-    if (tm.size() > 3) {
-      // before start
-      std::string tms="";
-      for (size_t h = tm.size() - 2; h > 0; h--) {
-        tms += std::to_string(tm[h]);
-      }
-      if (m_code_step1_tmp_str == tms) {
-        code_step1_trust_count ++;
-        if (code_step1_trust_count > 2) {
-          LOG(INFO) << "Repeat code repeat times > 2, start decode: ";
-          m_code_step1_tmp_start_tag = true;
-          for (size_t n = 0; n < tms.size(); n++) {
-            m_code_step1_tmp.push_back(tms.c_str()[n]);
+        if (m_code_step1_tmp_str == tms) {
+          code_step1_trust_count ++;
+          if (code_step1_trust_count > 2) {
+            LOG(INFO) << "Repeat code repeat times > 2, start decode: ";
+            m_code_step1_tmp_start_tag = true;
+            for (size_t n = 0; n < tms.size(); n++) {
+              m_code_step1_tmp.push_back(tms.c_str()[n]);
+            }
+            m_code_step1_tmp_cur_head = 0;
+            m_decode_step2_tmp_cur_head = 0;
+            code_step1_trust_count = 0;
           }
-          m_code_step1_tmp_cur_head = 0;
-          m_decode_step2_tmp_cur_head = 0;
+        } else {
           code_step1_trust_count = 0;
         }
-      } else {
-        code_step1_trust_count = 0;
+        m_code_step1_tmp_str = tms;
       }
-      m_code_step1_tmp_str = tms;
-    }
-  } else if (tg && m_code_step1_tmp_start_tag) {
-    for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
-      tp += m_code_step1_tmp[bp];
-    }
-    float t1 = 0.99f;
-    float t2 = 1.f;
-    float t3 = 0.985f;
+    } else if (tg && m_code_step1_tmp_start_tag) {
+      for (size_t bp = m_code_step1_tmp_cur_head; bp < m_code_step1_tmp.size(); bp++) {
+        tp += m_code_step1_tmp[bp];
+      }
+      float t1 = 0.99f;
+      float t2 = 1.f;
+      float t3 = 0.985f;
 
-    auto task1 = async::spawn([&, this, data]() -> S_RES {
-        return ThreadProcess(tp ,sz, tg, average, t1, data);
-    });
-    auto task2 = async::spawn([&, this, data]() -> S_RES {
-        return ThreadProcess(tp ,sz, tg, average, t2, data);
-    });
-    auto task3 = async::spawn([&, this, data]() -> S_RES {
-        return ThreadProcess(tp ,sz, tg, average, t3, data);
-    });
-    auto tasks_ = async::when_all(task1, task2, task3);
-    auto task_check_ = tasks_.then([tp](std::tuple< async::task<S_RES>,
-                                                  async::task<S_RES>,
-                                                  async::task<S_RES>> results) -> S_RES {
-        auto r1 = std::get<0>(results).get();
-        auto r2 = std::get<1>(results).get();
-        auto r3 = std::get<2>(results).get();
-//        std::cout<< r1.confidence_level <<":" << r1.decode_res
-//                 << " || "
-//                 << r2.confidence_level <<":" << r2.decode_res
-//                 << " || "
-//                 << r3.confidence_level <<":" << r3.decode_res
-//                 << std::endl;
-//        std::cout.flush();
-        if (r2.confidence_level < 13) {
-          return r2;
-        } else {
-          auto cur = r1;
-          if (r1.confidence_level > r3.confidence_level) {
-            cur = r3;
-//            std::cout << "special case 3:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
+      auto task1 = async::spawn([&, this, data]() -> S_RES {
+          return ThreadProcess(tp ,sz, tg, average, t1, data);
+      });
+      auto task2 = async::spawn([&, this, data]() -> S_RES {
+          return ThreadProcess(tp ,sz, tg, average, t2, data);
+      });
+      auto task3 = async::spawn([&, this, data]() -> S_RES {
+          return ThreadProcess(tp ,sz, tg, average, t3, data);
+      });
+      auto tasks_ = async::when_all(task1, task2, task3);
+      auto task_check_ = tasks_.then([tp](std::tuple< async::task<S_RES>,
+                                                    async::task<S_RES>,
+                                                    async::task<S_RES>> results) -> S_RES {
+          auto r1 = std::get<0>(results).get();
+          auto r2 = std::get<1>(results).get();
+          auto r3 = std::get<2>(results).get();
+  //        std::cout<< r1.confidence_level <<":" << r1.decode_res
+  //                 << " || "
+  //                 << r2.confidence_level <<":" << r2.decode_res
+  //                 << " || "
+  //                 << r3.confidence_level <<":" << r3.decode_res
+  //                 << std::endl;
+  //        std::cout.flush();
+          if (r2.confidence_level < 13) {
+            return r2;
           } else {
-            cur = r1;
-//            std::cout << "special case 1:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
-          }
-          std::cout.flush();
-          return cur;
-        }
-    });
-
-    static int e_count = 0;
-    auto res = task_check_.get();
-    auto tms = res.decode_res;
-
-    switch (res.confidence_level) {
-      case 1:
-      case 4:
-      case 11:
-        if (tms.size() > tp.size()) {
-          for (size_t i = 0; i < tms.size() - tp.size(); i++) {
-            m_code_step1_tmp.push_back('0');
-          }
-        }
-        for (size_t n = 0; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
-        }
-        break;
-      case 2:
-        if (tms.size() > (tp.size() - 1)) {
-          for (size_t i = 0; i < (tms.size() - (tp.size() - 1)); i++) {
-            m_code_step1_tmp.push_back('0');
-          }
-        }
-        for (size_t n = 0; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + 1 + n] = tms.c_str()[n];
-        }
-        m_code_step1_tmp_cur_head++;
-        break;
-      case 3:
-        m_code_step1_tmp_cur_head++;
-        break;
-      case 5:
-        if ((tms.size() - 1) > (tp.size())) {
-          for (size_t i = 0; i < ((tms.size() - 1) - (tp.size())); i++) {
-            m_code_step1_tmp.push_back('0');
-          }
-        }
-        for (size_t n = 1; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + n - 1] = tms.c_str()[n];
-        }
-        break;
-      case 6:
-        if ((tms.size() - 2) > (tp.size())) {
-          for (size_t i = 0; i < ((tms.size() - 2) - (tp.size())); i++) {
-            m_code_step1_tmp.push_back('0');
-          }
-        }
-        for (size_t n = 2; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + n - 2] = tms.c_str()[n];
-        }
-        break;
-      case 7:
-        if ((tms.size() - 1) > (tp.size() - 1)) {
-          for (size_t i = 0; i < ((tms.size() - 1) - (tp.size() - 1)); i++) {
-            m_code_step1_tmp.push_back('0');
-          }
-        }
-        for (size_t n = 1; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
-        }
-        m_code_step1_tmp_cur_head++;
-        break;
-      case 8:
-        if ((tms.size() - 2) > (tp.size() - 1)) {
-         for (size_t i = 0; i < ((tms.size() - 2) - (tp.size() - 1)); i++) {
-           m_code_step1_tmp.push_back('0');
-         }
-        }
-        for (size_t n = 2; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + n - 1] = tms.c_str()[n];
-        }
-        m_code_step1_tmp_cur_head++;
-        break;
-      case 9:
-        if ((tms.size() - 2) > (tp.size() - 2)) {
-          for (size_t i = 0; i < ((tms.size() - 2) - (tp.size() - 2)); i++) {
-            m_code_step1_tmp.push_back('0');
-          }
-        }
-        for (size_t n = 2; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
-        }
-        m_code_step1_tmp_cur_head += 2;
-        break;
-      case 10:
-        if ((tms.size() - 1) > (tp.size() - 2)) {
-          for (size_t i = 0; i < ((tms.size() - 1) - (tp.size() - 2)); i++) {
-            m_code_step1_tmp.push_back('0');
-          }
-        }
-        for (size_t n = 2; n < tms.size(); n++) {
-          m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n - 1];
-        }
-        m_code_step1_tmp_cur_head += 2;
-        break;
-      case 12:
-        m_code_step1_tmp_cur_head += 2;
-        break;
-      default:
-        e_count++;
-        if (e_count > 6) {
-          reset();
-        }
-        return false;
-    }
-    if (res.confidence_level < 15) {
-      e_count = 0;
-    }
-
-    switch (res.confidence_level) {
-      case 2:
-      case 3:
-      case 5:
-      case 7:
-      case 6:
-      case 8:
-      case 12:
-        if (!m_decode_step2_tmp_start_tag &&
-            (m_code_step1_tmp[m_code_step1_tmp_cur_head] == '3' ||
-            m_code_step1_tmp[m_code_step1_tmp_cur_head] == '6')) {
-          m_decode_step2_tmp_cur_head = m_code_step1_tmp_cur_head;
-          m_decode_step2_tmp_start_tag = TRUE;
-        }
-        if (m_decode_step2_tmp_start_tag) {
-          while (m_code_step1_tmp_cur_head > m_decode_step2_tmp_cur_head) {
-            int t1 = m_code_step1_tmp[m_decode_step2_tmp_cur_head + 1];
-            int t2 = m_code_step1_tmp[m_decode_step2_tmp_cur_head];
-
-            if (t2 == '3') {
-              if (t1 == '6') {
-                _resualt->push_back('1');
-                m_decode_step2_tmp_cur_head++;
-              } else if (t1 == '5') {
-                _resualt->push_back('1');
-                m_decode_step2_tmp_cur_head++;
-              } else {
-                m_decode_step2_tmp_cur_head++;
-              }
-            } else if (t2 == '6') {
-              if (t1 == '3') {
-                _resualt->push_back('0');
-                m_decode_step2_tmp_cur_head++;
-              } else if (t1 == '2') {
-                _resualt->push_back('0');
-                m_decode_step2_tmp_cur_head++;
-              } else {
-                m_decode_step2_tmp_cur_head++;
-              }
-            } else if (t2 == '2') {
-              if (t1 == '6') {
-                _resualt->push_back('X');
-                m_decode_step2_tmp_cur_head++;
-              } else if (t1 == '5') {
-                _resualt->push_back('0');
-                m_decode_step2_tmp_cur_head++;
-                m_decode_step2_tmp_cur_head++;
-              } else {
-                m_decode_step2_tmp_cur_head++;
-              }
-            } else if (t2 == '5') {
-              if (t1 == '3') {
-                _resualt->push_back('X');
-                m_decode_step2_tmp_cur_head++;
-              } else if (t1 == '2') {
-                _resualt->push_back('1');
-                m_decode_step2_tmp_cur_head++;
-                m_decode_step2_tmp_cur_head++;
-              } else {
-                m_decode_step2_tmp_cur_head++;
-              }
+            auto cur = r1;
+            if (r1.confidence_level > r3.confidence_level) {
+              cur = r3;
+  //            std::cout << "special case 3:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
             } else {
-              m_decode_step2_tmp_cur_head++;
+              cur = r1;
+  //            std::cout << "special case 1:" << cur.confidence_level << ":"<< cur.decode_res << "-" << tp << std::endl;
             }
+            std::cout.flush();
+            return cur;
+          }
+      });
 
-            if (t1 == '0' || t2 == '0') {
-              LOG(INFO) << "error";
-              reset();
+      static int e_count = 0;
+      auto res = task_check_.get();
+      auto tms = res.decode_res;
+
+      switch (res.confidence_level) {
+        case 1:
+        case 4:
+        case 11:
+          if (tms.size() > tp.size()) {
+            for (size_t i = 0; i < tms.size() - tp.size(); i++) {
+              m_code_step1_tmp.push_back('0');
             }
           }
-        }
-        break;
-      default:
-        break;
+          for (size_t n = 0; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
+          }
+          break;
+        case 2:
+          if (tms.size() > (tp.size() - 1)) {
+            for (size_t i = 0; i < (tms.size() - (tp.size() - 1)); i++) {
+              m_code_step1_tmp.push_back('0');
+            }
+          }
+          for (size_t n = 0; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + 1 + n] = tms.c_str()[n];
+          }
+          m_code_step1_tmp_cur_head++;
+          break;
+        case 3:
+          m_code_step1_tmp_cur_head++;
+          break;
+        case 5:
+          if ((tms.size() - 1) > (tp.size())) {
+            for (size_t i = 0; i < ((tms.size() - 1) - (tp.size())); i++) {
+              m_code_step1_tmp.push_back('0');
+            }
+          }
+          for (size_t n = 1; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + n - 1] = tms.c_str()[n];
+          }
+          break;
+        case 6:
+          if ((tms.size() - 2) > (tp.size())) {
+            for (size_t i = 0; i < ((tms.size() - 2) - (tp.size())); i++) {
+              m_code_step1_tmp.push_back('0');
+            }
+          }
+          for (size_t n = 2; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + n - 2] = tms.c_str()[n];
+          }
+          break;
+        case 7:
+          if ((tms.size() - 1) > (tp.size() - 1)) {
+            for (size_t i = 0; i < ((tms.size() - 1) - (tp.size() - 1)); i++) {
+              m_code_step1_tmp.push_back('0');
+            }
+          }
+          for (size_t n = 1; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
+          }
+          m_code_step1_tmp_cur_head++;
+          break;
+        case 8:
+          if ((tms.size() - 2) > (tp.size() - 1)) {
+           for (size_t i = 0; i < ((tms.size() - 2) - (tp.size() - 1)); i++) {
+             m_code_step1_tmp.push_back('0');
+           }
+          }
+          for (size_t n = 2; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + n - 1] = tms.c_str()[n];
+          }
+          m_code_step1_tmp_cur_head++;
+          break;
+        case 9:
+          if ((tms.size() - 2) > (tp.size() - 2)) {
+            for (size_t i = 0; i < ((tms.size() - 2) - (tp.size() - 2)); i++) {
+              m_code_step1_tmp.push_back('0');
+            }
+          }
+          for (size_t n = 2; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n];
+          }
+          m_code_step1_tmp_cur_head += 2;
+          break;
+        case 10:
+          if ((tms.size() - 1) > (tp.size() - 2)) {
+            for (size_t i = 0; i < ((tms.size() - 1) - (tp.size() - 2)); i++) {
+              m_code_step1_tmp.push_back('0');
+            }
+          }
+          for (size_t n = 2; n < tms.size(); n++) {
+            m_code_step1_tmp[m_code_step1_tmp_cur_head + n] = tms.c_str()[n - 1];
+          }
+          m_code_step1_tmp_cur_head += 2;
+          break;
+        case 12:
+          m_code_step1_tmp_cur_head += 2;
+          break;
+        default:
+          e_count++;
+          if (e_count > 6) {
+            reset();
+          }
+          return false;
+      }
+      if (res.confidence_level < 15) {
+        e_count = 0;
+      }
+
+      switch (res.confidence_level) {
+        case 2:
+        case 3:
+        case 5:
+        case 7:
+        case 6:
+        case 8:
+        case 12:
+          if (!m_decode_step2_tmp_start_tag &&
+              (m_code_step1_tmp[m_code_step1_tmp_cur_head] == '3' ||
+              m_code_step1_tmp[m_code_step1_tmp_cur_head] == '6')) {
+            m_decode_step2_tmp_cur_head = m_code_step1_tmp_cur_head;
+            m_decode_step2_tmp_start_tag = TRUE;
+          }
+          if (m_decode_step2_tmp_start_tag) {
+            while (m_code_step1_tmp_cur_head > m_decode_step2_tmp_cur_head) {
+              int t1 = m_code_step1_tmp[m_decode_step2_tmp_cur_head + 1];
+              int t2 = m_code_step1_tmp[m_decode_step2_tmp_cur_head];
+
+              if (t2 == '3') {
+                if (t1 == '6') {
+                  _resualt->push_back('1');
+                  m_decode_step2_tmp_cur_head++;
+                } else if (t1 == '5') {
+                  _resualt->push_back('1');
+                  m_decode_step2_tmp_cur_head++;
+                } else {
+                  m_decode_step2_tmp_cur_head++;
+                }
+              } else if (t2 == '6') {
+                if (t1 == '3') {
+                  _resualt->push_back('0');
+                  m_decode_step2_tmp_cur_head++;
+                } else if (t1 == '2') {
+                  _resualt->push_back('0');
+                  m_decode_step2_tmp_cur_head++;
+                } else {
+                  m_decode_step2_tmp_cur_head++;
+                }
+              } else if (t2 == '2') {
+                if (t1 == '6') {
+                  _resualt->push_back('X');
+                  m_decode_step2_tmp_cur_head++;
+                } else if (t1 == '5') {
+                  _resualt->push_back('0');
+                  m_decode_step2_tmp_cur_head++;
+                  m_decode_step2_tmp_cur_head++;
+                } else {
+                  m_decode_step2_tmp_cur_head++;
+                }
+              } else if (t2 == '5') {
+                if (t1 == '3') {
+                  _resualt->push_back('X');
+                  m_decode_step2_tmp_cur_head++;
+                } else if (t1 == '2') {
+                  _resualt->push_back('1');
+                  m_decode_step2_tmp_cur_head++;
+                  m_decode_step2_tmp_cur_head++;
+                } else {
+                  m_decode_step2_tmp_cur_head++;
+                }
+              } else {
+                m_decode_step2_tmp_cur_head++;
+              }
+
+              if (t1 == '0' || t2 == '0') {
+                LOG(INFO) << "error";
+                reset();
+              }
+            }
+          }
+          break;
+        default:
+          break;
+      }
+      _displayBuffer = res.cache;
+      return true;
     }
-    _displayBuffer = res.cache;
-    return true;
   }
 
   _displayBuffer = std::make_shared<std::vector<float>>(cache);
+
   return false;
 }
 bool PersonificationDecoderV2::decodeAfterWait() {

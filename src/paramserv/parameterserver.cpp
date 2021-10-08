@@ -260,12 +260,12 @@ static void handle_set_dev_ctrl(struct mg_connection *nc,struct http_message *hm
   if (!(custom_head && end)) {
     LOG(ERROR) << __FUNCTION__ << "error";
     free(res);
-    mg_http_send_error(nc, 403, NULL);
+    mg_http_send_error(nc, 403, nullptr);
     return;
   }
 
   memset(cache, 0, CACHE_MAX_SIZE);
-  memcpy(cache, custom_head + 9,end - custom_head - 9);
+  memcpy(cache, custom_head + 9, end - custom_head - 9);
   free(res);
 
   auto config_in = parse_string(cache, JSON, CONFIGURU_JSON_PARSE_ERROR_LOG);

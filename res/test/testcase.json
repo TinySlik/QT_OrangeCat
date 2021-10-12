@@ -269,7 +269,7 @@
         "z": 1
       }
     },
-    "hiden": false
+    "hiden": true
     // "transform": {
     //   "m_translate": {
     //     "x": -0.0031417012,

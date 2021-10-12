@@ -251,7 +251,7 @@ static void handle_get_device_usage(struct mg_connection *nc) {
   mg_send_http_chunk(nc, "", 0);
 }
 
-static void handle_set_dev_ctrl(struct mg_connection *nc,struct http_message *hm) {
+static void handle_set_dev_ctrl(struct mg_connection *nc, struct http_message *hm) {
   // Use chunked encoding in order to avoid calculating Content-Length
   char * res = urlDecode(hm->message.p);
   char *custom_head = strstr(res, "code_res=");
@@ -336,6 +336,39 @@ static void handle_get_dev_ctrl(struct mg_connection *nc) {
   mg_send_http_chunk(nc, "", 0);
 }
 
+static void handle_jsonp(struct mg_connection *nc, struct http_message *hm) {
+  // Use chunked encoding in order to avoid calculating Content-Length
+  char *res = urlDecode(hm->message.p);
+  char *custom_head = strstr(res, "jsonp");
+  char *end =  strstr(res, "HTTP/1.1");
+  if (!(custom_head && end)) {
+    LOG(ERROR) << __FUNCTION__ << "error";
+    free(res);
+    mg_http_send_error(nc, 403, nullptr);
+    return;
+  }
+
+  memset(cache, 0, CACHE_MAX_SIZE);
+  memcpy(cache, custom_head + 6, end - custom_head - 6);
+  free(res);
+
+  LOG(INFO) << cache;
+
+  // Use chunked encoding in order to avoid calculating Content-Length
+  mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
+
+  auto dev_ctrl = ParameterServer::instance()->GetCfgCtrlRoot();
+  std::string og = "fn(";
+#ifdef CONFIG_HIDEN_PARAM
+  mg_printf_http_chunk(nc, ( og + dump_string_with_hiden(dev_ctrl, JSON) + ")") .c_str());
+#else
+  mg_printf_http_chunk(nc, ( og + dump_string(dev_ctrl, JSON) + ")").c_str());
+#endif
+
+  // Send empty chunk, the end of response
+  mg_send_http_chunk(nc, "", 0);
+}
+
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
   struct http_message *hm = (struct http_message *) ev_data;
   switch (ev) {
@@ -348,6 +381,9 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
         handle_set_dev_ctrl(nc, hm);
       } else if (mg_vcmp(&hm->uri, "/set_target_root") == 0) {
         handle_set_target_root(nc, hm);
+      } else if (mg_vcmp(&hm->uri, "/jsonp") == 0) {
+        LOG(INFO) << "bingo";
+        handle_jsonp(nc, hm);
       } else {
         mg_serve_http(nc, hm, s_http_server_opts);  // Serve static content
       }

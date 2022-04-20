@@ -14,9 +14,9 @@
  */
 
 #define CONFIGURU_IMPLEMENTATION 1
-#include "browser.h"
-#include "browserwindow.h"
-#include "tabwidget.h"
+//#include "browser.h"
+//#include "browserwindow.h"
+//#include "tabwidget.h"
 #include "parameterserver.h"
 #include <QApplication>
 #include <QDesktopWidget>
@@ -26,15 +26,15 @@
 
 #include "mainwindow.h"
 #include <QApplication>
-#include <QWebEngineProfile>
-#include <QWebEngineSettings>
+//#include <QWebEngineProfile>
+//#include <QWebEngineSettings>
 
 #include <QGuiApplication>
 #include "easylogging++.h"
 #include <QFile>
 
 INITIALIZE_EASYLOGGINGPP
-
+/**
 QUrl commandLineUrlArgument() {
   const QStringList args = QCoreApplication::arguments();
   for (const QString &arg : args.mid(1)) {
@@ -43,7 +43,7 @@ QUrl commandLineUrlArgument() {
   }
   return QUrl(QStringLiteral("http://localhost:8099"));
 }
-
+*/
 int main(int argc, char **argv) {
   ParameterServer::instance()->CreateNewRoot("base", {
                                                   {"dev_ctrl", {
@@ -63,8 +63,8 @@ int main(int argc, char **argv) {
   QApplication app(argc, argv);
 ////    app.setWindowIcon(QIcon(QStringLiteral(":AppLogoColor.png")));
 
-  QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
+  //QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
+  //QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
 //  QWebEngineProfile::defaultProfile()->setUseForGlobalCertificateVerification();
 
   QCoreApplication::setApplicationName("Oil paint demo.");

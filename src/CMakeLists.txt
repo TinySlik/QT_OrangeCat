@@ -15,17 +15,17 @@ qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
 set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/certificateerrordialog.ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/passworddialog.ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadmanagerwidget.ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadwidget.ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/browser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/browserwindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadmanagerwidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadwidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/tabwidget.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webpage.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webpopupwindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webview.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/passworddialog.ui
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadmanagerwidget.ui
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadwidget.ui
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/browser.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/browserwindow.cpp
+    #{CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadmanagerwidget.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadwidget.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/tabwidget.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webpage.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webpopupwindow.cpp
+    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webview.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/urldecode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/mainwindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/mainwindow.h
@@ -180,9 +180,6 @@ set(SOURCE_ABMDAO_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/ABMDaoLib/well/entity/wellinfodepthstatus.h
 )
 
-set(SOURCE_TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/unittest/main.cpp
-)
-
 include_directories(log)
 include_directories(paramserv)
 include_directories(../3rdparty/asyncplusplus/include)
@@ -200,16 +197,13 @@ add_definitions(-D_WIN_ADBM_EXPORTING)
 add_library(ABMDaoLib ${SOURCE_ABMDAO_FILES})
 target_link_libraries(ABMDaoLib PRIVATE Qt5::Widgets Qt5::Sql)
 
-add_executable(unittest ${SOURCE_TEST_FILES})
-target_link_libraries(unittest PRIVATE ABMDaoLib gtest)
-
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-expansion-to-defined -Wno-deprecated-declarations" )
 add_executable(sample WIN32 ${SOURCE_FILTER_FILES})
 #target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ ADlink)
 if (ADLINK_32)
-  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ABMDaoLib ADlink)
+  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ABMDaoLib ADlink)
 else()
-  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::WebEngineWidgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ABMDaoLib)
+  target_link_libraries(sample PRIVATE Qt5::Widgets Qt5::Quick Qt5::Svg paramserv Async++ cdf ABMDaoLib)
 endif()
 
 add_executable(display ${SOURCE_GENERAL_FILES})

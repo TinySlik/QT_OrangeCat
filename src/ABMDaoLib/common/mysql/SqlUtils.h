@@ -12,6 +12,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QDebug>
+#include <memory>
 #include "../../windllsupport.h"
 
 /**

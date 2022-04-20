@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <functional>
 
 #ifndef MAX_CHAN_2405
 #define MAX_CHAN_2405	4

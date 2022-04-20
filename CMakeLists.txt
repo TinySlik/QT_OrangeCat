@@ -26,7 +26,7 @@ include(cmake/Option.cmake)
 # flags
 
 if(OS_WIN)
-  set(QT_PATH "D:/Qt/Qt5.13.2/5.13.2")
+  set(QT_PATH "C:/Qt/5.12.3")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 #  set(Qt5WebEngineWidgets_DIR ${QT_PATH}/msvc2017/lib/cmake/Qt5WebEngineWidgets)
@@ -63,7 +63,7 @@ endmacro()
 
 include(CMakePackageConfigHelpers)
 
-find_package(Qt5 COMPONENTS Widgets WebEngineWidgets Quick Test Svg PrintSupport Sql REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Quick Test Svg PrintSupport Sql REQUIRED)
 
 set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
 set_outdir(

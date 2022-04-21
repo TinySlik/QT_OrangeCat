@@ -21,8 +21,26 @@
 #include <thread>
 #include <chrono>
 #include "easylogging++.h"
+#include "udp_discovery_peer.hpp"
 #include <iostream>
 #include <string>
+
+
+#include <string.h>
+#include <map>
+#include <iostream>
+#include "udp_discovery_peer.hpp"
+
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
+const int kPort = 12021;
+const uint64_t kApplicationId = 7681412;
+const unsigned int kMulticastAddress = (236 << 24) + (255 << 16) + (255 << 8) + 123; // 236.255.255.123
 
 #define CONFIGURU_IMPLEMENTATION 1
 #define TARGET_WEB_DIR_NAME "../res/web_root"
@@ -107,8 +125,8 @@ static char cache[CACHE_MAX_SIZE];
     configuru::dump_file("your/path/to/out_put_config.json", cfg["target_parm_index"], configuru::JSON / configuru::CFG);
     -------------------------------------------------
  *  the second level config node such as
-    cfg["first_level"]["second_level"] = "your_value" will be crush when the cfg["first_level"] is exist as a object;
-    to solve this problem, you should use cfg.judge_or_create_key("first_level") to make sure the first level object is exist or you will create it;
+    cfg["first_level"]["second_level"] = "your_value" will be crush when the cfg["first_level"] is not exist as a object;
+    to solve this problem, you should use cfg.judge_or_create_key("first_level") to make sure the first level object is not exist or you will create it;
 
  *  sometimes we want to use some config but not show on the web server, then we should use hiden
     cfg["target_parm_index"].set_hiden(true);
@@ -124,27 +142,13 @@ static char cache[CACHE_MAX_SIZE];
 */
 
 configuru::Config &ParameterServer::GetCfgStatusRoot() {
-  if (_root_nodes.size() == 0) {
-    _cfgRoot.judge_or_create_key("dev_status");
-    return _cfgRoot["dev_status"];
-  } else {
-    return _root_nodes[_index].config.judge_with_create_key("dev_status");
-  }
+  return _cfgRoot.judge_with_create_key("dev_status");
 }
 configuru::Config &ParameterServer::GetCfgRoot() {
-  if (_root_nodes.size() == 0) {
-    return _cfgRoot;
-  } else {
-    return _root_nodes[_index].config;
-  }
+  return _cfgRoot;
 }
 configuru::Config &ParameterServer::GetCfgCtrlRoot() {
-  if (_root_nodes.size() == 0) {
-    _cfgRoot.judge_or_create_key("dev_ctrl");
-    return _cfgRoot["dev_ctrl"];
-  } else {
-    return _root_nodes[_index].config.judge_with_create_key("dev_ctrl");
-  }
+  return _cfgRoot.judge_with_create_key("dev_ctrl");
 }
 ParameterServer *ParameterServer::instance() {
   static ParameterServer *_this = nullptr;
@@ -154,73 +158,6 @@ ParameterServer *ParameterServer::instance() {
     _this->start_server();
   }
   return _this;
-}
-
-bool ParameterServer::CreateNewRoot(const std::string &name,
-    configuru::Config &&config) {
-  if (_root_nodes.size() > MAX_ROOT_NODE_COUNT)
-        return false;
-  for (size_t i = 0; i < _root_nodes.size(); i++) {
-    if (name == _root_nodes[i].name) {
-      LOG(WARNING) << "Duplicate name index.";
-      return false;
-    }
-  }
-  _root_nodes.push_back({name, config});
-  return true;
-}
-
-bool ParameterServer::RemoveRoot(const std::string &name) {
-  for (size_t i = 0; i < _root_nodes.size(); i++) {
-    if (name == _root_nodes[i].name) {
-      LOG(INFO) << "remove root node: " << name;
-      _root_nodes.erase(_root_nodes.begin() + i);
-      return true;
-    }
-  }
-  return false;
-}
-
-configuru::Config &ParameterServer::GetRoot(const std::string &name) {
-  for (size_t i = 0; i < _root_nodes.size(); i++) {
-    if (name == _root_nodes[i].name) return  _root_nodes[i].config;
-  }
-  LOG(WARNING) << "non-existent root node index.";
-  return _null;
-}
-
-configuru::Config &ParameterServer::GetRootOrCreate(const std::string &name, configuru::Config &&config) {
-  size_t i = 0;
-  for (; i < _root_nodes.size(); i++) {
-    if (name == _root_nodes[i].name) return  _root_nodes[i].config;
-  }
-  if (_root_nodes.size() > MAX_ROOT_NODE_COUNT) return _null;
-  for (i = 0; i < _root_nodes.size(); i++) {
-    if (name == _root_nodes[i].name) {
-      LOG(WARNING) << "Duplicate name index.";
-      return _null;
-    }
-  }
-  _root_nodes.push_back({name, config});
-  return _root_nodes[i].config;
-}
-
-bool ParameterServer::SetCurrentRoot(const std::string &name) {
-  for (size_t i = 0; i < _root_nodes.size(); i++) {
-    if (name == _root_nodes[i].name) {
-      _index = i;
-      return true;
-    }
-  }
-  LOG(WARNING) << "non-existent root node index.";
-  return false;
-}
-
-bool ParameterServer::SetCurrentRoot(size_t index) {
-  if (index > _root_nodes.size()) return false;
-  if (index == _index ) return false;
-  _index = index;
-  return true;
 }
 
 static void handle_get_device_usage(struct mg_connection *nc) {
@@ -240,10 +177,10 @@ static void handle_get_device_usage(struct mg_connection *nc) {
     cfg["dev_status"]= Config::object();
   }
   auto dev_status = cfg["dev_status"];
-//  dev_status["mem"] = mem;
-//  dev_status["vmem"] = vmem;
-//  dev_status["io_r"] = r;
-//  dev_status["io_w"] = w;
+  //  dev_status["mem"] = mem;
+  //  dev_status["vmem"] = vmem;
+  //  dev_status["io_r"] = r;
+  //  dev_status["io_w"] = w;
 
   mg_printf_http_chunk(nc, dump_string(dev_status, JSON).c_str());
 
@@ -287,40 +224,6 @@ static void handle_set_dev_ctrl(struct mg_connection *nc, struct http_message *h
   mg_send_http_chunk(nc, "", 0);
 }
 
-static void handle_set_target_root(struct mg_connection *nc,struct http_message *hm) {
-  // Use chunked encoding in order to avoid calculating Content-Length
-  char * res = urlDecode(hm->message.p);
-  char *custom_head = strstr(res, "code_res=");
-  char *end =  strstr(res, "HTTP/1.1");
-
-  if (!(custom_head && end)) {
-    LOG(ERROR) << __FUNCTION__ << "error";
-    free(res);
-    mg_http_send_error(nc, 403, NULL);
-    return;
-  }
-
-  memset(cache, 0, CACHE_MAX_SIZE);
-  memcpy(cache, custom_head + 9,end - custom_head - 10);
-  free(res);
-
-  auto res_root = ParameterServer::instance()->SetCurrentRoot(cache);
-  if (res_root) {
-    auto dev_ctrl = ParameterServer::instance()->GetCfgCtrlRoot();
-    mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
-#ifdef CONFIG_HIDEN_PARAM
-    mg_printf_http_chunk(nc, dump_string_with_hiden(dev_ctrl, JSON).c_str());
-#else
-    mg_printf_http_chunk(nc, dump_string(dev_ctrl, JSON).c_str());
-#endif
-  } else {
-    mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
-  }
-
-  // Send empty chunk, the end of response
-  mg_send_http_chunk(nc, "", 0);
-}
-
 static void handle_get_dev_ctrl(struct mg_connection *nc) {
   // Use chunked encoding in order to avoid calculating Content-Length
   mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
@@ -336,6 +239,7 @@ static void handle_get_dev_ctrl(struct mg_connection *nc) {
   mg_send_http_chunk(nc, "", 0);
 }
 
+#ifdef WITH_HTTP_PAGE
 static void handle_jsonp(struct mg_connection *nc, struct http_message *hm) {
   // Use chunked encoding in order to avoid calculating Content-Length
   char *res = urlDecode(hm->message.p);
@@ -368,6 +272,7 @@ static void handle_jsonp(struct mg_connection *nc, struct http_message *hm) {
   // Send empty chunk, the end of response
   mg_send_http_chunk(nc, "", 0);
 }
+#endif
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
   struct http_message *hm = (struct http_message *) ev_data;
@@ -379,11 +284,10 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
         handle_get_dev_ctrl(nc);
       } else if (mg_vcmp(&hm->uri, "/set_dev_ctrl") == 0) {
         handle_set_dev_ctrl(nc, hm);
-      } else if (mg_vcmp(&hm->uri, "/set_target_root") == 0) {
-        handle_set_target_root(nc, hm);
+#ifdef WITH_HTTP_PAGE
       } else if (mg_vcmp(&hm->uri, "/jsonp") == 0) {
-        LOG(INFO) << "bingo";
         handle_jsonp(nc, hm);
+#endif
       } else {
         mg_serve_http(nc, hm, s_http_server_opts);  // Serve static content
       }
@@ -406,11 +310,29 @@ private:
   ThreadState requestedState=INIT;
   ThreadState currentState=INIT;
   int id;
-
+  struct mg_mgr mgr;
+  struct mg_connection *nc;
+  cs_stat_t st;
 public:
   ServerThread(int id) {
     this->id=id;
     condition=new Condition(mmutex);
+#ifdef WITH_HTTP_PAGE
+    mg_mgr_init(&mgr, NULL);
+    nc = mg_bind(&mgr, s_http_port, ev_handler);
+    while (nc == NULL && s_http_port[3] != '0') {
+      LOG(WARNING) << "Cannot bind to " << s_http_port << std::endl;
+      s_http_port[3]--;
+      LOG(WARNING) << "Try " << s_http_port << std::endl;
+      nc = mg_bind(&mgr, s_http_port, ev_handler);
+    }
+    if (s_http_port[3] == '0') {
+#ifdef DEBUG_PARAM_SERV
+	    LOG(ERROR) << "failed";
+#endif
+      exit(1);
+    }
+#endif
   }
   ~ServerThread() {
     delete condition;
@@ -436,24 +358,6 @@ public:
       currentState=RUNNING;
     }
 #ifdef WITH_HTTP_PAGE
-    struct mg_mgr mgr;
-    struct mg_connection *nc;
-    cs_stat_t st;
-    mg_mgr_init(&mgr, NULL);
-    nc = mg_bind(&mgr, s_http_port, ev_handler);
-	while (nc == NULL && s_http_port[3] != '0') {
-	  LOG(WARNING) << "Cannot bind to " << s_http_port << std::endl;
-	  s_http_port[3]--;
-	  LOG(WARNING) << "Try " << s_http_port << std::endl;
-	  nc = mg_bind(&mgr, s_http_port, ev_handler);
-	}
-	if (s_http_port[3] == '0') {
-#ifdef DEBUG_PARAM_SERV
-	  LOG(ERROR) << "failed";
-#endif
-      exit(1);
-    }
-
     mg_set_protocol_http_websocket(nc);
     s_http_server_opts.document_root = TARGET_WEB_DIR_NAME;
 
@@ -485,20 +389,146 @@ public:
   }
 };
 
+class MutilCastThread : public Runnable {
+private:
+  std::mutex mmutex;
+  Condition *condition;
+  ThreadState requestedState=INIT;
+  ThreadState currentState=INIT;
+  int id;
+
+public:
+  MutilCastThread(int id) {
+    this->id=id;
+    condition=new Condition(mmutex);
+  }
+  ~MutilCastThread() {
+    delete condition;
+  }
+  int getId() {
+    return id;
+  }
+  void setState(ThreadState nState) {
+    {
+    Synchronized x(mmutex);
+    requestedState=nState;
+    condition->notifyAll(x);
+    }
+  };
+  ThreadState getState() {
+    Synchronized x(mmutex);
+    return currentState;
+  };
+
+  virtual void run() {
+    {
+      Synchronized x(mmutex);
+      currentState=RUNNING;
+    }
+
+#ifdef WITH_HTTP_PAGE
+    std::string user_data = "error";
+    udpdiscovery::PeerParameters parameters;
+    parameters.set_multicast_group_address(kMulticastAddress);
+    // parameters.set_can_use_broadcast(true);
+    parameters.set_can_use_multicast(true);
+    parameters.set_can_discover(true);
+    parameters.set_can_be_discovered(true);
+    if (parameters.can_be_discovered()) {
+      user_data = s_http_port;
+    }
+    parameters.set_port(kPort);
+    parameters.set_application_id(kApplicationId);
+
+    udpdiscovery::Peer peer;
+    if (!peer.Start(parameters, user_data)) {
+#ifdef DEBUG_PARAM_SERV
+      LOG(ERROR) << "MutilCast initial failed.";
+#endif
+      return;
+    }
+    std::list<udpdiscovery::DiscoveredPeer> discovered_peers;
+    std::map<udpdiscovery::IpPort, std::string> last_seen_user_datas;
+
+    while (true) {
+      if (parameters.can_discover()) {
+        std::list<udpdiscovery::DiscoveredPeer> new_discovered_peers = peer.ListDiscovered();
+        if (!udpdiscovery::Same(parameters.same_peer_mode(), discovered_peers, new_discovered_peers)) {
+          discovered_peers = new_discovered_peers;
+
+          last_seen_user_datas.clear();
+          for (std::list<udpdiscovery::DiscoveredPeer>::const_iterator it = discovered_peers.begin(); it != discovered_peers.end(); ++it) {
+            last_seen_user_datas.insert(std::make_pair((*it).ip_port(), (*it).user_data()));
+          }
+
+          LOG(INFO) << "Discovered peers: " << discovered_peers.size();
+          for (std::list<udpdiscovery::DiscoveredPeer>::const_iterator it = discovered_peers.begin(); it != discovered_peers.end(); ++it) {
+            LOG(INFO) << udpdiscovery::IpPortToString((*it).ip_port()) << ", " << (*it).user_data();
+          }
+        } else {
+          bool same_user_datas = true;
+          for (std::list<udpdiscovery::DiscoveredPeer>::const_iterator it = new_discovered_peers.begin(); it != new_discovered_peers.end(); ++it) {
+            std::map<udpdiscovery::IpPort, std::string>::const_iterator find_it = last_seen_user_datas.find((*it).ip_port());
+            if (find_it != last_seen_user_datas.end()) {
+              if ((*find_it).second != (*it).user_data()) {
+                same_user_datas = false;
+                break;
+              }
+            } else {
+              same_user_datas = false;
+              break;
+            }
+          }
+
+          if (!same_user_datas) {
+            discovered_peers = new_discovered_peers;
+
+            last_seen_user_datas.clear();
+            for (std::list<udpdiscovery::DiscoveredPeer>::const_iterator it = discovered_peers.begin(); it != discovered_peers.end(); ++it) {
+              last_seen_user_datas.insert(std::make_pair((*it).ip_port(), (*it).user_data()));
+            }
+
+            LOG(INFO) << "Discovered peers: " << discovered_peers.size();
+            for (std::list<udpdiscovery::DiscoveredPeer>::const_iterator it = discovered_peers.begin(); it != discovered_peers.end(); ++it) {
+              LOG(INFO) << udpdiscovery::IpPortToString((*it).ip_port()) << ", " << (*it).user_data();
+            }
+          }
+        }
+#if defined(_WIN32)
+        Sleep(500);
+#else
+        usleep(500000);
+#endif
+      }
+    }
+#endif
+  }
+
+  virtual void stop() {
+    requestedState=STOP;
+    currentState=STOP;
+  }
+};
+
 ParameterServer::ParameterServer() :
 m_ServerThreadContext(nullptr),
 m_ServerThread(nullptr),
+m_MutilCastThreadContext(nullptr),
+m_MutilCastThread(nullptr),
 _index(0) {
   el::Configurations defaultConf;
   defaultConf.setToDefault();
 
   defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
   defaultConf.setGlobally(el::ConfigurationType::Filename, "param_server.log");
-  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
+  // defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
   // default logger uses default configurations
   el::Loggers::reconfigureLogger("default", defaultConf);
   m_ServerThreadContext = std::make_shared<ServerThread>(0);
   m_ServerThread = std::make_shared<Thread>(m_ServerThreadContext);
+
+  m_MutilCastThreadContext = std::make_shared<MutilCastThread>(0);
+  m_MutilCastThread = std::make_shared<Thread>(m_MutilCastThreadContext);
 #ifdef WITH_HTTP_PAGE
   debug_ = true;
 #else
@@ -508,10 +538,12 @@ _index(0) {
 
 void ParameterServer::stop_server() {
   m_ServerThreadContext->stop();
+  m_MutilCastThreadContext->stop();
 }
 
 void ParameterServer::start_server() {
   m_ServerThread->start();
+  m_MutilCastThread->start();
 }
 
 void ParameterServer::init() {

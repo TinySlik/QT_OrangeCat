@@ -15,17 +15,6 @@ qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
 
 set(SOURCE_FILTER_FILES ${QRC_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/certificateerrordialog.ui
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/passworddialog.ui
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadmanagerwidget.ui
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadwidget.ui
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/browser.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/browserwindow.cpp
-    #{CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadmanagerwidget.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/downloadwidget.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/tabwidget.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webpage.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webpopupwindow.cpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/webview.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/urldecode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/mainwindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/samples/filter/mainwindow.h

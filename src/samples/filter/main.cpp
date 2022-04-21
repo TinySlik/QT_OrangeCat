@@ -45,16 +45,6 @@ QUrl commandLineUrlArgument() {
 }
 */
 int main(int argc, char **argv) {
-  ParameterServer::instance()->CreateNewRoot("base", {
-                                                  {"dev_ctrl", {
-                                                  }},
-                                                  {"dev_status", {
-                                                  }}
-                                                });
-  ParameterServer::instance()->SetCurrentRoot("base");
-
-
-
 
   QCoreApplication::setOrganizationName("QtExamples");
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

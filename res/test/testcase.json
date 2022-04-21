@@ -159,7 +159,7 @@
   "display logo default": {
     "lineThickness": 0.01,
     "test_switch": 0,
-    "display_switch": 5,
+    "display_switch": 4,
     "test_file_path": "empty",
     "svg_background_path": "empty",
     "file_load_location": 0,

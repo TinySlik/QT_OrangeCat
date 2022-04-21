@@ -38,14 +38,6 @@ int main(int argc, char **argv) {
   // default logger uses default configurations
   el::Loggers::reconfigureLogger("default", defaultConf);
 
-  ParameterServer::instance()->CreateNewRoot("base", {
-                                                  {"dev_ctrl", {
-                                                  }},
-                                                  {"dev_status", {
-                                                  }}
-                                                });
-  ParameterServer::instance()->SetCurrentRoot("base");
-
   QCoreApplication::setOrganizationName("QtExamples");
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
